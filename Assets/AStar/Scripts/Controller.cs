@@ -8,6 +8,8 @@ public class Controller : MonoBehaviour
     public Grid3D Grid;
     private Action<Node> OnNodeClickedSignature;
 
+    public float zPos = 1.0f;
+    
     private void Start()
     {
         DisableMouseInput();
@@ -50,11 +52,19 @@ public class Controller : MonoBehaviour
     {
         Grid.DestroyGrid();
     }
+    // public void OnNavigate()
+    // {
+    //     var nodes = Grid.GetStartEndNodes();
+    //     //var path = AStar.Navigate(nodes.start, nodes.end);
+    //     //Grid.SetPathNode(path);
+    //     var path = BLA.GenerateLine(nodes.start, nodes.end);
+    //     BLA.DrawLine(path, zPos, 5.0f);
+    // }
     public void OnNavigate()
     {
         var nodes = Grid.GetStartEndNodes();
-        var path = AStar.Navigate(nodes.start, nodes.end);
-        Grid.SetPathNode(path);
+        var line = BLA.GenerateLine(nodes.start, nodes.end);
+        BLA.DrawLine(line, zPos: 0f, duration: 10f);
     }
     private void HandleOnStartNodeSet(Node node)
     {
@@ -66,7 +76,7 @@ public class Controller : MonoBehaviour
     private void HandleOnEndNodeSet(Node node)
     {
         Grid.SetEndNode(node);
-        OnNodeClickedSignature -= HandleOnStartNodeSet;
+        OnNodeClickedSignature -= HandleOnEndNodeSet;
         DisableMouseInput();
         Debug.Log($"End node set to: {node.name}");
     }

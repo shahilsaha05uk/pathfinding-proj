@@ -57,6 +57,7 @@ public static class AStar
         Debug.LogWarning("No path found!");
         return new List<Node>();
     }
+
     private static Node FindLowestF(List<Node> nodeList)
     {
         Node lowestNode = null;

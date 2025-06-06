@@ -743,6 +743,10 @@ PrefabInstance:
       propertyPath: Grid
       value: 
       objectReference: {fileID: 190795196}
+    - target: {fileID: 7347791667276110945, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
+      propertyPath: zPos
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8869740383310540511, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
       propertyPath: m_Name
       value: Controller
