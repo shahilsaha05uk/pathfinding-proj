@@ -5,10 +5,14 @@
     {
         public static List<Vector2Int> GenerateLine(Node start, Node end)
         {
-            Vector2Int a = new Vector2Int(Mathf.RoundToInt(start.transform.position.x), Mathf.RoundToInt(start.transform.position.z));
-            Vector2Int b = new Vector2Int(Mathf.RoundToInt(end.transform.position.x), Mathf.RoundToInt(end.transform.position.z));
+            var startPos = NodeMathHelper.GetPositionAs3DInt(start);
+            var endPos = NodeMathHelper.GetPositionAs3DInt(end);
+            return BresenhamLine(startPos, endPos);
+            
+            //Vector2Int a = new Vector2Int(Mathf.RoundToInt(start.transform.position.x), Mathf.RoundToInt(start.transform.position.z));
+            //Vector2Int b = new Vector2Int(Mathf.RoundToInt(end.transform.position.x), Mathf.RoundToInt(end.transform.position.z));
+            //return BresenhamLine(a, b);
 
-            return BresenhamLine(a, b);
         }
 
         private static List<Vector2Int> BresenhamLine(Vector2Int start, Vector2Int end)
@@ -87,83 +91,5 @@
                 Vector3 end = new Vector3(points[i + 1].x, zPos, points[i + 1].y);
                 Debug.DrawLine(start, end, drawColor, duration);
             }
-        }
-
-        private static List<Vector2Int> DrawLineH(int x0, int x1, int y0, int y1)
-        {
-            List<Vector2Int> points = new List<Vector2Int>();
-            if (x0 > x1)
-            {
-                (x0, x1) = (x1, x0);
-                (y0, y1) = (y1, y0);
-            }
-        
-            // Calculate the distance between the start and end nodes
-            int dx = x1 - x0;
-            int dy = y1 - y0;
-            
-            // Check direction for horizontal
-            int dir = (dy < 0) ? -1 : 1;
-            dy *= dir;
-            
-            if (dx != 0)
-            {
-                int p = 2 * dy - dx;
-                int y = y0;
-            
-                for (int i = 0; i <= dx; i++)
-                {
-                    // So every step we move one step to the direction of the end node and slope steps up or down
-                    points.Add(new Vector2Int(x0 + i, y));
-                    if (p >= 0)
-                    {
-                        y += 1;
-                        p -= 2 * dx;
-                    }
-                    p += 2 * dy;
-                }
-            }
-
-            return points;
-        }
-        
-        private static List<Vector2Int> DrawLineV(int x0, int x1, int y0, int y1)
-        {
-            List<Vector2Int> points = new List<Vector2Int>();
-
-            if (y0 > y1)
-            {
-                (x0, x1) = (x1, x0);
-                (y0, y1) = (y1, y0);
-            }
-        
-            // Calculate the distance between the start and end nodes
-            int dx = x1 - x0;
-            int dy = y1 - y0;
-            
-            // Check direction for horizontal
-            int dir = (dx < 0) ? -1 : 1;
-            dx *= dir;
-            
-            if (dy != 0)
-            {
-                int x = x0;
-                int p = 2 * dy - dx;
-            
-                for (int i = 0; i <= dx; i++)
-                {
-                    // So every step we move one step to the direction of the end node and slope steps up or down
-                    points.Add(new Vector2Int(x, y0 + i));
-
-                    if (p >= 0)
-                    {
-                        x += 1;
-                        p -= 2 * dy;
-                    }
-                    p += 2 * dx;
-                }
-            }
-            
-            return points;
         }
     }

@@ -9,7 +9,7 @@ public class Node : MonoBehaviour
     public Node parent;
     public TerrainType terrainType;
     public bool isBlocked;
-    private List<Node> neighbors;
+    [SerializeField] private List<Node> neighbors;
     [SerializeField] private Color defaultColor;
 
     private void Awake()
@@ -43,17 +43,6 @@ public class Node : MonoBehaviour
         gridZ = z;
     }
     
-    public static float GetHeuristicDistance(Node a, Node b)
-    {
-        int dstX = Mathf.Abs(a.gridX - b.gridX);
-        int dstY = Mathf.Abs(a.gridY - b.gridY);
-
-        // Diagonal movement cost = 14, straight = 10 (classic heuristic)
-        if (dstX > dstY)
-            return 14 * dstY + 10 * (dstX - dstY);
-        return 14 * dstX + 10 * (dstY - dstX);
-    }
-
     public void ShowNeighbours()
     {
         foreach (var n in neighbors)

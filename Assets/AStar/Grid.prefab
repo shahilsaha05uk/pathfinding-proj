@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7665792249558207773}
-  - component: {fileID: 1528588151576849654}
   - component: {fileID: 7616832128631517232}
   m_Layer: 0
   m_Name: Grid
@@ -33,29 +32,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1528588151576849654
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1977348059990501322}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0254f76a9c9931243a3f6d76c5c583b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NodeObject: {fileID: 3023195866892656414, guid: 025dae23b79c9e146938fd026a951348, type: 3}
-  GridColors:
-    DefaultNodeColor: {r: 0, g: 0, b: 0, a: 1}
-    StartNodeColor: {r: 0, g: 0.26666668, b: 1, a: 1}
-    EndNodeColor: {r: 0.06817675, g: 1, b: 0, a: 1}
-    PathNodeColor: {r: 1, g: 0.90469533, b: 0, a: 1}
-    ObstacleNodeColor: {r: 0, g: 0, b: 0, a: 1}
-    VisitedNodeColor: {r: 1, g: 0, b: 0, a: 1}
-  gridSize: 10
-  cellSize: 1
-  tileSpacing: 0.1
 --- !u!114 &7616832128631517232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,12 +46,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NodeObject: {fileID: 3023195866892656414, guid: 025dae23b79c9e146938fd026a951348, type: 3}
   GridColors:
-    DefaultNodeColor: {r: 0, g: 0, b: 0, a: 0}
-    StartNodeColor: {r: 0, g: 0, b: 0, a: 0}
-    EndNodeColor: {r: 0, g: 0, b: 0, a: 0}
-    PathNodeColor: {r: 0, g: 0, b: 0, a: 0}
-    ObstacleNodeColor: {r: 0, g: 0, b: 0, a: 0}
-    VisitedNodeColor: {r: 0, g: 0, b: 0, a: 0}
-  gridSize: 10
+    DefaultNodeColor: {r: 0, g: 0, b: 0, a: 1}
+    StartNodeColor: {r: 0.40023613, g: 0, b: 1, a: 1}
+    EndNodeColor: {r: 0.44569826, g: 0, b: 1, a: 1}
+    PathNodeColor: {r: 0, g: 1, b: 0.8372221, a: 1}
+    ObstacleNodeColor: {r: 0, g: 0, b: 0, a: 1}
+    VisitedNodeColor: {r: 1, g: 0, b: 0, a: 1}
+  gridSize: 50
   cellSize: 1
-  tileSpacing: 0.1
+  tileSpacing: 2
+  maxHeight: 5
+  offsetX: 4.49
+  offsetZ: 7.21
+  randomizeOffset: 0.599

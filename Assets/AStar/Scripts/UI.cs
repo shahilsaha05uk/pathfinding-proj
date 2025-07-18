@@ -9,7 +9,6 @@ public class UI : MonoBehaviour
     
     public Controller Controller;
     
-    public TMP_Dropdown otnDimension;
     public Button btnCreate;
     public Button btnSetStart;
     public Button btnSetEnd;
@@ -17,19 +16,28 @@ public class UI : MonoBehaviour
     public Button btnNavigate;
     public void Start()
     {
-        otnDimension.onValueChanged.AddListener(OnDimensionChanged);
-        btnCreate.onClick.AddListener(() => Controller.OnCreateGrid());
-        btnSetStart.onClick.AddListener(() => Controller.OnSetStart());
-        btnSetEnd.onClick.AddListener(() => Controller.OnSetEnd());
-        btnClear.onClick.AddListener(() => Controller.OnClearGrid());
-        btnNavigate.onClick.AddListener(() => Controller.OnNavigate());
-
-        otnDimension.value = (int)DefaultDimension;
+        btnCreate.onClick.AddListener(OnCreateGridButtonClick);
+        btnSetStart.onClick.AddListener(OnStartNodeSetButtonClick);
+        btnSetEnd.onClick.AddListener(OnEndNodeSetButtonClick);
+        btnClear.onClick.AddListener(OnClearGridButtonClick);
+        btnNavigate.onClick.AddListener(OnNavigateButtonClick);
     }
 
-    private void OnDimensionChanged(int option)
+    private void OnCreateGridButtonClick() => Controller.CreateGrid();
+    private void OnClearGridButtonClick() => Controller.ClearGrid();
+    
+    private void OnStartNodeSetButtonClick()
     {
-        if(option == 0) Controller.OnDimensionChange(EDimension.Grid3D);
-        else if(option == 1) Controller.OnDimensionChange(EDimension.Grid2D);
+        Controller.SubscribeTo_StartNodeSet();
+    }
+    
+    private void OnEndNodeSetButtonClick()
+    {
+        Controller.SubscribeTo_EndNodeSet();
+    }
+    
+    private void OnNavigateButtonClick()
+    {
+        Controller.OnNavigate();
     }
 }
