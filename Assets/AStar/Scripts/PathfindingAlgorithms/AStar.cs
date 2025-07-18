@@ -34,7 +34,7 @@ public static class AStar
 
             foreach (var neighbor in neighbors)
             {
-                if(closedList.Contains(neighbor))
+                if(closedList.Contains(neighbor) || neighbor.isBlocked)
                     continue;
                 
                 // Calculate f, g, and h values
