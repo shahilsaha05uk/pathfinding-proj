@@ -1389,98 +1389,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b163075cb364734082426c1547c34df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &963194225
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 963194228}
-  - component: {fileID: 963194227}
-  - component: {fileID: 963194226}
-  m_Layer: 0
-  m_Name: Main Camera
-  m_TagString: MainCamera
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!81 &963194226
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
---- !u!20 &963194227
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_Iso: 200
-  m_ShutterSpeed: 0.005
-  m_Aperture: 16
-  m_FocusDistance: 10
-  m_FocalLength: 50
-  m_BladeCount: 5
-  m_Curvature: {x: 2, y: 11}
-  m_BarrelClipping: 0.25
-  m_Anamorphism: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 60
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: -1
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
---- !u!4 &963194228
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.38722247, y: -0.25946495, z: 0.11498034, w: 0.87722075}
-  m_LocalPosition: {x: 6.6598854, y: 9.865703, z: -3.8737175}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!224 &967542552 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1094049041255255336, guid: cb7efa09e901e694183b6f182440eb5c, type: 3}
@@ -1831,17 +1739,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
   m_VerticalFit: 2
---- !u!1 &1631289690 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1977348059990501322, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
-  m_PrefabInstance: {fileID: 2668594315322529203}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1631289692 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
   m_PrefabInstance: {fileID: 2668594315322529203}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1631289690}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e50becb82804255846523957d8fab3b, type: 3}
@@ -3047,15 +2950,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3840474830134968480, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.7441661
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3840474830134968480, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.4645424
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3840474830134968480, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.9193583
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3840474830134968480, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3086,41 +2989,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7347791667276110945, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
-      propertyPath: Grid
-      value: 
-      objectReference: {fileID: 1631289690}
-    - target: {fileID: 7347791667276110945, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
-      propertyPath: zPos
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7347791667276110945, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
       propertyPath: mGrid
       value: 
       objectReference: {fileID: 1631289692}
-    - target: {fileID: 7347791667276110945, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
-      propertyPath: Grid2D
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 7347791667276110945, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
-      propertyPath: Grid3D
-      value: 
-      objectReference: {fileID: 1631289692}
-    - target: {fileID: 7347791667276110945, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
-      propertyPath: yOffset
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7347791667276110945, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
-      propertyPath: debugSize
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7347791667276110945, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
-      propertyPath: bShowDebug
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7347791667276110945, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
-      propertyPath: debugSpherePrefab
-      value: 
-      objectReference: {fileID: 4776042745589685123, guid: edc4d7befe045974c9faa7650662ca85, type: 3}
     - target: {fileID: 8869740383310540511, guid: 5960390cbfd311d40ab7555722a4ef61, type: 3}
       propertyPath: m_Name
       value: Controller
@@ -3373,7 +3244,6 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 963194228}
   - {fileID: 705507995}
   - {fileID: 1415971063}
   - {fileID: 7914143063781573082}
