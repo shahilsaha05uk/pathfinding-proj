@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 public class Grid3D : BaseGrid
@@ -6,11 +7,11 @@ public class Grid3D : BaseGrid
     public int maxHeight = 7;
 
     private Node[,,] Nodes;
-    [Range(0f, 100f)][SerializeField]
+    [UnityEngine.Range(0f, 100f)][SerializeField]
     private float offsetX;
-    [Range(0f, 100f)][SerializeField]
+    [UnityEngine.Range(0f, 100f)][SerializeField]
     private float offsetZ;
-    [Range(0f, 10f)] [SerializeField]
+    [UnityEngine.Range(0f, 10f)] [SerializeField]
     private float randomizeOffset;
     
     private float noiseScale = 0.1f;
@@ -46,17 +47,17 @@ public class Grid3D : BaseGrid
                     if (y == terrainHeight - 1)
                     {
                         // Hilltop
-                        node.SetType(TerrainType.HillTop, Color.green, false);
+                        node.SetType(TerrainType.HillTop, "#0b4f0e", false);
                     }
                     else if (y == 0)
                     {
                         // Cave bottom
-                        node.SetType(TerrainType.Cave, Color.gray, true);
+                        node.SetType(TerrainType.Cave, "#290e04", true);
                     }
                     else
                     {
                         // Middle ground
-                        node.SetType(TerrainType.Ground, Color.yellow, false);
+                        node.SetType(TerrainType.Ground, "#0b4f0e", false);
                     }
                 }
             }
@@ -89,6 +90,7 @@ public class Grid3D : BaseGrid
         }
         Nodes = null;
     }
+
     protected override void AssignNeighbors()
     {
         for (int x = 0; x < gridSize; x++)
@@ -110,22 +112,28 @@ public class Grid3D : BaseGrid
     
     private List<Node> GetNeighbors(int x, int y, int z)
     {
+        return GetNeighbors(new Vector3Int(x,y,z), 1);
+    }
+    
+    public List<Node> GetNeighbors(Vector3Int point, int width)
+    {
         List<Node> neighbors = new List<Node>();
 
-        for (int dx = -1; dx <= 1; dx++)
+        for (int dx = -width; dx <= width; dx++)
         {
-            for (int dy = -1; dy <= 1; dy++)
+            for (int dy = -width; dy <= width; dy++)
             {
-                for (int dz = -1; dz <= 1; dz++)
+                for (int dz = -width; dz <= width; dz++)
                 {
                     if (dx == 0 && dy == 0 && dz == 0)
                         continue;
 
-                    int nx = x + dx;
-                    int ny = y + dy;
-                    int nz = z + dz;
+                    int nx = point.x + dx;
+                    int ny = point.y + dy;
+                    int nz = point.z + dz;
 
-                    if (IsInsideGrid(nx, ny, nz) && Nodes[nx, ny, nz] != null)
+                    var neighbor = GetNodeAt(nx, ny, nz);
+                    if (neighbor != null)
                         neighbors.Add(Nodes[nx, ny, nz]);
                 }
             }
@@ -133,6 +141,13 @@ public class Grid3D : BaseGrid
 
         return neighbors;
     }
+    public Node GetNodeAt(int x, int y, int z)
+    {
+        if(IsInsideGrid(x, y, z))
+            return Nodes[x, y, z];
+        return null;
+    }
+    
     private void SetNodePosition(Node node, int x, int y, int z)
     {
         // Calculate the idle position, as to where it should be without noise

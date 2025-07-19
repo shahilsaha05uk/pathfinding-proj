@@ -1,122 +1,97 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-public enum EDimension
-{
-    Grid2D,
-    Grid3D
-}
+using UnityEngine.Serialization;
 
 public class Controller : MonoBehaviour
 {
-    public bool bListenToMouseInput = false;
-    public GameObject Grid;
-    private BaseGrid mGrid;
-    private Action<Node> OnNodeClickedSignature;
-
+    public Grid3D mGrid;
     private Node selectedNode;
-    public float zPos = 1.0f;
     
-    private void Start()
-    {
-        UpdateDimension(EDimension.Grid3D); // Default to 2D grid
-    }
+    public bool bIsNodeHit = false;
+    public Action<Node> OnNodeSet_Signature;
+    
+    [Space(10)][Header("Debugger")]
+    public GameObject debugSpherePrefab;
+    public bool bShowDebug;
+    public float debugSize = 0.1f;
+    public float yOffset;
+    public List<Node> debugPoints;
+    
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.S) && Input.GetMouseButtonUp(0))
+        if (Input.GetKey(KeyCode.S) && Input.GetMouseButtonUp(0))
         {
-            // Check if a tile is clicked
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
+            var node = GetNodeHit();
+            if (node == null)
             {
-                if (hit.collider.TryGetComponent(out Node node))
-                {
-                    HandleOnShowNeighbours(node);
-                }
+                Debug.LogWarning("No node hit!");
+                return;
             }
+            HandleOnShowNeighbours(node);
         }
-        if (Input.GetMouseButtonUp(0) && bListenToMouseInput)
+        if (Input.GetMouseButtonUp(0) && bIsNodeHit)
         {
-            HideSelectedNode();
-
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
-            {
-                if (hit.collider.TryGetComponent(out Node node))
-                {
-                    OnNodeClickedSignature?.Invoke(node);
-                }
-            }
+            if(Execute_OnNodeSet()) UnsubscribeFrom_OnNodeSet();
         }
     }
 
-    public void EnableMouseInput() => bListenToMouseInput = true;
-    public void DisableMouseInput() => bListenToMouseInput = false;
+    public void EnableNodeHit() => bIsNodeHit = true;
+    public void DisableNodeHit() => bIsNodeHit = false;
 
-    public void OnDimensionChange(EDimension dimension)
+    public Node GetNodeHit()
     {
-        UpdateDimension(dimension);
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.TryGetComponent(out Node node))
+            {
+                return node;
+            }
+        }
+        return null;
     }
-    public void OnCreateGrid()
+    
+    public void CreateGrid() => mGrid.Create();
+    public void ClearGrid() => mGrid.Clear();
+
+    public void SubscribeTo_StartNodeSet()
     {
-        mGrid.Create();
+        EnableNodeHit();
+        OnNodeSet_Signature += HandleOnStartNodeSet;
     }
-    public void OnSetStart()
+    public void SubscribeTo_EndNodeSet()
     {
-        OnNodeClickedSignature += HandleOnStartNodeSet;
-        EnableMouseInput();
+        EnableNodeHit();
+        OnNodeSet_Signature += HandleOnEndNodeSet;
     }
-    public void OnSetEnd()
+    public void UnsubscribeFrom_OnNodeSet()
     {
-        OnNodeClickedSignature += HandleOnEndNodeSet;
-        EnableMouseInput();
+        DisableNodeHit();
+        OnNodeSet_Signature = null;
     }
-    public void OnClearGrid()
+    
+    private bool Execute_OnNodeSet()
     {
-        mGrid.Clear();
+        var node = GetNodeHit();
+        if (node == null)
+        {
+            Debug.LogWarning("No node hit!");
+            return false;
+        }
+        OnNodeSet_Signature?.Invoke(node);
+        return true;
     }
+    
     public void OnNavigate()
     {
         var nodes = mGrid.GetStartEndNodes();
-        var path = AStar.Navigate(nodes.start, nodes.end);
+        var path = ILS.Navigate(mGrid, nodes.start, nodes.end);
         mGrid.SetPathNode(path);
-        
-        
-        //BLA.DrawLine(path, zPos, 5.0f);
     }
 
-    private void UpdateDimension(EDimension dimension)
-    {
-        if (dimension is EDimension.Grid2D) mGrid = Grid.GetComponent<Grid2D>();
-        else if (dimension is EDimension.Grid3D) mGrid = Grid.GetComponent<Grid3D>();
-    }
-    private void HandleOnStartNodeSet(Node node)
-    {
-        mGrid.SetStartNode(node);
-        OnNodeClickedSignature -= HandleOnStartNodeSet;
-        DisableMouseInput();
-        Debug.Log($"Start node set to: {node.name}");
-    }
-    private void HandleOnEndNodeSet(Node node)
-    {
-        mGrid.SetEndNode(node);
-        OnNodeClickedSignature -= HandleOnEndNodeSet;
-        DisableMouseInput();
-        Debug.Log($"End node set to: {node.name}");
-    }
-
-    private void HandleOnShowNeighbours(Node node)
-    {
-        HideSelectedNode();
-        selectedNode = node;
-        selectedNode.ShowNeighbours();
-    }
-    
     private void HideSelectedNode()
     {
         if (selectedNode != null)
@@ -124,5 +99,29 @@ public class Controller : MonoBehaviour
             selectedNode.HideNeighbours();
             selectedNode = null;
         }
+    }
+
+    // Event handlers for node interactions
+    private void HandleOnStartNodeSet(Node node)
+    {
+        mGrid.SetStartNode(node);
+        Debug.Log($"Start node set to: {node.name}");
+    }
+    private void HandleOnEndNodeSet(Node node)
+    {
+        mGrid.SetEndNode(node);
+        Debug.Log($"End node set to: {node.name}");
+    }
+    private void HandleOnShowNeighbours(Node node)
+    {
+        if (selectedNode != null && selectedNode == node)
+        {
+            HideSelectedNode();
+            return;
+        }
+        
+        HideSelectedNode();
+        selectedNode = node;
+        selectedNode.ShowNeighbours();
     }
 }
