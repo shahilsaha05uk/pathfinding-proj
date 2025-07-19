@@ -42,9 +42,10 @@ public static class AStar
             foreach (var neighbor in neighbors)
             {
                 // If the neighbor is already in the closed list or is blocked, skip it
-                if(allowedNodes != null && (closedList.Contains(neighbor) || 
-                                            neighbor.isBlocked || 
-                                            !allowedNodes.Contains(neighbor)))
+                if(allowedNodes != null && 
+                   (closedList.Contains(neighbor) || 
+                    neighbor.isBlocked || 
+                    !allowedNodes.Contains(neighbor)))
                     continue;
                 
                 // Gets the distance from the current node to the neighbor

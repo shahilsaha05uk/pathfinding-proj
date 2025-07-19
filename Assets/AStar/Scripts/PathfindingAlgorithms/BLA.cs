@@ -42,17 +42,8 @@
         }
     }
     public static class BLA
-    {
-        public static List<Vector3Int> GenerateLine(Node start, Node end)
-        {
-            var startPos = NodeMathHelper.GetPositionAs3DInt(start);
-            var endPos = NodeMathHelper.GetPositionAs3DInt(end);
-            var points = BresenhamLine(startPos, endPos);
-            DrawLine(points);
-            return points;
-        }
-
-        public static List<Vector3Int> GenerateDebugLine(Node start, Node end, float offset = 0.2f)
+    { 
+        public static List<Vector3Int> GenerateLine(Node start, Node end, float offset = 0.2f)
         {
             var startPos = NodeMathHelper.GetPositionAs3DInt(start);
             var endPos = NodeMathHelper.GetPositionAs3DInt(end);
@@ -117,26 +108,6 @@
             
             return points;
         }
-
-
-        private static List<Vector3Int> BresenhamLine(Vector3Int start, Vector3Int end)
-        {
-            List<Vector3Int> points = new List<Vector3Int>();
-
-            // var slope = GetLineData(start, end);
-            // var decisionParameter = CalculateDecisionParameter(slope.deltaX, slope.deltaY);
-            //
-            // var deltaX = slope.deltaX;
-            //
-            // // For every step in the x direction
-            // for (int i = 0; i < deltaX; i++)
-            // {
-            //     Gizmos.color = Color.red;
-            //     Gizmos.DrawSphere(new Vector3(start.x + i, start.y + i, start.z + i), 10f);
-            // }
-            
-            return points;
-        }
         
         public static void DrawLine(List<Vector3Int> points,
             float duration = 500f, Color? color = null)
@@ -152,35 +123,7 @@
             }
         }
     }
-
-// public static List<Vector3Int> GenerateLine(Node start, Node end)
-// {
-//     Vector2Int a = new Vector2Int(Mathf.RoundToInt(start.transform.position.x), Mathf.RoundToInt(start.transform.position.z));
-//     Vector2Int b = new Vector2Int(Mathf.RoundToInt(end.transform.position.x), Mathf.RoundToInt(end.transform.position.z));
-//     return BresenhamLine(a, b);
-// }
     
-    // for (int i = 0; i < totalSteps; i++)
-    // {
-    //     points.Add(new Vector3(currentX, offset, currentZ));
-    //
-    //     int e2 = 2 * p;  // do NOT change the real error value
-    //
-    //     if (e2 > -deltaZ)
-    //     {
-    //         p -= deltaZ;
-    //         currentX += stepX;
-    //     }
-    //
-    //     if (e2 < deltaX)
-    //     {
-    //         p += deltaX;
-    //         currentZ += stepZ;
-    //     }
-    //
-    //     if (currentX == lineData.x1 && currentZ == lineData.z1)
-    //         break;
-    // }
 // private static List<Vector2Int> BresenhamLine(Vector2Int start, Vector2Int end)
 // {
 //     List<Vector2Int> points = new List<Vector2Int>();
@@ -220,42 +163,3 @@
 //     return points;
 // }
 //
-// public static List<Vector2Int> GenerateLine(Node start, Node end)
-// {
-//     // Get the position of the start and end nodes
-//     var startPos = start.transform.position;
-//     var endPos = end.transform.position;
-//
-//     // Get the x and y coordinates of the start and end nodes
-//     int x0 = Mathf.RoundToInt(startPos.x);
-//     int x1 = Mathf.RoundToInt(endPos.x);
-//
-//     int y0 = Mathf.RoundToInt(startPos.y);
-//     int y1 = Mathf.RoundToInt(endPos.y);
-//     
-//     if(Mathf.Abs(x1 - x0) > Mathf.Abs(y1 - y0))
-//     {
-//         // Horizontal line
-//         return DrawLineH(x0, x1, y0, y1);
-//     }
-//     else
-//     {
-//         // Vertical line
-//         return DrawLineV(x0, x1, y0, y1);
-//     }
-// }
-// public static void DrawLine(List<Vector2Int> points, float zPos = 1.0f, float thickness = 2.0f,
-//     float duration = 500f, Color? color = null)
-// {
-//     if (points == null || points.Count < 2)
-//         return;
-//
-//     Color drawColor = color ?? Color.red;
-//
-//     for (int i = 0; i < points.Count - 1; i++)
-//     {
-//         Vector3 start = new Vector3(points[i].x, zPos, points[i].y);
-//         Vector3 end = new Vector3(points[i + 1].x, zPos, points[i + 1].y);
-//         Debug.DrawLine(start, end, drawColor, duration);
-//     }
-// }
