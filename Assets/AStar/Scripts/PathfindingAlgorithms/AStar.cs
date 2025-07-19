@@ -9,7 +9,7 @@ using UnityEngine;
 
 public static class AStar
 {
-    public static List<Node> Navigate(Node start, Node end)
+    public static List<Node> Navigate(Node start, Node end, HashSet<Node> allowedNodes = null)
     {
         List<Node> openList = new List<Node>();
         HashSet<Node> closedList = new HashSet<Node>();
@@ -42,7 +42,9 @@ public static class AStar
             foreach (var neighbor in neighbors)
             {
                 // If the neighbor is already in the closed list or is blocked, skip it
-                if(closedList.Contains(neighbor) || neighbor.isBlocked)
+                if(allowedNodes != null && (closedList.Contains(neighbor) || 
+                                            neighbor.isBlocked || 
+                                            !allowedNodes.Contains(neighbor)))
                     continue;
                 
                 // Gets the distance from the current node to the neighbor

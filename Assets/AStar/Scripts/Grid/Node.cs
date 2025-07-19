@@ -16,11 +16,22 @@ public class Node : MonoBehaviour
     {
         defaultColor = GetComponent<MeshRenderer>().material.color;
     }
-    public void SetType(TerrainType type, Color color, bool blocked)
+    public void SetType(TerrainType type, string ColorHex, bool blocked)
     {
-        terrainType = type;
-        isBlocked = blocked;
-        SetColor(color);
+        Color color;
+        if (ColorUtility.TryParseHtmlString(ColorHex, out color))
+        {
+            terrainType = type;
+            isBlocked = blocked;
+            SetColor(color);
+        }
+        else
+        {
+            Debug.LogError($"Invalid color hex: {ColorHex}");
+            terrainType = type;
+            isBlocked = blocked;
+            SetColor(Color.black);
+        }
     }
     public void SetColor(Color color)
     {

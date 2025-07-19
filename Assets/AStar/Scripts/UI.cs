@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class UI : MonoBehaviour
 {
-    public EDimension DefaultDimension;
-    
     public Controller Controller;
     
     public Button btnCreate;
@@ -14,6 +12,7 @@ public class UI : MonoBehaviour
     public Button btnSetEnd;
     public Button btnClear;
     public Button btnNavigate;
+    
     public void Start()
     {
         btnCreate.onClick.AddListener(OnCreateGridButtonClick);

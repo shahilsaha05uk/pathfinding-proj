@@ -3,27 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public enum EDimension
-{
-    Grid2D,
-    Grid3D
-}
-
 public class Controller : MonoBehaviour
 {
-    [FormerlySerializedAs("bNodeHit")] [FormerlySerializedAs("bAllowNodeHit")] public bool bIsNodeHit = false;
-    public GameObject Grid;
-    private BaseGrid mGrid;
-
+    public Grid3D mGrid;
     private Node selectedNode;
-    public float zPos = 1.0f;
     
+    public bool bIsNodeHit = false;
     public Action<Node> OnNodeSet_Signature;
     
-    private void Start()
-    {
-        UpdateDimension(EDimension.Grid3D); // Default to 2D grid
-    }
+    [Space(10)][Header("Debugger")]
+    public GameObject debugSpherePrefab;
+    public bool bShowDebug;
+    public float debugSize = 0.1f;
+    public float yOffset;
+    public List<Node> debugPoints;
+    
     void Update()
     {
         if (Input.GetKey(KeyCode.S) && Input.GetMouseButtonUp(0))
@@ -60,10 +54,6 @@ public class Controller : MonoBehaviour
         return null;
     }
     
-    public void OnDimensionChange(EDimension dimension)
-    {
-        UpdateDimension(dimension);
-    }
     public void CreateGrid() => mGrid.Create();
     public void ClearGrid() => mGrid.Clear();
 
@@ -98,17 +88,8 @@ public class Controller : MonoBehaviour
     public void OnNavigate()
     {
         var nodes = mGrid.GetStartEndNodes();
-        //var path = AStar.Navigate(nodes.start, nodes.end);
-        //mGrid.SetPathNode(path);
-
-        var points = BLA.GenerateLine(nodes.start, nodes.end);
-        BLA.DrawLine(points: points, color: Color.blue);
-    }
-
-    private void UpdateDimension(EDimension dimension)
-    {
-        if (dimension is EDimension.Grid2D) mGrid = Grid.GetComponent<Grid2D>();
-        else if (dimension is EDimension.Grid3D) mGrid = Grid.GetComponent<Grid3D>();
+        var path = ILS.Navigate(mGrid, nodes.start, nodes.end);
+        mGrid.SetPathNode(path);
     }
 
     private void HideSelectedNode()
