@@ -3,17 +3,30 @@ using UnityEngine;
 
 public static class ILS
 {
-    public static List<Node> Navigate(Grid3D grid, Node start, Node end)
+    public static List<Node> Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth)
     {
-        var linePoints = GenerateLine(start, end);
-        var corridor = DefineCorridor(linePoints, grid, start, end);
-        return FindPath(start, end, corridor);
+        int currentWidth = 1;
+        int maxWidth = maxCorridorWidth;
+
+        while (currentWidth <= maxWidth)
+        {
+            var linePoints = GenerateLine(start, end);
+            var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
+            var path = FindPath(start, end, corridor);
+            
+            if(path is { Count: > 0 })
+                return path;
+            
+            currentWidth++;
+        }
+
+        return null;
     }
     
     // Step 1: Get the Line from BLA
     private static List<Vector3Int> GenerateLine(Node start, Node end)
     {
-        return BLA.GenerateDebugLine(start, end);
+        return BLA.GenerateLine(start, end);
     }
     
     // Step 2: Define the corridor

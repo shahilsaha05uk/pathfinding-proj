@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public struct GridColor
@@ -13,20 +14,27 @@ public struct GridColor
     public Color VisitedNodeColor;
 }
 
-
 public abstract class BaseGrid : MonoBehaviour
 {
     public Node NodeObject;
     public GridColor GridColors;
     
-    public int gridSize = 10;
-    public float cellSize = 1;
-    public float tileSpacing = 0.1f;
+    protected GridConfig mConfig;
+    
+    protected int mGridSize = 10;
+    protected float mTileSize = 1;
+    protected float mTileSpacing = 0.1f;
 
     protected Node startNode;
     protected Node endNode;
-    
-    public virtual void Create() { }
+
+    public virtual void Create(GridConfig config)
+    {
+        mConfig = config;
+        mGridSize = mConfig.GridSize;
+        mTileSize = mConfig.TileSize;
+        mTileSpacing = mConfig.TileSpacing;
+    }
     public virtual void Clear() { }
 
     public void SetStartNode(Node node)
@@ -70,9 +78,9 @@ public abstract class BaseGrid : MonoBehaviour
     
     protected bool IsInsideGrid(int x, int y, int z)
     {
-        return x >= 0 && x < gridSize &&
-               y >= 0 && y < gridSize &&
-               z >= 0 && z < gridSize;
+        return x >= 0 && x < mGridSize &&
+               y >= 0 && y < mGridSize &&
+               z >= 0 && z < mGridSize;
     }
 
     protected void SetNodeIndex(Node node, int x, int y, int z = 0)

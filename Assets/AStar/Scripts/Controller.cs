@@ -54,7 +54,7 @@ public class Controller : MonoBehaviour
         return null;
     }
     
-    public void CreateGrid() => mGrid.Create();
+    public void CreateGrid(GridConfig config) => mGrid.Create(config);
     public void ClearGrid() => mGrid.Clear();
 
     public void SubscribeTo_StartNodeSet()
@@ -85,11 +85,20 @@ public class Controller : MonoBehaviour
         return true;
     }
     
-    public void OnNavigate()
+    public void OnNavigate(string maxCorridorWidth)
     {
-        var nodes = mGrid.GetStartEndNodes();
-        var path = ILS.Navigate(mGrid, nodes.start, nodes.end);
-        mGrid.SetPathNode(path);
+        if(UIHelper.ValidateInputAsInt(maxCorridorWidth, out int corridorWidth))
+        {
+            var nodes = mGrid.GetStartEndNodes();
+            var path = ILS.Navigate(mGrid, nodes.start, nodes.end, corridorWidth);
+            
+            if(path != null)
+                mGrid.SetPathNode(path);
+        }
+        else
+        {
+            Debug.LogWarning("Invalid corridor width input.");
+        }
     }
 
     private void HideSelectedNode()

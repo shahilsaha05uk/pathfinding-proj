@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
 
 public class Grid3D : BaseGrid
@@ -7,26 +6,33 @@ public class Grid3D : BaseGrid
     public int maxHeight = 7;
 
     private Node[,,] Nodes;
-    [UnityEngine.Range(0f, 100f)][SerializeField]
+    
     private float offsetX;
-    [UnityEngine.Range(0f, 100f)][SerializeField]
     private float offsetZ;
-    [UnityEngine.Range(0f, 10f)] [SerializeField]
     private float randomizeOffset;
     
     private float noiseScale = 0.1f;
-    public override void Create()
+    
+    public override void Create(GridConfig config)
     {
+        if(Nodes != null && Nodes.Length > 0) Clear();
+        
+        base.Create(config);
+        offsetX = config.Offset.x;
+        offsetZ = config.Offset.z;
+        randomizeOffset = config.OffsetRandomization;
+        noiseScale = config.NoiseScale;
+        
         // Create the array of nodes
-        Nodes = new Node[gridSize, maxHeight, gridSize];
+        Nodes = new Node[mGridSize, maxHeight, mGridSize];
         
         // Randomize the offset values to create a more varied terrain
         offsetX += Random.Range(-randomizeOffset, randomizeOffset);
         offsetZ += Random.Range(-randomizeOffset, randomizeOffset);
         
-        for (int x = 0; x < gridSize; x++)
+        for (int x = 0; x < mGridSize; x++)
         {
-            for (int z = 0; z < gridSize; z++)
+            for (int z = 0; z < mGridSize; z++)
             {
                 // This will create a random height based on the noise set
                 float noise = AddNoiseXZ(x, z, offsetX, offsetZ);
@@ -74,11 +80,11 @@ public class Grid3D : BaseGrid
             return;
         }
         
-        for (int x = 0; x < gridSize; x++)
+        for (int x = 0; x < mGridSize; x++)
         {
             for (int y = 0; y < maxHeight; y++)
             {
-                for (int z = 0; z < gridSize; z++)
+                for (int z = 0; z < mGridSize; z++)
                 {
                     // Continue if the node is null
                     if (Nodes[x, y, z] == null) continue;
@@ -93,11 +99,11 @@ public class Grid3D : BaseGrid
 
     protected override void AssignNeighbors()
     {
-        for (int x = 0; x < gridSize; x++)
+        for (int x = 0; x < mGridSize; x++)
         {
             for (int y = 0; y < maxHeight; y++)
             {
-                for (int z = 0; z < gridSize; z++)
+                for (int z = 0; z < mGridSize; z++)
                 {
                     var node = Nodes[x, y, z];
                     if (node == null) continue;
@@ -151,9 +157,9 @@ public class Grid3D : BaseGrid
     private void SetNodePosition(Node node, int x, int y, int z)
     {
         // Calculate the idle position, as to where it should be without noise
-        float baseX = transform.position.x + x * (cellSize + tileSpacing);
-        float baseY = transform.position.y + y * (cellSize + tileSpacing);
-        float baseZ = transform.position.z + z * (cellSize + tileSpacing);
+        float baseX = transform.position.x + x * (mTileSize + mTileSpacing);
+        float baseY = transform.position.y + y * (mTileSize + mTileSpacing);
+        float baseZ = transform.position.z + z * (mTileSize + mTileSpacing);
 
         // TODO: These values should be set dynamically
         // Add random noise to the position
@@ -169,7 +175,7 @@ public class Grid3D : BaseGrid
         );
 
         // Set the node's transform properties
-        node.transform.localScale = new Vector3(cellSize, cellSize, 1);
+        node.transform.localScale = new Vector3(mTileSize, mTileSize, 1);
         node.transform.position = finalPosition;
     }
     private float AddNoiseXZ(int x, int z, float offX, float offZ)
