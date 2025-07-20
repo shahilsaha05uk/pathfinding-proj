@@ -1,7 +1,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-public enum TerrainType { Ground, HillTop, Cave }
+public enum TerrainType { Ground, HillTop, Cave, Obstacle }
 public class Node : MonoBehaviour
 {
     public float gCost, hCost, fCost;
@@ -18,8 +18,7 @@ public class Node : MonoBehaviour
     }
     public void SetType(TerrainType type, string ColorHex, bool blocked)
     {
-        Color color;
-        if (ColorUtility.TryParseHtmlString(ColorHex, out color))
+        if (ColorUtils.GetColorFromHex(ColorHex, out var color))
         {
             terrainType = type;
             isBlocked = blocked;

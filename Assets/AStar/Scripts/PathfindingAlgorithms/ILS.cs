@@ -1,6 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public enum CorridorShape
+{
+    Cube,
+    Diamond,
+    Sphere
+}
 public static class ILS
 {
     public static List<Node> Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth)
@@ -19,7 +26,7 @@ public static class ILS
             
             currentWidth++;
         }
-
+        Debug.LogWarning("No path found!");
         return null;
     }
     
@@ -30,25 +37,24 @@ public static class ILS
     }
     
     // Step 2: Define the corridor
-    private static HashSet<Node> DefineCorridor(List<Vector3Int> linePoints, Grid3D grid, Node start, Node end, int width = 1)
+    private static HashSet<Node> DefineCorridor(
+        List<Vector3Int> linePoints, 
+        Grid3D grid, 
+        Node start, Node end,
+        int width = 1,
+        CorridorShape shape = CorridorShape.Diamond)
     {
         var corridorNodes = new HashSet<Node>();
 
         foreach (var point in linePoints)
         {
             var neighbors = grid.GetNeighbors(point, width);
-
-            // TODO: Debugging: Set color for neighbors to visualize the corridor
-            foreach (var n in neighbors)
-            {
-                //TODO: Remove this after testing
-                n.SetColor(Color.yellow);
-            }
             corridorNodes.UnionWith(neighbors);
         }
         
         corridorNodes.Add(start);
         corridorNodes.Add(end);
+        
         return corridorNodes;
     }
     

@@ -21,8 +21,6 @@
         public readonly int y1;
         public readonly int z0;
         public readonly int z1;
-        public int m;
-        public int totalSteps;
         public (int X, int Y, int Z) deltas;
         
         public LineData(Vector3Int v1, Vector3Int v2) : this()
@@ -35,9 +33,6 @@
             
             z0 = v1.z;
             z1 = v2.z;
-            
-            m = BLAHelper.CalculateSlope(x0, x1, y0, y1, z0, z1);
-            totalSteps = BLAHelper.CalculateTotalSteps(this);
             deltas = BLAHelper.CalculateDeltas(this);
         }
     }
@@ -47,65 +42,97 @@
         {
             var startPos = NodeMathHelper.GetPositionAs3DInt(start);
             var endPos = NodeMathHelper.GetPositionAs3DInt(end);
+            var lineData = new LineData(startPos, endPos);
 
             List<Vector3Int> points = new List<Vector3Int>();
 
-            var lineData = new LineData(startPos, endPos);
+            int x0 = lineData.x0, y0 = lineData.y0, z0 = lineData.z0;
+            int x1 = lineData.x1,   y1 = lineData.y1,   z1 = lineData.z1;
             
             // the slope of the line
             (int deltaX, int deltaY, int deltaZ) = lineData.deltas;
             
             // steps
-            int stepX = (lineData.x0 < lineData.x1) ? 1 : -1;   // x0 = 2, x1 = 6 (moving on the positive x direction)
-            int stepY = (lineData.y0 < lineData.y1) ? 1 : -1;   // y0 = 2, y1 = 6 (moving on the positive y direction)
-            int stepZ = (lineData.z0 < lineData.z1) ? 1 : -1;   // y0 = 2, y1 = 6 (moving on the positive z direction)
+            int stepX = (lineData.x0 < lineData.x1) ? 1 : -1;
+            int stepY = (lineData.y0 < lineData.y1) ? 1 : -1;
+            int stepZ = (lineData.z0 < lineData.z1) ? 1 : -1;
             
-            int totalSteps = lineData.totalSteps;
+            // Add the goal point to the list
+            int x = x0, y = y0, z = z0;
+            points.Add(new Vector3Int(x, y, z));
             
-            int currentX = lineData.x0;
-            int currentY = lineData.y0;
-            int currentZ = lineData.z0;
-            
-            float errorX = deltaX / (float)totalSteps;
-            float errorY = deltaY / (float)totalSteps;
-            float errorZ = deltaZ / (float)totalSteps;
-            
-            float accumX = 0;
-            float accumY = 0;
-            float accumZ = 0;
-            
-            // for every step in the x direction
-            for (int i = 0; i < totalSteps; i++)
+            // Driving axis is X-axis
+            if (deltaX >= deltaY && deltaX >= deltaZ)
             {
-                accumX += errorX;
-                accumY += errorY;
-                accumZ += errorZ;
-                
-                points.Add(new Vector3Int(currentX, currentY, currentZ));
-
-                if (accumX >= 1f)
+                int p1 = 2 * deltaY - deltaX;
+                int p2 = 2 * deltaZ - deltaX;
+                while (x != x1)
                 {
-                    currentX += stepX;
-                    accumX -= 1f;
+                    x += stepX;
+                    if (p1 >= 0)
+                    {
+                        y += stepY;
+                        p1 -= 2 * deltaX;
+                    }
+                    if (p2 >= 0)
+                    {
+                        z += stepZ;
+                        p2 -= 2 * deltaX;
+                    }
+                    p1 += 2 * deltaY;
+                    p2 += 2 * deltaZ;
+                    points.Add(new Vector3Int(x, y, z));
                 }
-
-                if (accumY >= 1f)
-                {
-                    currentY += stepY;
-                    accumY -= 1f;
-                }
-
-                if (accumZ >= 1f)
-                {
-                    currentZ += stepZ;
-                    accumZ -= 1f;
-                }
-                
-                // Break if we reach the end point
-                if(currentX == lineData.x1 && currentZ == lineData.z1)
-                    break;
             }
-            
+            // Driving axis is Y-axis
+            else if (deltaY >= deltaX && deltaY >= deltaZ)
+            {
+                int p1 = 2 * deltaX - deltaY;
+                int p2 = 2 * deltaZ - deltaY;
+                while (y != y1)
+                {
+                    y += stepY;
+                    if (p1 >= 0)
+                    {
+                        x += stepX;
+                        p1 -= 2 * deltaY;
+                    }
+                    if (p2 >= 0)
+                    {
+                        z += stepZ;
+                        p2 -= 2 * deltaY;
+                    }
+                    p1 += 2 * deltaX;
+                    p2 += 2 * deltaZ;
+                    points.Add(new Vector3Int(x, y, z));
+                }
+            }
+            // Driving axis is Z-axis
+            else
+            {
+                int p1 = 2 * deltaY - deltaZ;
+                int p2 = 2 * deltaX - deltaZ;
+                while (z != z1)
+                {
+                    z += stepZ;
+                    if (p1 >= 0)
+                    {
+                        y += stepY;
+                        p1 -= 2 * deltaZ;
+                    }
+
+                    if (p2 >= 0)
+                    {
+                        x += stepX;
+                        p2 -= 2 * deltaZ;
+                    }
+
+                    p1 += 2 * deltaY;
+                    p2 += 2 * deltaX;
+                    points.Add(new Vector3Int(x, y, z));
+                }
+            }
+
             return points;
         }
         
@@ -123,43 +150,3 @@
             }
         }
     }
-    
-// private static List<Vector2Int> BresenhamLine(Vector2Int start, Vector2Int end)
-// {
-//     List<Vector2Int> points = new List<Vector2Int>();
-//
-//     int x0 = start.x;
-//     int y0 = start.y;
-//     int x1 = end.x;
-//     int y1 = end.y;
-//
-//     int dx = Mathf.Abs(x1 - x0);
-//     int dy = Mathf.Abs(y1 - y0);
-//     int sx = (x0 < x1) ? 1 : -1;
-//     int sy = (y0 < y1) ? 1 : -1;
-//     int err = dx - dy;
-//
-//     while (true)
-//     {
-//         points.Add(new Vector2Int(x0, y0));
-//
-//         if (x0 == x1 && y0 == y1) break;
-//
-//         int e2 = 2 * err;
-//
-//         if (e2 > -dy)
-//         {
-//             err -= dy;
-//             x0 += sx;
-//         }
-//
-//         if (e2 < dx)
-//         {
-//             err += dx;
-//             y0 += sy;
-//         }
-//     }
-//
-//     return points;
-// }
-//

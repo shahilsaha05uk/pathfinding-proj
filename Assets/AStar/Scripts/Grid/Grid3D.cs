@@ -1,12 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Grid3D : BaseGrid
 {
-    public int maxHeight = 7;
-
     private Node[,,] Nodes;
     
+    private int maxHeight;
     private float offsetX;
     private float offsetZ;
     private float randomizeOffset;
@@ -18,10 +18,14 @@ public class Grid3D : BaseGrid
         if(Nodes != null && Nodes.Length > 0) Clear();
         
         base.Create(config);
+        
+        List<Node> potentialObstacles = new List<Node>();
+        
         offsetX = config.Offset.x;
         offsetZ = config.Offset.z;
         randomizeOffset = config.OffsetRandomization;
         noiseScale = config.NoiseScale;
+        maxHeight = config.MaxHeight;
         
         // Create the array of nodes
         Nodes = new Node[mGridSize, maxHeight, mGridSize];
@@ -53,7 +57,8 @@ public class Grid3D : BaseGrid
                     if (y == terrainHeight - 1)
                     {
                         // Hilltop
-                        node.SetType(TerrainType.HillTop, "#0b4f0e", false);
+                        node.SetType(TerrainType.HillTop, "#707070", false);
+                        potentialObstacles.Add(node);
                     }
                     else if (y == 0)
                     {
@@ -64,14 +69,17 @@ public class Grid3D : BaseGrid
                     {
                         // Middle ground
                         node.SetType(TerrainType.Ground, "#0b4f0e", false);
+                        potentialObstacles.Add(node);
+
                     }
                 }
             }
         }
 
         AssignNeighbors(); // If pathfinding requires neighbor linking
+        AddObstacles(potentialObstacles); // Add obstacles based on the percentage
     }
-
+    
     public override void Clear()
     {
         if (Nodes == null || Nodes.Length == 0)
@@ -97,30 +105,6 @@ public class Grid3D : BaseGrid
         Nodes = null;
     }
 
-    protected override void AssignNeighbors()
-    {
-        for (int x = 0; x < mGridSize; x++)
-        {
-            for (int y = 0; y < maxHeight; y++)
-            {
-                for (int z = 0; z < mGridSize; z++)
-                {
-                    var node = Nodes[x, y, z];
-                    if (node == null) continue;
-                    
-                    // Set the node's neighbors
-                    var neighbors = GetNeighbors(x, y, z);
-                    node.SetNeighbors(neighbors);
-                }
-            }
-        }
-    }
-    
-    private List<Node> GetNeighbors(int x, int y, int z)
-    {
-        return GetNeighbors(new Vector3Int(x,y,z), 1);
-    }
-    
     public List<Node> GetNeighbors(Vector3Int point, int width)
     {
         List<Node> neighbors = new List<Node>();
@@ -140,18 +124,100 @@ public class Grid3D : BaseGrid
 
                     var neighbor = GetNodeAt(nx, ny, nz);
                     if (neighbor != null)
-                        neighbors.Add(Nodes[nx, ny, nz]);
+                        neighbors.Add(neighbor);
                 }
             }
         }
 
         return neighbors;
     }
+
+    public List<Node> GetManhattanRadius(Vector3Int point, int width, CorridorShape shape)
+    {
+        var corridorNodes = new List<Node>();
+        for (int dx = -width; dx <= width; dx++)
+        {
+            for (int dy = -width; dy <= width; dy++)
+            {
+                for (int dz = -width; dz <= width; dz++)
+                {
+                    if (dx == 0 && dy == 0 && dz == 0) continue;
+
+                    int nx = point.x + dx;
+                    int ny = point.y + dy;
+                    int nz = point.z + dz;
+
+                    if (!IsInsideGrid(nx, ny, nz)) continue;
+
+                    float distance = shape switch
+                    {
+                        CorridorShape.Cube => 1f, // Always include
+                        CorridorShape.Diamond => Mathf.Abs(dx) + Mathf.Abs(dy) + Mathf.Abs(dz),
+                        CorridorShape.Sphere => Mathf.Sqrt(dx * dx + dy * dy + dz * dz),
+                        _ => float.MaxValue
+                    };
+
+                    if (distance <= width)
+                    {
+                        var node = GetNodeAt(nx, ny, nz);
+                        if (node != null)
+                            corridorNodes.Add(node);
+                    }
+                }
+            }
+        }
+        return corridorNodes;
+    }
+
     public Node GetNodeAt(int x, int y, int z)
     {
-        if(IsInsideGrid(x, y, z))
-            return Nodes[x, y, z];
-        return null;
+        if (!IsInsideGrid(x, y, z)) return null;
+        
+        var node = Nodes[x, y, z];
+        return node != null ? node : null;
+    }
+    
+    public bool IsInsideGrid(int x, int y, int z)
+    {
+        return x >= 0 && x < mGridSize &&
+               y >= 0 && y < maxHeight &&
+               z >= 0 && z < mGridSize;
+    }
+    
+    protected override void AssignNeighbors()
+    {
+        for (int x = 0; x < mGridSize; x++)
+        {
+            for (int y = 0; y < maxHeight; y++)
+            {
+                for (int z = 0; z < mGridSize; z++)
+                {
+                    var node = Nodes[x, y, z];
+                    if (node == null) continue;
+                    
+                    // Set the node's neighbors
+                    var neighbors = GetNeighbors(x, y, z);
+                    node.SetNeighbors(neighbors);
+                }
+            }
+        }
+    }
+
+    protected override void AddObstacles(List<Node> potentialObstacles)
+    {
+        int obstacleCount = Mathf.FloorToInt(potentialObstacles.Count * mObstacleDensity);
+        var shuffled = potentialObstacles.OrderBy(_ => Random.value).ToList();
+
+        for (int i = 0; i < obstacleCount; i++)
+        {
+            var node = shuffled[i];
+            node.SetType(TerrainType.Obstacle, "#a30808", true); // New type or reuse blocked
+        }
+    }
+    
+    private List<Node> GetNeighbors(int x, int y, int z)
+    {
+        return GetNeighbors(new Vector3Int(x,y,z), 1);
     }
     
     private void SetNodePosition(Node node, int x, int y, int z)
@@ -178,6 +244,7 @@ public class Grid3D : BaseGrid
         node.transform.localScale = new Vector3(mTileSize, mTileSize, 1);
         node.transform.position = finalPosition;
     }
+    
     private float AddNoiseXZ(int x, int z, float offX, float offZ)
     {
         return Mathf.PerlinNoise((x + offX) * noiseScale, (z + offZ) * noiseScale);

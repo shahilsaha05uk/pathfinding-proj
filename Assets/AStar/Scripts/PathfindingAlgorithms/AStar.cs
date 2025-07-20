@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 /*
  * gCost = Cost of the start node
@@ -9,11 +8,14 @@ using UnityEngine;
 
 public static class AStar
 {
+    private static HashSet<Node> allowedNodes = null;
     public static List<Node> Navigate(Node start, Node end, HashSet<Node> allowedNodes = null)
     {
         List<Node> openList = new List<Node>();
         HashSet<Node> closedList = new HashSet<Node>();
-
+        
+        AStar.allowedNodes = allowedNodes;
+        
         openList.Add(start);
         start.gCost = 0;                                                     // Cost of the start node is 0
         start.hCost = HeuristicHelper.GetManhattanDistance(start, end); // Heuristic cost from start to end
@@ -33,7 +35,10 @@ public static class AStar
             
             // if the goal node is the current node, retrace the path and return it
             if (currentNode == end)
+            {
+                AStar.allowedNodes = null; // Reset allowed nodes to null for future calls
                 return RetracePath(start, end);
+            }
             
             // Else, get all the neighbors of the current node
             var neighbors = currentNode.GetNeighbors();
@@ -42,10 +47,7 @@ public static class AStar
             foreach (var neighbor in neighbors)
             {
                 // If the neighbor is already in the closed list or is blocked, skip it
-                if(allowedNodes != null && 
-                   (closedList.Contains(neighbor) || 
-                    neighbor.isBlocked || 
-                    !allowedNodes.Contains(neighbor)))
+                if (closedList.Contains(neighbor) || !IsNodeAllowed(neighbor))
                     continue;
                 
                 // Gets the distance from the current node to the neighbor
@@ -67,7 +69,6 @@ public static class AStar
         }
         
         // No path found
-        Debug.LogWarning("No path found!");
         return new List<Node>();
     }
 
@@ -105,4 +106,7 @@ public static class AStar
         path.Reverse();
         return path;
     }
+
+    private static bool IsNodeAllowed(Node n) =>
+        allowedNodes == null || (!n.isBlocked && allowedNodes.Contains(n));
 }
