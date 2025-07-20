@@ -8,6 +8,7 @@ public class UI : MonoBehaviour
     public Controller Controller;
 
     public PanelInputField inputGridSize;
+    public PanelInputField inputMaxHeight;
     public PanelInputField inputTileSize;
     public PanelInputField inputTileSpacing;
     public PanelInputField inputMaxCorridorWidth;
@@ -44,6 +45,7 @@ public class UI : MonoBehaviour
     private void OnCreateGridButtonClick() => Controller.CreateGrid(new GridConfig
     {
         GridSize = UIHelper.ValidateInputAsInt(inputGridSize.GetValue(), out int gridSize) ? gridSize : 10,
+        MaxHeight = UIHelper.ValidateInputAsInt(inputMaxHeight.GetValue(), out int maxHeight) ? maxHeight : 7,
         TileSize = UIHelper.ValidateInputAsFloat(inputTileSize.GetValue(), out float tileSize) ? tileSize : 1f,
         TileSpacing = UIHelper.ValidateInputAsFloat(inputTileSpacing.GetValue(), out float tileSpacing) ? tileSpacing : 0.1f,
         Offset = new Vector3(

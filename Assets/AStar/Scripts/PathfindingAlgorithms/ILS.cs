@@ -19,7 +19,7 @@ public static class ILS
             
             currentWidth++;
         }
-
+        Debug.LogWarning("No path found!");
         return null;
     }
     

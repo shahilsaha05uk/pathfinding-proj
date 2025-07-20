@@ -67,7 +67,6 @@ public static class AStar
         }
         
         // No path found
-        Debug.LogWarning("No path found!");
         return new List<Node>();
     }
 

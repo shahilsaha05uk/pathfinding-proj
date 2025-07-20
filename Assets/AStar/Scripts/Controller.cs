@@ -83,7 +83,7 @@ public class Controller : MonoBehaviour
             if (Input.GetKey(KeyCode.E)) direction += cameraTransform.up;
             if (Input.GetKey(KeyCode.Q)) direction -= cameraTransform.up;
 
-            cameraTransform.position += direction.normalized * speed * Time.deltaTime;
+            cameraTransform.position += direction.normalized * (speed * Time.deltaTime);
         }
     }
     
@@ -127,11 +127,8 @@ public class Controller : MonoBehaviour
     private bool Execute_OnNodeSet()
     {
         var node = GetNodeHit();
-        if (node == null)
-        {
-            Debug.LogWarning("No node hit!");
-            return false;
-        }
+        if (node == null) return false;
+
         OnNodeSet_Signature?.Invoke(node);
         return true;
     }

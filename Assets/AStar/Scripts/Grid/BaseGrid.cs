@@ -76,13 +76,6 @@ public abstract class BaseGrid : MonoBehaviour
         return (startNode, endNode);
     }
     
-    protected bool IsInsideGrid(int x, int y, int z)
-    {
-        return x >= 0 && x < mGridSize &&
-               y >= 0 && y < mGridSize &&
-               z >= 0 && z < mGridSize;
-    }
-
     protected void SetNodeIndex(Node node, int x, int y, int z = 0)
     {
         if (node != null)

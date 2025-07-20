@@ -5,6 +5,7 @@ using UnityEngine;
 public struct GridConfig
 {
     public int GridSize;
+    public int MaxHeight;
     public float TileSize;
     public float TileSpacing;
     public Vector3 Offset;

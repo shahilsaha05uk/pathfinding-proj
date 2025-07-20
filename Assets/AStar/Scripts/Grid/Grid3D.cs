@@ -3,10 +3,9 @@ using UnityEngine;
 
 public class Grid3D : BaseGrid
 {
-    public int maxHeight = 7;
-
     private Node[,,] Nodes;
     
+    private int maxHeight;
     private float offsetX;
     private float offsetZ;
     private float randomizeOffset;
@@ -22,6 +21,7 @@ public class Grid3D : BaseGrid
         offsetZ = config.Offset.z;
         randomizeOffset = config.OffsetRandomization;
         noiseScale = config.NoiseScale;
+        maxHeight = config.MaxHeight;
         
         // Create the array of nodes
         Nodes = new Node[mGridSize, maxHeight, mGridSize];
@@ -140,7 +140,7 @@ public class Grid3D : BaseGrid
 
                     var neighbor = GetNodeAt(nx, ny, nz);
                     if (neighbor != null)
-                        neighbors.Add(Nodes[nx, ny, nz]);
+                        neighbors.Add(neighbor);
                 }
             }
         }
@@ -149,9 +149,10 @@ public class Grid3D : BaseGrid
     }
     public Node GetNodeAt(int x, int y, int z)
     {
-        if(IsInsideGrid(x, y, z))
-            return Nodes[x, y, z];
-        return null;
+        if (!IsInsideGrid(x, y, z)) return null;
+        
+        var node = Nodes[x, y, z];
+        return node != null ? node : null;
     }
     
     private void SetNodePosition(Node node, int x, int y, int z)
@@ -178,6 +179,14 @@ public class Grid3D : BaseGrid
         node.transform.localScale = new Vector3(mTileSize, mTileSize, 1);
         node.transform.position = finalPosition;
     }
+    
+    private bool IsInsideGrid(int x, int y, int z)
+    {
+        return x >= 0 && x < mGridSize &&
+               y >= 0 && y < maxHeight &&
+               z >= 0 && z < mGridSize;
+    }
+    
     private float AddNoiseXZ(int x, int z, float offX, float offZ)
     {
         return Mathf.PerlinNoise((x + offX) * noiseScale, (z + offZ) * noiseScale);
