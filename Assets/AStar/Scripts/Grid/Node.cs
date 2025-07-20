@@ -18,8 +18,7 @@ public class Node : MonoBehaviour
     }
     public void SetType(TerrainType type, string ColorHex, bool blocked)
     {
-        Color color;
-        if (ColorUtility.TryParseHtmlString(ColorHex, out color))
+        if (ColorUtils.GetColorFromHex(ColorHex, out var color))
         {
             terrainType = type;
             isBlocked = blocked;

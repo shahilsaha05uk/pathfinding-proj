@@ -35,6 +35,7 @@ public abstract class BaseGrid : MonoBehaviour
         mTileSize = mConfig.TileSize;
         mTileSpacing = mConfig.TileSpacing;
     }
+    
     public virtual void Clear() { }
 
     public void SetStartNode(Node node)
@@ -75,7 +76,8 @@ public abstract class BaseGrid : MonoBehaviour
     {
         return (startNode, endNode);
     }
-    
+    public GridConfig GetGridConfig() => mConfig;
+
     protected void SetNodeIndex(Node node, int x, int y, int z = 0)
     {
         if (node != null)

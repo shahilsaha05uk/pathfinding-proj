@@ -53,7 +53,7 @@ public class Grid3D : BaseGrid
                     if (y == terrainHeight - 1)
                     {
                         // Hilltop
-                        node.SetType(TerrainType.HillTop, "#0b4f0e", false);
+                        node.SetType(TerrainType.HillTop, "#707070", false);
                     }
                     else if (y == 0)
                     {
@@ -116,11 +116,6 @@ public class Grid3D : BaseGrid
         }
     }
     
-    private List<Node> GetNeighbors(int x, int y, int z)
-    {
-        return GetNeighbors(new Vector3Int(x,y,z), 1);
-    }
-    
     public List<Node> GetNeighbors(Vector3Int point, int width)
     {
         List<Node> neighbors = new List<Node>();
@@ -147,12 +142,46 @@ public class Grid3D : BaseGrid
 
         return neighbors;
     }
+    
+    public List<Node> GetManhattanRadius(Vector3Int point, int radius)
+    {
+        List<Node> nodes = new List<Node>();
+
+        for (int dx = -radius; dx <= radius; dx++)
+        {
+            for (int dy = -radius; dy <= radius; dy++)
+            {
+                for (int dz = -radius; dz <= radius; dz++)
+                {
+                    if (Mathf.Abs(dx) + Mathf.Abs(dy) + Mathf.Abs(dz) > radius)
+                        continue;
+
+                    int nx = point.x + dx;
+                    int ny = point.y + dy;
+                    int nz = point.z + dz;
+
+                    var node = GetNodeAt(nx, ny, nz);
+                    if (node != null)
+                        nodes.Add(node);
+                }
+            }
+        }
+
+        return nodes;
+    }
+    
     public Node GetNodeAt(int x, int y, int z)
     {
         if (!IsInsideGrid(x, y, z)) return null;
         
         var node = Nodes[x, y, z];
         return node != null ? node : null;
+    }
+    
+    
+    private List<Node> GetNeighbors(int x, int y, int z)
+    {
+        return GetNeighbors(new Vector3Int(x,y,z), 1);
     }
     
     private void SetNodePosition(Node node, int x, int y, int z)
