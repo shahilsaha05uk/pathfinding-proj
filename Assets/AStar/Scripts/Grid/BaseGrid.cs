@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [Serializable]
 public struct GridColor
@@ -24,7 +23,7 @@ public abstract class BaseGrid : MonoBehaviour
     protected int mGridSize = 10;
     protected float mTileSize = 1;
     protected float mTileSpacing = 0.1f;
-
+    protected float mObstacleDensity;
     protected Node startNode;
     protected Node endNode;
 
@@ -34,13 +33,14 @@ public abstract class BaseGrid : MonoBehaviour
         mGridSize = mConfig.GridSize;
         mTileSize = mConfig.TileSize;
         mTileSpacing = mConfig.TileSpacing;
+        mObstacleDensity = mConfig.ObstacleDensity;
     }
     
     public virtual void Clear() { }
 
     public void SetStartNode(Node node)
     {
-        if (node == null) return;
+        if (node == null || node.isBlocked) return;
         
         if (startNode != null)
             SetNodeColor(startNode, GridColors.DefaultNodeColor);
@@ -50,7 +50,7 @@ public abstract class BaseGrid : MonoBehaviour
     }
     public void SetEndNode(Node node)
     {
-        if (node == null) return;
+        if (node == null || node.isBlocked) return;
         
         if (endNode != null)
             SetNodeColor(endNode, GridColors.DefaultNodeColor);
@@ -93,5 +93,6 @@ public abstract class BaseGrid : MonoBehaviour
         }
     }
     protected virtual void AssignNeighbors() { }
-    
+
+    protected virtual void AddObstacles(List<Node> potentialObstacles) { }
 }

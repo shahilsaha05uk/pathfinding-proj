@@ -1,7 +1,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-public enum TerrainType { Ground, HillTop, Cave }
+public enum TerrainType { Ground, HillTop, Cave, Obstacle }
 public class Node : MonoBehaviour
 {
     public float gCost, hCost, fCost;

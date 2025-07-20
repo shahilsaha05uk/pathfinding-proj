@@ -12,8 +12,6 @@ public static class ILS
 {
     public static List<Node> Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth)
     {
-        var temp = Time.realtimeSinceStartup;
-
         int currentWidth = 1;
         int maxWidth = maxCorridorWidth;
 
@@ -43,8 +41,8 @@ public static class ILS
         List<Vector3Int> linePoints, 
         Grid3D grid, 
         Node start, Node end,
-        CorridorShape shape = CorridorShape.Diamond,
-        int width = 1)
+        int width = 1,
+        CorridorShape shape = CorridorShape.Diamond)
     {
         var corridorNodes = new HashSet<Node>();
 
@@ -57,7 +55,6 @@ public static class ILS
         corridorNodes.Add(start);
         corridorNodes.Add(end);
         
-
         return corridorNodes;
     }
     

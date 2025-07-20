@@ -33,6 +33,8 @@ public class UI : MonoBehaviour
     public PanelSlider offsetZSlider;
     public PanelSlider randomizeSlider;
     public PanelSlider noiseSlider;
+    [Space(5)][Header("Obstacles")]
+    public PanelSlider obstacleDensitySlider;
 
     [Space(5)][Header("Input Fields")]
     public PanelLabel AStarTimeLabel;
@@ -81,6 +83,7 @@ public class UI : MonoBehaviour
             offsetYSlider.GetValue(),
             offsetZSlider.GetValue()
         ),
+        ObstacleDensity = obstacleDensitySlider.GetValue(),
         OffsetRandomization = randomizeSlider.GetValue(),
         NoiseScale = noiseSlider.GetValue()
     });
