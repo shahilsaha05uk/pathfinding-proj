@@ -6,8 +6,8 @@ using UnityEngine.Serialization;
 [Serializable]
 public class PathResult
 {
-    public float TimeTaken;
-    public float SpaceTaken;
+    public double TimeTaken;
+    public long SpaceTaken;
     public int PathLength;
     public float PathCost;
     public int CorridorIterations;

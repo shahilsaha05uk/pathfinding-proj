@@ -15,7 +15,7 @@ public static class ILS
             while (currentWidth <= maxWidth)
             {
                 var linePoints = GenerateLine(start, end);
-                var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
+                var corridor = DefineCorridor(linePoints, grid, start, end, CorridorShape.Diamond, currentWidth);
                 var pathResult = FindPath(start, end, corridor, algorithm);
 
                 if (pathResult != null)

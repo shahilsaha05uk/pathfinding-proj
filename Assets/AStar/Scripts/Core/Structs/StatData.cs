@@ -3,7 +3,7 @@
 [Serializable]
 public struct StatData
 {
-    public float TimeTaken;
-    public float SpaceTaken;
+    public double TimeTaken;
+    public long SpaceTaken;
 }
 

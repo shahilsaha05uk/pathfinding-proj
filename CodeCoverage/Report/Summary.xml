@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CoverageReport scope="Summary">
+  <Summary>
+    <Generatedon>21/07/2025 - 19:48:38</Generatedon>
+    <Parser>MultiReportParser (2x OpenCoverParser)</Parser>
+    <Assemblies>1</Assemblies>
+    <Classes>6</Classes>
+    <Files>6</Files>
+    <Coveredlines>169</Coveredlines>
+    <Uncoveredlines>62</Uncoveredlines>
+    <Coverablelines>231</Coverablelines>
+    <Totallines>450</Totallines>
+    <Linecoverage>73.1</Linecoverage>
+    <Coveredbranches>0</Coveredbranches>
+    <Totalbranches>0</Totalbranches>
+    <Coveredmethods>13</Coveredmethods>
+    <Totalmethods>17</Totalmethods>
+    <Methodcoverage>76.4</Methodcoverage>
+  </Summary>
+  <Coverage>
+    <Assembly name="Assembly-CSharp" classes="6" coverage="73.1" coveredlines="169" coverablelines="231" totallines="450" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="13" totalmethods="17" methodcoverage="76.4">
+      <Class name="AStar" coverage="97.9" coveredlines="47" coverablelines="48" totallines="94" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="2" totalmethods="2" methodcoverage="100" />
+      <Class name="BLA" coverage="49.2" coveredlines="34" coverablelines="69" totallines="105" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="1" totalmethods="2" methodcoverage="50" />
+      <Class name="GBFS" coverage="92.1" coveredlines="35" coverablelines="38" totallines="100" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="2" totalmethods="2" methodcoverage="100" />
+      <Class name="ILS" coverage="74.5" coveredlines="41" coverablelines="55" totallines="105" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="4" totalmethods="5" methodcoverage="80" />
+      <Class name="PathfindingEvaluator" coverage="64.2" coveredlines="9" coverablelines="14" totallines="30" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="1" totalmethods="2" methodcoverage="50" />
+      <Class name="PathfindingManager" coverage="42.8" coveredlines="3" coverablelines="7" totallines="16" branchcoverage="" coveredbranches="0" totalbranches="0" coveredmethods="3" totalmethods="4" methodcoverage="75" />
+    </Assembly>
+  </Coverage>
+</CoverageReport>

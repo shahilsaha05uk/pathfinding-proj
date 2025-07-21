@@ -1,0 +1,29 @@
+{
+  "summary": {
+    "generatedon": "2025-07-21T18:48:38Z",
+    "parser": "MultiReportParser (2x OpenCoverParser)",
+    "assemblies": 1,
+    "classes": 6,
+    "files": 6,
+    "coveredlines": 169,
+    "uncoveredlines": 62,
+    "coverablelines": 231,
+    "totallines": 450,
+    "linecoverage": 73.1,
+    "coveredbranches": 0,
+    "totalbranches": 0,
+    "coveredmethods": 13,
+    "totalmethods": 17,
+    "methodcoverage": 76.4
+ },
+  "coverage": {
+    "assemblies": [
+      { "name": "Assembly-CSharp", "classes": 6, "coverage": 73.1, "coveredlines": 169, "coverablelines": 231, "totallines": 450, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 76.4, "coveredmethods": 13, "totalmethods": 17, "classesinassembly": [
+        { "name": "AStar", "coverage": 97.9, "coveredlines": 47, "coverablelines": 48, "totallines": 94, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 2, "totalmethods": 2 },
+        { "name": "BLA", "coverage": 49.2, "coveredlines": 34, "coverablelines": 69, "totallines": 105, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 50, "coveredmethods": 1, "totalmethods": 2 },
+        { "name": "GBFS", "coverage": 92.1, "coveredlines": 35, "coverablelines": 38, "totallines": 100, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 2, "totalmethods": 2 },
+        { "name": "ILS", "coverage": 74.5, "coveredlines": 41, "coverablelines": 55, "totallines": 105, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 80, "coveredmethods": 4, "totalmethods": 5 },
+        { "name": "PathfindingEvaluator", "coverage": 64.2, "coveredlines": 9, "coverablelines": 14, "totallines": 30, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 50, "coveredmethods": 1, "totalmethods": 2 },
+        { "name": "PathfindingManager", "coverage": 42.8, "coveredlines": 3, "coverablelines": 7, "totallines": 16, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 75, "coveredmethods": 3, "totalmethods": 4 } ] } ]
+  }
+}
