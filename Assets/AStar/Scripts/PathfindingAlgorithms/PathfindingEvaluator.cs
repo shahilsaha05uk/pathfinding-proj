@@ -13,30 +13,21 @@ public class PathfindingEvaluator
     
     public EvaluationResult Evaluate()
     {
-        UIHelper.ValidateInputAsInt(mUI.inputMaxCorridorWidth.GetValue(), out int corridorWidth);
-        var result = new EvaluationResult();
+        UIHelper.ValidateInputAsInt(mUI.controlPanel.inputMaxCorridorWidth.GetValue(), out int corridorWidth);
         var nodes = mGrid.GetStartEndNodes();
 
-        // TODO: These should also return the traversal nodes count and space taken
-        var stats_ils_aStar = Stats.TimedStats(() =>
-        {
-            mPathManager.RunILS(nodes.start, nodes.end, corridorWidth);
-        });
-        
-        var stats_gbfs = Stats.TimedStats(() =>
-        {
-            mPathManager.RunGBFS(nodes.start, nodes.end);
-        });
-        
-        var stats_aStar = Stats.TimedStats(() =>
-        {
-            mPathManager.RunAStar(nodes.start, nodes.end);
-        });
-        
-        result.ILSWithAStarTime = stats_ils_aStar;
-        result.GBFSTime = stats_gbfs;
-        result.AStarTime = stats_aStar;
+        var aStar = EvaluationResult.FromPathResult(mPathManager.RunAStar(nodes.start, nodes.end));
+        var ilsWithAStar = EvaluationResult.FromPathResult(mPathManager.RunILS(nodes.start, nodes.end, corridorWidth, PathfindingAlgorithm.AStar));
+        var gbfs = EvaluationResult.FromPathResult(mPathManager.RunGBFS(nodes.start, nodes.end));
+        var ilsWithGBFS = EvaluationResult.FromPathResult(mPathManager.RunILS(nodes.start, nodes.end, corridorWidth, PathfindingAlgorithm.GBFS));
 
+        var result = new EvaluationResult
+        {
+            AStar = aStar,
+            ILSWithAStar = ilsWithAStar,
+            GBFS = gbfs,
+            ILSWithGBFS = ilsWithGBFS,
+        };
         return result;
     }
 }
