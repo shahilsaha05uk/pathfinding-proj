@@ -183,7 +183,7 @@ public class Grid3D : BaseGrid
                y >= 0 && y < maxHeight &&
                z >= 0 && z < mGridSize;
     }
-    
+
     protected override void AssignNeighbors()
     {
         for (int x = 0; x < mGridSize; x++)

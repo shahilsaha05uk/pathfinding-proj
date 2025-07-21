@@ -1,13 +1,6 @@
 using System;
 using System.Diagnostics;
 
-[Serializable]
-public struct StatData
-{
-    public float TimeTaken;
-    public float SpaceTaken;
-}
-
 public static class Stats
 {
     public static StatData RecordStats(Action action)

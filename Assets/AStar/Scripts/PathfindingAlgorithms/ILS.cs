@@ -3,23 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum CorridorShape
-{
-    Cube,
-    Diamond,
-    Sphere
-}
-
-public enum PathfindingAlgorithm
-{
-    AStar,
-    GBFS,
-}
-
-
 public static class ILS
 {
-    public static PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, PathfindingAlgorithm algorithm)
+    public static PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, ILSAlgorithm algorithm)
     {
         var (result, stats) = Stats.RecordStats(() =>
         {
@@ -104,13 +90,13 @@ public static class ILS
     }
     
     // Step 3: Pass it to the pathfinding algorithm
-    private static PathResult FindPath(Node start, Node end, HashSet<Node> corridor, PathfindingAlgorithm algorithm)
+    private static PathResult FindPath(Node start, Node end, HashSet<Node> corridor, ILSAlgorithm algorithm)
     {
         switch (algorithm)
         {
-            case PathfindingAlgorithm.AStar:
+            case ILSAlgorithm.AStar:
                 return AStar.Navigate(start, end, corridor);
-            case PathfindingAlgorithm.GBFS:
+            case ILSAlgorithm.GBFS:
                 return GBFS.Navigate(start, end, corridor);
             default:
                 return AStar.Navigate(start, end, corridor);

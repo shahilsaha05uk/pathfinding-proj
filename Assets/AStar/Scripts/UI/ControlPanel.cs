@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,15 +12,17 @@ public class ControlPanel : MonoBehaviour
     public PanelInputField inputMaxHeight;
     public PanelInputField inputTileSize;
     public PanelInputField inputTileSpacing;
-    public PanelInputField inputMaxCorridorWidth;
+    public PanelInputField inputEvaluationSize;
     
     [Space(5)][Header("Buttons")]
     public Button btnCreate;
     public Button btnSetStart;
     public Button btnSetEnd;
     public Button btnClear;
-    public Button btnNavigateILS;
-    public Button btnNavigateGBFS;
+    public Button btnNavigate;
+    public Button btnResetNodes;
+    public Button btnEvaluate;
+    public Button btnSaveAndExport;
     
     [Space(5)][Header("Sliders")]
     public PanelSlider offsetXSlider;
@@ -27,12 +30,17 @@ public class ControlPanel : MonoBehaviour
     public PanelSlider offsetZSlider;
     public PanelSlider randomizeSlider;
     public PanelSlider noiseSlider;
-    [Space(5)][Header("Obstacles")]
     public PanelSlider obstacleDensitySlider;
 
-    public Button btnEvaluate;
-    
+    [Space(5)][Header("Options")]
+    public TMP_Dropdown optionAlgorithmType;
+
+    public Toggle toggleAutoSavePostEvaluation;
+
     public Action<EvaluationResult> OnResultEvaluated;
+    public Action<AlgorithmType, EvaluationData> OnNavigated;
+
+    private AlgorithmType algorithmType;
     
     public void Start()
     {
@@ -40,14 +48,22 @@ public class ControlPanel : MonoBehaviour
         btnSetStart.onClick.AddListener(OnStartNodeSetButtonClick);
         btnSetEnd.onClick.AddListener(OnEndNodeSetButtonClick);
         btnClear.onClick.AddListener(OnClearGridButtonClick);
-        btnNavigateILS.onClick.AddListener(OnNavigateILSButtonClick);
-        btnNavigateGBFS.onClick.AddListener(OnNavigateGBFSButtonClick);
-        
+        btnNavigate.onClick.AddListener(OnNavigate);
+        btnResetNodes.onClick.AddListener(OnResetNodes);
         btnEvaluate.onClick.AddListener(OnEvaluateButtonClick);
-
+        btnSaveAndExport.onClick.AddListener(OnSaveAndExport);
         
         inputGridSize.onValueChanged += OnGridSizeChanged;
         OnGridSizeChanged(inputGridSize.GetValue());    // Run once at start to set the initial state of the button
+
+        toggleAutoSavePostEvaluation.onValueChanged.AddListener(OnAutosaveValueChanged);
+        OnAutosaveValueChanged(toggleAutoSavePostEvaluation.isOn);
+
+        var options = UIHelper.CreateOptionListFromEnum<AlgorithmType>();
+        optionAlgorithmType.AddOptions(options);
+        optionAlgorithmType.onValueChanged.AddListener(OnAlgorithmChanged);
+        OnAlgorithmChanged(optionAlgorithmType.value);
+
     }
 
     public void Init(Controller controller)
@@ -59,6 +75,12 @@ public class ControlPanel : MonoBehaviour
     {
         btnCreate.interactable = UIHelper.ValidateInputAsInt(inputGridSize.GetValue(), out int gridSize);
     }
+
+    private void OnAutosaveValueChanged(bool value)
+    {
+        btnSaveAndExport.interactable = !value;
+    }
+
 
     private void OnCreateGridButtonClick() => Controller.CreateGrid(new GridConfig
     {
@@ -82,13 +104,29 @@ public class ControlPanel : MonoBehaviour
     
     private void OnEndNodeSetButtonClick() => Controller.SubscribeTo_EndNodeSet();
     
-    private void OnNavigateILSButtonClick() => Controller.OnNavigateILS(inputMaxCorridorWidth.GetValue());
-    
-    private void OnNavigateGBFSButtonClick() => Controller.OnNavigateGBFS();
+    private void OnNavigate()
+    { 
+        var data = Controller.OnNavigate(algorithmType);
+        OnNavigated?.Invoke(algorithmType, data);
+    }
+
+    private void OnResetNodes() => Controller.OnResetPath();
+
+    private void OnAlgorithmChanged(int option)
+    {
+        algorithmType = UIHelper.GetEnumValueFromOption<AlgorithmType>(option);
+    }
 
     private void OnEvaluateButtonClick()
     {
-        var result = Controller.OnEvaluate();
+        UIHelper.ValidateInputAsInt(inputEvaluationSize.GetValue(), out int size);
+
+        var result = Controller.OnEvaluate(size, toggleAutoSavePostEvaluation.isOn);
         OnResultEvaluated?.Invoke(result);
+    }
+
+    private void OnSaveAndExport()
+    {
+        Controller.GetSaveManager().SaveAndExport();
     }
 }

@@ -97,6 +97,6 @@ public static class HeuristicHelper
         return lowestNode;
     }
 
-    public static bool IsNodeAllowed(Node n, HashSet<Node> allowedNodes) =>
+    public static bool IsNodeAllowed(Node n, HashSet<Node> allowedNodes = null) =>
         allowedNodes == null || (!n.isBlocked && allowedNodes.Contains(n));
 }

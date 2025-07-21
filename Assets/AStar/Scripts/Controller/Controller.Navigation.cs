@@ -1,37 +1,36 @@
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public partial class Controller
 {
-    public void OnNavigateAStar()
+    public EvaluationData OnNavigate(AlgorithmType algorithmType, int corridorWidth = 1)
     {
-        var nodes = mGrid.GetStartEndNodes();
-        var pathResult = pathfindingManager.RunAStar(nodes.start, nodes.end);
-        SetNodePath(pathResult.Path);
-    }
-    public void OnNavigateILS(string maxCorridorWidth)
-    {
-        if(UIHelper.ValidateInputAsInt(maxCorridorWidth, out int corridorWidth))
-        {
-            var nodes = mGrid.GetStartEndNodes();
-            var pathResult = pathfindingManager.RunILS(nodes.start, nodes.end, corridorWidth, PathfindingAlgorithm.AStar);
-            SetNodePath(pathResult.Path);
-            return;
-        }
-        Debug.LogWarning("Invalid corridor width input.");
-    }
-    public void OnNavigateGBFS()
-    {
-        var nodes = mGrid.GetStartEndNodes();
-        var pathResult = GBFS.Navigate(nodes.start, nodes.end);
-        SetNodePath(pathResult.Path);
-    }
-    
-    public EvaluationResult OnEvaluate() => evaluator.Evaluate();
+        mGrid.ResetPath();
 
-    private void SetNodePath(List<Node> path)
-    {
-        if(path != null)
-            mGrid.SetPathNode(path);
+        var (start, end) = mGrid.GetStartEndNodes();
+        PathResult result = null;
+
+        switch (algorithmType)
+        {
+            case AlgorithmType.AStar:
+                result = pathfindingManager.RunAStar(start, end);
+                break;
+            case AlgorithmType.GBFS:
+                result = pathfindingManager.RunGBFS(start, end);
+                break;
+            case AlgorithmType.ILS_AStar:
+                result = pathfindingManager.RunILS(start, end, ILSAlgorithm.AStar);
+                break;
+            case AlgorithmType.ILS_GBFS:
+                result = pathfindingManager.RunILS(start, end, ILSAlgorithm.GBFS);
+                break;
+            default:
+                result = pathfindingManager.RunAStar(start, end);
+                break;
+        }
+
+        if(result != null)
+            mGrid.HighlightPath(result.Path);
+        return EvaluationResult.FromPathResult(result);
     }
 }
