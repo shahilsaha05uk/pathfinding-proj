@@ -1,20 +1,10 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public struct GridColor
-{
-    public Color DefaultNodeColor;
-    public Color StartNodeColor;
-    public Color EndNodeColor;
-    public Color PathNodeColor;
-    public Color ObstacleNodeColor;
-    public Color VisitedNodeColor;
-}
-
 public abstract class BaseGrid : MonoBehaviour
 {
+    private List<Node> navPath;
+
     public Node NodeObject;
     public GridColor GridColors;
     
@@ -24,6 +14,7 @@ public abstract class BaseGrid : MonoBehaviour
     protected float mTileSize = 1;
     protected float mTileSpacing = 0.1f;
     protected float mObstacleDensity;
+    
     protected Node startNode;
     protected Node endNode;
 
@@ -38,26 +29,11 @@ public abstract class BaseGrid : MonoBehaviour
     
     public virtual void Clear() { }
 
-    public void SetStartNode(Node node)
-    {
-        if (node == null || node.isBlocked) return;
-        
-        if (startNode != null)
-            SetNodeColor(startNode, GridColors.DefaultNodeColor);
-        startNode = node;
-        SetNodeColor(node, GridColors.StartNodeColor);
-
-    }
-    public void SetEndNode(Node node)
-    {
-        if (node == null || node.isBlocked) return;
-        
-        if (endNode != null)
-            SetNodeColor(endNode, GridColors.DefaultNodeColor);
-        endNode = node;
-        SetNodeColor(node, GridColors.EndNodeColor);
-    }
-    public void SetPathNode(List<Node> path)
+    public void SetStartNode(Node node) => SetNode(node, ref startNode, GridColors.StartNodeColor);
+    
+    public void SetEndNode(Node node) => SetNode(node, ref endNode, GridColors.EndNodeColor);
+    
+    public void HighlightPath(List<Node> path)
     {
         if (path == null || path.Count < 2)
         {
@@ -65,18 +41,32 @@ public abstract class BaseGrid : MonoBehaviour
             return;
         }
         
-        int size = path.Count;
-        int startIndex = 1;
-        int endIndex = size - 1;
+        navPath = path;
+        int size = path.Count - 1;
         
-        for(int i = startIndex; i < endIndex; i++)
+        for(int i = 1; i < size; i++)
             SetNodeColor(path[i], GridColors.PathNodeColor);
     }
-    public (Node start, Node end) GetStartEndNodes()
-    {
-        return (startNode, endNode);
-    }
+
+    public (Node start, Node end) GetStartEndNodes() => (startNode, endNode);
+    
+    public List<Node> GetPath() => navPath;
+
     public GridConfig GetGridConfig() => mConfig;
+
+    public void ResetPath()
+    {
+        if(navPath == null || navPath.Count == 0)
+            return;
+
+        foreach (var node in navPath)
+            node.ResetNode();
+
+        if(startNode != null)
+            SetNodeColor(startNode, GridColors.StartNodeColor);
+        if (endNode != null)
+            SetNodeColor(endNode, GridColors.EndNodeColor);
+    }
 
     protected void SetNodeIndex(Node node, int x, int y, int z = 0)
     {
@@ -85,6 +75,7 @@ public abstract class BaseGrid : MonoBehaviour
             node.SetNodeIndex(x, y, z);
         }
     }
+    
     protected virtual void SetNodeColor(Node node, Color color)
     {
         if (node != null)
@@ -92,7 +83,18 @@ public abstract class BaseGrid : MonoBehaviour
             node.SetColor(color);
         }
     }
+    
     protected virtual void AssignNeighbors() { }
 
     protected virtual void AddObstacles(List<Node> potentialObstacles) { }
+
+    private void SetNode(Node newNode, ref Node targetNode, Color color)
+    {
+        if (newNode == null || newNode.isBlocked) return;
+
+        if (targetNode != null)
+            targetNode.ResetNode();
+        targetNode = newNode;
+        SetNodeColor(newNode, color);
+    }
 }

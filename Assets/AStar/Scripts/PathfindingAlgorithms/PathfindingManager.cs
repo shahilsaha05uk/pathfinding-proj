@@ -1,4 +1,4 @@
-    using System.Collections.Generic;
+
 
 public class PathfindingManager
 {
@@ -9,9 +9,8 @@ public class PathfindingManager
         mGrid = grid;
     }
 
-    public List<Node> RunAStar(Node start, Node end) => AStar.Navigate(start, end);
-    public List<Node> RunGBFS(Node start, Node end) => GBFS.Navigate(start, end);
-
-    public List<Node> RunILS(Node start, Node end, int corridorWidth) =>
-        ILS.Navigate(mGrid, start, end, corridorWidth);
+    public PathResult RunAStar(Node start, Node end) => AStar.Navigate(start, end);
+    public PathResult RunGBFS(Node start, Node end) => GBFS.Navigate(start, end);
+    public PathResult RunILS(Node start, Node end, ILSAlgorithm algorithm, int corridorWidth = 10) =>
+        ILS.Navigate(mGrid, start, end, corridorWidth, algorithm);
 }

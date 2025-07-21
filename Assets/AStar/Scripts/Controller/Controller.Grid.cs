@@ -1,20 +1,18 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 
 public partial class Controller
 {
     private Node selectedNode;
-    public bool bIsNodeHit = false;
     
+    public bool bIsNodeHit = false;
     public Action<Node> OnNodeSet_Signature; 
     
-    [Header("Debugging")]
-    List<Node> navigationPath = new List<Node>();
-    
     public void EnableNodeHit() => bIsNodeHit = true;
+    
     public void DisableNodeHit() => bIsNodeHit = false;
+    
     public Node GetNodeHit()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -29,55 +27,49 @@ public partial class Controller
         }
         return null;
     }
+
     public void CreateGrid(GridConfig config) => mGrid.Create(config);
+    
     public void ClearGrid() => mGrid.Clear();
+    
+    public void OnResetPath() => mGrid.ResetPath();
+
     public void SubscribeTo_StartNodeSet()
     {
         EnableNodeHit();
         OnNodeSet_Signature += HandleOnStartNodeSet;
     }
+
     public void SubscribeTo_EndNodeSet()
     {
         EnableNodeHit();
         OnNodeSet_Signature += HandleOnEndNodeSet;
     }
+
     public void UnsubscribeFrom_OnNodeSet()
     {
         DisableNodeHit();
         OnNodeSet_Signature = null;
     }
 
-    private void HideSelectedNode()
-    {
-        if (selectedNode != null)
-        {
-            selectedNode.HideNeighbours();
-            selectedNode = null;
-        }
-    }
+    private void HandleOnStartNodeSet(Node node) => mGrid.SetStartNode(node);
 
-    private void HandleOnStartNodeSet(Node node)
-    {
-        mGrid.SetStartNode(node);
-        Debug.Log($"Start node set to: {node.name}");
-    }
-    private void HandleOnEndNodeSet(Node node)
-    {
-        mGrid.SetEndNode(node);
-        Debug.Log($"End node set to: {node.name}");
-    }
+    private void HandleOnEndNodeSet(Node node) => mGrid.SetEndNode(node);
+
     private void HandleOnShowNeighbours(Node node)
     {
         if (selectedNode != null && selectedNode == node)
         {
-            HideSelectedNode();
+            selectedNode.ToggleNeighbours(false);
+            selectedNode = null;
             return;
         }
 
-        HideSelectedNode();
+        selectedNode.ToggleNeighbours(false);
         selectedNode = node;
-        selectedNode.ShowNeighbours();
+        selectedNode.ToggleNeighbours(true);
     }
+
     private bool Execute_OnNodeSet()
     {
         var node = GetNodeHit();

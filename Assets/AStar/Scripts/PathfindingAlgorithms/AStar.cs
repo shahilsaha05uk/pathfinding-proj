@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 /*
@@ -8,38 +9,56 @@ using System.Collections.Generic;
 
 public static class AStar
 {
-    private static HashSet<Node> allowedNodes = null;
-    public static List<Node> Navigate(Node start, Node end, HashSet<Node> allowedNodes = null)
+    public static PathResult Navigate(Node start, Node end, HashSet<Node> allowedNodes = null, bool trackStats = true)
+    {
+        if (trackStats)
+        {
+            var (result, stats) = Stats.RecordStats(() => FindPath(start, end, allowedNodes));
+            if (result != null)
+            {
+                result.TimeTaken = stats.TimeTaken;
+                result.SpaceTaken = stats.SpaceTaken;
+                return result;
+            }
+            return null;
+        }
+        return FindPath(start, end, allowedNodes)?? null;
+    }
+
+    private static PathResult FindPath(Node start, Node goal, HashSet<Node> allowedNodes = null)
     {
         List<Node> openList = new List<Node>();
         HashSet<Node> closedList = new HashSet<Node>();
-        
-        AStar.allowedNodes = allowedNodes;
-        
+
         openList.Add(start);
-        start.gCost = 0;                                                     // Cost of the start node is 0
-        start.hCost = HeuristicHelper.GetManhattanDistance(start, end); // Heuristic cost from start to end
-        start.fCost = start.gCost + start.hCost;                            // Total cost of the path from start to end
-        
+        start.gCost = 0; // Cost of the start node is 0
+        start.hCost = HeuristicHelper.GetManhattanDistance(start, goal); // Heuristic cost from start to end
+        start.fCost = start.gCost + start.hCost; // Total cost of the path from start to end
+
         // while there are nodes in the open list
         while (openList.Count > 0)
         {
             // Get the current Node with the lowest fCost
-            Node currentNode = FindLowestF(openList);
-            
+            Node currentNode = HeuristicHelper.FindLowestF(openList);
+
             // if the node is there in the open list, move it to the closed list
-            if(openList.Contains(currentNode))
+            if (openList.Contains(currentNode))
                 openList.Remove(currentNode);
-            
+
             closedList.Add(currentNode);
-            
+
             // if the goal node is the current node, retrace the path and return it
-            if (currentNode == end)
+            if (currentNode == goal)
             {
-                AStar.allowedNodes = null; // Reset allowed nodes to null for future calls
-                return RetracePath(start, end);
+                var (path, totalCost) = HeuristicHelper.RetracePath(start, goal);
+                return new PathResult
+                {
+                    Path = path,
+                    PathLength = path.Count,
+                    PathCost = totalCost,
+                };
             }
-            
+
             // Else, get all the neighbors of the current node
             var neighbors = currentNode.GetNeighbors();
 
@@ -47,17 +66,18 @@ public static class AStar
             foreach (var neighbor in neighbors)
             {
                 // If the neighbor is already in the closed list or is blocked, skip it
-                if (closedList.Contains(neighbor) || !IsNodeAllowed(neighbor))
+                if (closedList.Contains(neighbor) || !HeuristicHelper.IsNodeAllowed(neighbor, allowedNodes))
                     continue;
-                
+
                 // Gets the distance from the current node to the neighbor
-                float tentativeGCost = currentNode.gCost + HeuristicHelper.GetManhattanDistance(currentNode, neighbor);
-                
+                float tentativeGCost =
+                    currentNode.gCost + HeuristicHelper.GetManhattanDistance(currentNode, neighbor);
+
                 // calculate the cost of the path to the neighbor
                 if (tentativeGCost < neighbor.gCost || !openList.Contains(neighbor))
                 {
                     neighbor.gCost = tentativeGCost;
-                    neighbor.hCost = HeuristicHelper.GetManhattanDistance(neighbor, end);
+                    neighbor.hCost = HeuristicHelper.GetManhattanDistance(neighbor, goal);
                     neighbor.fCost = neighbor.gCost + neighbor.hCost;
                     neighbor.parent = currentNode;
 
@@ -67,46 +87,8 @@ public static class AStar
                 }
             }
         }
-        
-        // No path found
-        return new List<Node>();
+
+        // No path was found, return null
+        return null;
     }
-
-    // This will find the node with the lowest cost (fCost) to the destination from the nodes in the open list
-    private static Node FindLowestF(List<Node> nodeList)
-    {
-        Node lowestNode = null;
-        float lowestFCost = float.MaxValue;
-        
-        // Go through every node in the list
-        foreach (var node in nodeList)
-        {
-            // if the node has a lower fCost than the current lowest, set it as the new lowest
-            if (node.fCost < lowestFCost)
-            {
-                lowestFCost = node.fCost;
-                lowestNode = node;
-            }
-        }
-
-        // return the node with the lowest fCost
-        return lowestNode;
-    }
-    private static List<Node> RetracePath(Node start, Node end)
-    {
-        List<Node> path = new List<Node>();
-        Node currentNode = end;
-
-        while (currentNode != start)
-        {
-            path.Add(currentNode);
-            currentNode = currentNode.parent;
-        }
-        path.Add(start);
-        path.Reverse();
-        return path;
-    }
-
-    private static bool IsNodeAllowed(Node n) =>
-        allowedNodes == null || (!n.isBlocked && allowedNodes.Contains(n));
 }

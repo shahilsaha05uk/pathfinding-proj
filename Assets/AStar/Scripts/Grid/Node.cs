@@ -1,7 +1,9 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+
 public enum TerrainType { Ground, HillTop, Cave, Obstacle }
+
 public class Node : MonoBehaviour
 {
     public float gCost, hCost, fCost;
@@ -12,10 +14,6 @@ public class Node : MonoBehaviour
     [SerializeField] private List<Node> neighbors;
     [SerializeField] private Color defaultColor;
 
-    private void Awake()
-    {
-        defaultColor = GetComponent<MeshRenderer>().material.color;
-    }
     public void SetType(TerrainType type, string ColorHex, bool blocked)
     {
         if (ColorUtils.GetColorFromHex(ColorHex, out var color))
@@ -23,12 +21,14 @@ public class Node : MonoBehaviour
             terrainType = type;
             isBlocked = blocked;
             SetColor(color);
+            defaultColor = color;
         }
         else
         {
             Debug.LogError($"Invalid color hex: {ColorHex}");
             terrainType = type;
             isBlocked = blocked;
+            defaultColor = Color.black;
             SetColor(Color.black);
         }
     }
@@ -52,20 +52,18 @@ public class Node : MonoBehaviour
         gridY = y;
         gridZ = z;
     }
-    
-    public void ShowNeighbours()
+
+    public void ToggleNeighbours(bool value)
     {
+        Color color = value ? Color.yellow : defaultColor;
         foreach (var n in neighbors)
-        {
-            n.SetColor(Color.red);
-        }
+            n.SetColor(color);
     }
-    public void HideNeighbours()
+
+    public void ResetNode()
     {
-        foreach (var n in neighbors)
-        {
-            n.SetColor(defaultColor);
-        }
+        parent = null;
+        SetColor(defaultColor);
     }
 
     public void DestroyNode()

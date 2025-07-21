@@ -1,33 +1,44 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum CorridorShape
-{
-    Cube,
-    Diamond,
-    Sphere
-}
 public static class ILS
 {
-    public static List<Node> Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth)
+    public static PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, ILSAlgorithm algorithm)
     {
-        int currentWidth = 1;
-        int maxWidth = maxCorridorWidth;
-
-        while (currentWidth <= maxWidth)
+        var (result, stats) = Stats.RecordStats(() =>
         {
-            var linePoints = GenerateLine(start, end);
-            var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
-            var path = FindPath(start, end, corridor);
-            
-            if(path is { Count: > 0 })
-                return path;
-            
-            currentWidth++;
-        }
-        Debug.LogWarning("No path found!");
-        return null;
+            int currentWidth = 1;
+            int maxWidth = maxCorridorWidth;
+            int corridorIterations = 1;
+            while (currentWidth <= maxWidth)
+            {
+                var linePoints = GenerateLine(start, end);
+                var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
+                var pathResult = FindPath(start, end, corridor, algorithm);
+
+                if (pathResult != null)
+                {
+                    return new PathResult
+                    {
+                        Path = pathResult.Path,
+                        PathLength = pathResult.PathLength,
+                        PathCost = pathResult.PathCost,
+                        CorridorIterations = corridorIterations,
+                    };
+                }
+                
+                currentWidth++;
+                corridorIterations++;
+            }
+            Debug.LogWarning("No path found!");
+            return new PathResult { Path = null };
+        });
+
+        result.TimeTaken = stats.TimeTaken;
+        result.SpaceTaken = stats.SpaceTaken;
+        return result;
     }
     
     // Step 1: Get the Line from BLA
@@ -41,8 +52,7 @@ public static class ILS
         List<Vector3Int> linePoints, 
         Grid3D grid, 
         Node start, Node end,
-        int width = 1,
-        CorridorShape shape = CorridorShape.Diamond)
+        int width = 1)
     {
         var corridorNodes = new HashSet<Node>();
 
@@ -58,9 +68,38 @@ public static class ILS
         return corridorNodes;
     }
     
-    // Step 3: Pass it to the pathfinding algorithm
-    private static List<Node> FindPath(Node start, Node end, HashSet<Node> corridor)
+    private static HashSet<Node> DefineCorridor(
+        List<Vector3Int> linePoints, 
+        Grid3D grid, 
+        Node start, Node end,
+        CorridorShape shape,
+        int width = 1)
     {
-        return AStar.Navigate(start, end, corridor);
+        var corridorNodes = new HashSet<Node>();
+
+        foreach (var point in linePoints)
+        {
+            var neighbors = grid.GetManhattanRadius(point, width, shape);
+            corridorNodes.UnionWith(neighbors);
+        }
+        
+        corridorNodes.Add(start);
+        corridorNodes.Add(end);
+        
+        return corridorNodes;
+    }
+    
+    // Step 3: Pass it to the pathfinding algorithm
+    private static PathResult FindPath(Node start, Node end, HashSet<Node> corridor, ILSAlgorithm algorithm)
+    {
+        switch (algorithm)
+        {
+            case ILSAlgorithm.AStar:
+                return AStar.Navigate(start, end, corridor);
+            case ILSAlgorithm.GBFS:
+                return GBFS.Navigate(start, end, corridor);
+            default:
+                return AStar.Navigate(start, end, corridor);
+        }
     }
 }

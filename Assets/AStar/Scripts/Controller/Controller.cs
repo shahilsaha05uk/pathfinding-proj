@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -40,5 +41,6 @@ public partial class Controller : MonoBehaviour
         HandleCameraRotation();
         HandleCameraMovement();
     }
-    
+
+    public SaveManager GetSaveManager() => saveManager;
 }
