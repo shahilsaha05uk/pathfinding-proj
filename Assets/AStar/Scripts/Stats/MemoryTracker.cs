@@ -2,6 +2,7 @@ using System.Collections;
 using Unity.Profiling;
 using UnityEngine;
 using System.Diagnostics;
+using UnityEngine.Profiling;
 
 public class MemoryTracker : MonoBehaviour
 {
@@ -24,11 +25,8 @@ public class MemoryTracker : MonoBehaviour
         var delay = new WaitForSeconds(1f);
         while (true)
         {
-            if (systemMem.Valid)
-            {
-                var systemUsed = GetMemoryUsage();
-                UnityEngine.Debug.Log($"System Used Memory: {systemUsed} MB");
-            }
+            var memoryUsage = Profiler.GetTotalAllocatedMemoryLong();
+            UnityEngine.Debug.Log($"System Used Memory: {memoryUsage/ 1024} MB");
 
             yield return delay;
         }

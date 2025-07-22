@@ -20,7 +20,6 @@ public class UI : MonoBehaviour
     public void Init(Controller controller)
     {
         Controller = controller;
-        metricsUI.Init(controller);
         controlPanel.Init(controller);
     }
 
@@ -32,7 +31,6 @@ public class UI : MonoBehaviour
 
     private void OnResultEvaluated(EvaluationResult result)
     {
-        metricsUI.SetEvaluationResult(result);
         statusPanel.SetValue("Evaluation completed", "#0f0");
     }
 }

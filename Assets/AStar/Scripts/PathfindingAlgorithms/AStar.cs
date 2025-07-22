@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine.Profiling;
 
 /*
  * gCost = Cost of the start node
@@ -7,26 +8,11 @@ using System.Collections.Generic;
  * fCost = (gCost + hCost) represents the total cost of the PATH
  */
 
-public static class AStar
+public class AStar : BasePathfinding
 {
-    public static PathResult Navigate(Node start, Node end, HashSet<Node> allowedNodes = null, bool trackStats = true)
+    protected override PathResult FindPath(Node start, Node goal, HashSet<Node> allowedNodes = null)
     {
-        if (trackStats)
-        {
-            var (result, stats) = Stats.RecordStats(() => FindPath(start, end, allowedNodes));
-            if (result != null)
-            {
-                result.TimeTaken = stats.TimeTaken;
-                result.MemoryUsage = stats.MemoryUsed;
-                return result;
-            }
-            return null;
-        }
-        return FindPath(start, end, allowedNodes)?? null;
-    }
-
-    private static PathResult FindPath(Node start, Node goal, HashSet<Node> allowedNodes = null)
-    {
+        int visitedNodes = 0;
         List<Node> openList = new List<Node>();
         HashSet<Node> closedList = new HashSet<Node>();
 
@@ -56,6 +42,7 @@ public static class AStar
                     Path = path,
                     PathLength = path.Count,
                     PathCost = totalCost,
+                    VisitedNodes = visitedNodes,
                 };
             }
 
@@ -81,9 +68,8 @@ public static class AStar
                     neighbor.fCost = neighbor.gCost + neighbor.hCost;
                     neighbor.parent = currentNode;
 
-                    // Add it to the open list if it is not already there
-                    if (!openList.Contains(neighbor))
-                        openList.Add(neighbor);
+                    openList.Add(neighbor);
+                    visitedNodes++;
                 }
             }
         }

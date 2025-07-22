@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 public partial class Controller
 {
-    private List<EvaluationResult> evaluationResults = new List<EvaluationResult>();
-
     public EvaluationResult OnEvaluate(int evalSize, bool bSaveAndExport)
     {
         if (evalSize <= 0)
@@ -14,38 +12,27 @@ public partial class Controller
         }
 
         // Evaluate the algorithms and collect the results
-        Evaluate(evalSize);
+        var result = Evaluate(evalSize);
 
-        if (evaluationResults.Count <= 0) return null;
+        if (result == null) return null;
 
         // If bSave is true, save the evaluation results
         if (bSaveAndExport)
             Export();
         
-        return evaluationResults[evalSize - 1];
+        return result;
     }
 
-    private void Evaluate(int evalSize)
-    {
-        // Delete the last evaluation results
-        if (evaluationResults != null && evaluationResults.Count > 0)
-            evaluationResults.Clear();
-
-        int count = 0;
-
-        // collect the data from the algorithms and add it to the list
-        while (count < evalSize)
-        {
-            var results = evaluator.Evaluate();
-            evaluationResults.Add(results);
-            count++;
-        }
-    }
+    private EvaluationResult Evaluate(int evalSize) => evaluator.Evaluate(evalSize);
 
     private void Export()
     {
-        var data = saveManager.CreateSaveData(mGrid.GetGridConfig(), evaluationResults);
+        var results = evaluator.GetEvaluationResults();
+        
+        var data = saveManager.CreateSaveData(mGrid.GetGridConfig(), results);
         saveManager.AddSaveData(data);
         saveManager.SaveAndExport();
+
+        evaluator.ClearResults();
     }
 }

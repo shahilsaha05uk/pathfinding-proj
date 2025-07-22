@@ -1,34 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class GBFS
+public class GBFS : BasePathfinding
 {
-    public static PathResult Navigate(Node start, Node goal, HashSet<Node> allowedNodes = null, bool trackStats = true)
+    protected override PathResult FindPath(Node start, Node goal, HashSet<Node> allowedNodes = null)
     {
-        if (trackStats)
-        {
-            var (result, stats) = Stats.RecordStats(() => FindPath(start, goal, allowedNodes));
-            if (result != null)
-            {
-                result.TimeTaken = stats.TimeTaken;
-                result.MemoryUsage = stats.MemoryUsed;
-                return result;
-            }
-        }
-        return FindPath(start, goal, allowedNodes);
-    }
-
-    private static PathResult FindPath(Node start, Node goal, HashSet<Node> allowedNodes = null)
-    {
+        int visitedNodes = 0;
         List<Node> openList = new List<Node>();
         HashSet<Node> closedList = new HashSet<Node>();
         
-        // Step 1: Place the start node in the open list
+        // Place the start node in the open list
         openList.Add(start);
         
         while (openList.Count > 0)
         {
-            // Step 3: Pick the lowest hCost node from the open list
+            // Pick the lowest hCost node from the open list
             var currentNode = HeuristicHelper.FindLowestH(openList);
             openList.Remove(currentNode);
             closedList.Add(currentNode);
@@ -40,11 +26,12 @@ public static class GBFS
                 {
                     Path = path,
                     PathLength = path.Count,
-                    PathCost = totalCost
+                    PathCost = totalCost,
+                    VisitedNodes = visitedNodes,
                 };
             }
             
-            // Step 4: expand the neighbors
+            // Expand the neighbors
             var neighbors = currentNode.GetNeighbors();
             foreach (var neighbor in neighbors)
             {
@@ -57,7 +44,9 @@ public static class GBFS
                     neighbor.parent = currentNode;
                     neighbor.hCost = HeuristicHelper.GetManhattanDistance(neighbor, goal);
                     openList.Add(neighbor);
+                    visitedNodes++;
                 }
+
             }
         }
         Debug.LogWarning("No path found to the goal!");

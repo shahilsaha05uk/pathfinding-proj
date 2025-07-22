@@ -9,7 +9,6 @@ public partial class Controller
         var (start, end) = mGrid.GetStartEndNodes();
         PathResult result = null;
 
-        Profiler.BeginSample("Pathfinding");
         switch (algorithmType)
         {
             case AlgorithmType.AStar:
@@ -19,17 +18,15 @@ public partial class Controller
                 result = pathfindingManager.RunGBFS(start, end);
                 break;
             case AlgorithmType.ILS_AStar:
-                result = pathfindingManager.RunILS(start, end, ILSAlgorithm.AStar);
+                result = pathfindingManager.RunILSWithAStar(start, end);
                 break;
             case AlgorithmType.ILS_GBFS:
-                result = pathfindingManager.RunILS(start, end, ILSAlgorithm.GBFS);
+                result = pathfindingManager.RunILSWithGBFS(start, end);
                 break;
             default:
                 result = pathfindingManager.RunAStar(start, end);
                 break;
         }
-
-        Profiler.EndSample();
         
         if (result != null)
             mGrid.HighlightPath(result.Path);
