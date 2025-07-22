@@ -14,7 +14,7 @@ public class EvaluationResult
         return new EvaluationData
         {
             TimeTaken = result.TimeTaken,
-            SpaceTaken = result.SpaceTaken,
+            MemoryUsage = result.MemoryUsage,
             PathLength = result.PathLength,
             PathCost = result.PathCost,
             CorridorIterations = result.CorridorIterations

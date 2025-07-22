@@ -1,5 +1,4 @@
-
-using UnityEngine;
+using UnityEngine.Profiling;
 
 public partial class Controller
 {
@@ -10,6 +9,7 @@ public partial class Controller
         var (start, end) = mGrid.GetStartEndNodes();
         PathResult result = null;
 
+        Profiler.BeginSample("Pathfinding");
         switch (algorithmType)
         {
             case AlgorithmType.AStar:
@@ -29,7 +29,9 @@ public partial class Controller
                 break;
         }
 
-        if(result != null)
+        Profiler.EndSample();
+        
+        if (result != null)
             mGrid.HighlightPath(result.Path);
         return EvaluationResult.FromPathResult(result);
     }

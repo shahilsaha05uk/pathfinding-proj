@@ -17,7 +17,7 @@ public static class AStar
             if (result != null)
             {
                 result.TimeTaken = stats.TimeTaken;
-                result.SpaceTaken = stats.SpaceTaken;
+                result.MemoryUsage = stats.MemoryUsed;
                 return result;
             }
             return null;

@@ -76,7 +76,7 @@ public static class CSVExporter
             saveData.Offset.z.ToString("F3"),
             algorithmName,
             data.TimeTaken.ToString("F3"),
-            data.SpaceTaken.ToString("F3"),
+            data.MemoryUsage.ToString("F3"),
             data.PathLength.ToString(),
             data.PathCost.ToString("F3"),
             data.CorridorIterations.ToString()

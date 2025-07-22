@@ -1,5 +1,7 @@
 
 
+using UnityEngine.Profiling;
+
 public class PathfindingManager
 {
     private Grid3D mGrid;

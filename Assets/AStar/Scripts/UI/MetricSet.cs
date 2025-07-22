@@ -22,8 +22,8 @@ public class MetricSet : MonoBehaviour
 
     public virtual void UpdateMetric(EvaluationData data)
     {
-        Time.SetValue(data.SpaceTaken.ToString());
-        Space.SetValue(data.TimeTaken.ToString());
+        Time.SetValue(data.TimeTaken.ToString());
+        Space.SetValue(data.MemoryUsage.ToString());
         PathCost.SetValue(data.PathCost.ToString());
         PathLength.SetValue(data.PathLength.ToString());
     }

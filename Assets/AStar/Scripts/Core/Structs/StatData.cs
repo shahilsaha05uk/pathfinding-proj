@@ -1,9 +1,9 @@
 ﻿using System;
 
 [Serializable]
-public struct StatData
+public class StatData
 {
     public float TimeTaken;
-    public float SpaceTaken;
+    public float MemoryUsed;
+    public float PeakMemoryUsed;
 }
-

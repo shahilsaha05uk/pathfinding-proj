@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 public class PathResult
 {
     public float TimeTaken;
-    public float SpaceTaken;
+    public float MemoryUsage;
     public int PathLength;
     public float PathCost;
     public int CorridorIterations;

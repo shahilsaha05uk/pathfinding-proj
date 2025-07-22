@@ -37,7 +37,7 @@ public static class ILS
         });
 
         result.TimeTaken = stats.TimeTaken;
-        result.SpaceTaken = stats.SpaceTaken;
+        result.MemoryUsage = stats.MemoryUsed;
         return result;
     }
     

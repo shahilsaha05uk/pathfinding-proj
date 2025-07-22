@@ -789,11 +789,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3259577197562859193, guid: 5106d632d00629e4ebc3e7ce83bdec14, type: 3}
       propertyPath: m_Name
-      value: Space
+      value: Memory
       objectReference: {fileID: 0}
     - target: {fileID: 5145166254534060833, guid: 5106d632d00629e4ebc3e7ce83bdec14, type: 3}
       propertyPath: label
-      value: Space
+      value: Memory
       objectReference: {fileID: 0}
     - target: {fileID: 6141803918100065869, guid: 5106d632d00629e4ebc3e7ce83bdec14, type: 3}
       propertyPath: m_AnchorMax.y
