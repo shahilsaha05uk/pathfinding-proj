@@ -6,6 +6,7 @@ public class EvaluationData
     public float TimeTaken;
     public int PathLength;
     public float PathCost;
+    public int VisitedNodes;
     public int CorridorIterations;
 }
 
