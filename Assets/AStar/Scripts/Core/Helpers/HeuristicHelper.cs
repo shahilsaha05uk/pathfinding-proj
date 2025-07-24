@@ -39,24 +39,21 @@ public static class HeuristicHelper
         int dz = Mathf.Abs(a.gridZ - b.gridZ);
         return Mathf.Max(dx, Mathf.Max(dy, dz));
     }
-    
-    public static (List<Node> path, float totalCost) RetracePath(Node start, Node end)
+
+    public static float GetDiagonalDistance(Node a, Node b)
     {
-        List<Node> path = new List<Node>();
-        Node currentNode = end;
-        float totalCost = 0f;
-        
-        while (currentNode != start)
-        {
-            path.Add(currentNode);
-            totalCost += currentNode.gCost;
-            currentNode = currentNode.parent;
-        }
-        path.Add(start);
-        path.Reverse();
-        return (path, totalCost);
+        int dx = Mathf.Abs(a.gridX - b.gridX);
+        int dy = Mathf.Abs(a.gridY - b.gridY);
+        int dz = Mathf.Abs(a.gridZ - b.gridZ);
+
+        int max = Mathf.Max(dx, Mathf.Max(dy, dz));
+        int min = Mathf.Min(dx, Mathf.Min(dy, dz));
+        int mid = dx + dy + dz - max - min;
+
+        // √3 ≈ 1.732, √2 ≈ 1.414
+        return 1.732f * min + 1.414f * (mid - min) + (max - mid);
     }
-    
+
     public static Node FindLowestF(List<Node> nodeList)
     {
         Node lowestNode = null;

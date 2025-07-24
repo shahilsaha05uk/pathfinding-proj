@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Grid3D : BaseGrid
 {
+    public static Grid3D Instance { get; private set; }
     private Node[,,] Nodes;
     
     private int maxHeight;
@@ -12,7 +13,13 @@ public class Grid3D : BaseGrid
     private float randomizeOffset;
     
     private float noiseScale = 0.1f;
-    
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
     public override void Create(GridConfig config)
     {
         if(Nodes != null && Nodes.Length > 0) Clear();
@@ -103,6 +110,7 @@ public class Grid3D : BaseGrid
             }
         }
         Nodes = null;
+        navPath.Clear();
     }
 
     public List<Node> GetNeighbors(Vector3Int point, int width)
@@ -177,6 +185,11 @@ public class Grid3D : BaseGrid
         return node != null ? node : null;
     }
     
+    public Node GetNodeAt(Vector3Int point)
+    {
+        return GetNodeAt(point.x, point.y, point.z);
+    }
+
     public bool IsInsideGrid(int x, int y, int z)
     {
         return x >= 0 && x < mGridSize &&

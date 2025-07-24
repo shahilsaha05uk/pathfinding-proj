@@ -3,7 +3,7 @@ using UnityEngine;
 
 public abstract class BaseGrid : MonoBehaviour
 {
-    private List<Node> navPath;
+    protected List<Node> navPath;
 
     public Node NodeObject;
     public GridColor GridColors;

@@ -35,16 +35,8 @@ public class AStar : BasePathfinding
 
             // if the goal node is the current node, retrace the path and return it
             if (currentNode == goal)
-            {
-                var (path, totalCost) = HeuristicHelper.RetracePath(start, goal);
-                return new PathResult
-                {
-                    Path = path,
-                    PathLength = path.Count,
-                    PathCost = totalCost,
-                    VisitedNodes = visitedNodes,
-                };
-            }
+                return ReturnPath(start, goal, visitedNodes);
+
 
             // Else, get all the neighbors of the current node
             var neighbors = currentNode.GetNeighbors();
@@ -53,7 +45,8 @@ public class AStar : BasePathfinding
             foreach (var neighbor in neighbors)
             {
                 // If the neighbor is already in the closed list or is blocked, skip it
-                if (closedList.Contains(neighbor) || !HeuristicHelper.IsNodeAllowed(neighbor, allowedNodes))
+                if (closedList.Contains(neighbor) || 
+                   !HeuristicHelper.IsNodeAllowed(neighbor, allowedNodes))
                     continue;
 
                 // Gets the distance from the current node to the neighbor

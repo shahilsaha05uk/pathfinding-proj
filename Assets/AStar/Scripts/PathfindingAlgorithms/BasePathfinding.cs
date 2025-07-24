@@ -21,5 +21,34 @@ public abstract class BasePathfinding : MonoBehaviour
         return FindPath(start, end, allowedNodes) ?? null;
     }
 
+    protected virtual (List<Node> path, float totalCost) RetracePath(Node start, Node end)
+    {
+        List<Node> path = new List<Node>();
+        Node currentNode = end;
+        float totalCost = 0f;
+
+        while (currentNode != start)
+        {
+            path.Add(currentNode);
+            totalCost += currentNode.gCost;
+            currentNode = currentNode.parent;
+        }
+        path.Add(start);
+        path.Reverse();
+        return (path, totalCost);
+    }
+
     protected virtual PathResult FindPath(Node start, Node goal, HashSet<Node> allowedNodes = null) => null;
+
+    protected virtual PathResult ReturnPath(Node start, Node goal, int visited = 0)
+    {
+        var (path, totalCost) = RetracePath(start, goal);
+        return new PathResult
+        {
+            Path = path,
+            PathLength = path.Count,
+            PathCost = totalCost,
+            VisitedNodes = visited,
+        };
+    }
 }

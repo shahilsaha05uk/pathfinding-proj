@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /*
-    Orthogonal neighbors: Up, Down, Left, Right
-    Diagonal neighbors: Up-Left, Up-Right, Down-Left, Down-Right
+    Orthogonal neighbors: Up, Down, Left : Right: Total = 6
+    Diagonal neighbors: Up-Left, Up-Right, Down-Left, Down-Right : Total = 8 corners +  
  */
 
 public enum TerrainType { Ground, HillTop, Cave, Obstacle }
@@ -64,6 +64,8 @@ public class Node : MonoBehaviour
         gridY = y;
         gridZ = z;
     }
+
+    public Vector3Int GetNodePositionOnGrid() => new Vector3Int(gridX, gridY, gridZ);
 
     public void ToggleNeighbours(bool value)
     {

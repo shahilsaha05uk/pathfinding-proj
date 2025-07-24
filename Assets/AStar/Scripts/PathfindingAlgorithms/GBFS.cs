@@ -20,17 +20,8 @@ public class GBFS : BasePathfinding
             closedList.Add(currentNode);
 
             if (currentNode == goal)
-            {
-                var (path, totalCost) = HeuristicHelper.RetracePath(start, goal);   
-                return new PathResult
-                {
-                    Path = path,
-                    PathLength = path.Count,
-                    PathCost = totalCost,
-                    VisitedNodes = visitedNodes,
-                };
-            }
-            
+                return ReturnPath(start, goal, visitedNodes);
+
             // Expand the neighbors
             var neighbors = currentNode.GetNeighbors();
             foreach (var neighbor in neighbors)

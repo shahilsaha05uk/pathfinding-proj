@@ -134,6 +134,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2160ee6de38a7b048b4fcf922ff110c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &6194125427792560827
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 134147797372271141}
+  - component: {fileID: 8893423696599815159}
+  - component: {fileID: 8490356757849609649}
+  m_Layer: 0
+  m_Name: Dijkstra
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &134147797372271141
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6194125427792560827}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3753176820776727679}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8893423696599815159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6194125427792560827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a56ca6a464a445ec91cb24bca3588753, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8490356757849609649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6194125427792560827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7c640bb07e6b9d4c9bbcd45750194bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6805181826825499464
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,6 +267,7 @@ Transform:
   m_Children:
   - {fileID: 8285999142668596055}
   - {fileID: 2207881264200808727}
+  - {fileID: 134147797372271141}
   - {fileID: 2881430716955297956}
   - {fileID: 2378291580918283437}
   m_Father: {fileID: 0}
@@ -229,4 +287,5 @@ MonoBehaviour:
   mGrid: {fileID: 0}
   aStar: {fileID: 1093933300889748}
   gbfs: {fileID: 2146567032715355885}
+  dijkstra: {fileID: 8490356757849609649}
   ils: {fileID: 2399236662088388762}
