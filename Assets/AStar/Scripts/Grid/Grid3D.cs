@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Grid3D : BaseGrid
 {
+    public static Grid3D Instance { get; private set; }
     private Node[,,] Nodes;
     
     private int maxHeight;
@@ -12,7 +13,13 @@ public class Grid3D : BaseGrid
     private float randomizeOffset;
     
     private float noiseScale = 0.1f;
-    
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
     public override void Create(GridConfig config)
     {
         if(Nodes != null && Nodes.Length > 0) Clear();
@@ -103,6 +110,7 @@ public class Grid3D : BaseGrid
             }
         }
         Nodes = null;
+        navPath.Clear();
     }
 
     public List<Node> GetNeighbors(Vector3Int point, int width)
@@ -177,6 +185,11 @@ public class Grid3D : BaseGrid
         return node != null ? node : null;
     }
     
+    public Node GetNodeAt(Vector3Int point)
+    {
+        return GetNodeAt(point.x, point.y, point.z);
+    }
+
     public bool IsInsideGrid(int x, int y, int z)
     {
         return x >= 0 && x < mGridSize &&
@@ -195,9 +208,14 @@ public class Grid3D : BaseGrid
                     var node = Nodes[x, y, z];
                     if (node == null) continue;
                     
-                    // Set the node's neighbors
-                    var neighbors = GetNeighbors(x, y, z);
-                    node.SetNeighbors(neighbors);
+                    // Set all the neighbors of this node
+                    AddAllNeighbors(ref node, x, y, z);
+
+                    // Set orthogonal neighbors
+                    AddOrthogonalNeighbors(ref node, x, y, z);
+
+                    // Set diagonal neighbors
+                    AddDiagonalNeighbors(ref node, x, y, z);
                 }
             }
         }
@@ -215,11 +233,88 @@ public class Grid3D : BaseGrid
         }
     }
     
+    private void AddAllNeighbors(ref Node node, int x, int y, int z)
+    {
+        var neighbors = GetNeighbors(x, y, z);
+        node.SetNeighbors(neighbors);
+    }
+
+    private void AddOrthogonalNeighbors(ref Node node, int x, int y, int z)
+    {
+        var orthogonalNeighbors = GetOrthogonalNeighbors(x, y, z);
+        node.SetOrthogonalNeighbours(orthogonalNeighbors);
+    }
+
+    private void AddDiagonalNeighbors(ref Node node, int x, int y, int z)
+    {
+        var diagonalNeighbors = GetDiagonalNeighbors(x, y, z);
+        node.SetDiagonalNeighbours(diagonalNeighbors);
+    }
+
     private List<Node> GetNeighbors(int x, int y, int z)
     {
         return GetNeighbors(new Vector3Int(x,y,z), 1);
     }
-    
+
+    private List<Node> GetOrthogonalNeighbors(int x, int y, int z)
+    {
+        var directions = new List<Vector3Int>
+        {
+            new Vector3Int(1, 0, 0),
+            new Vector3Int(-1, 0, 0),
+            new Vector3Int(0, 1, 0),
+            new Vector3Int(0, -1, 0),
+            new Vector3Int(0, 0, 1),
+            new Vector3Int(0, 0, -1)
+        };
+
+        return GetDirectionalNeighbors(x, y, z, directions);
+    }
+
+    private List<Node> GetDirectionalNeighbors(int x, int y, int z, List<Vector3Int> directions)
+    {
+        List<Node> neighbors = new List<Node>();
+
+        foreach (var dir in directions)
+        {
+            int nx = x + dir.x;
+            int ny = y + dir.y;
+            int nz = z + dir.z;
+
+            if (IsInsideGrid(nx, ny, nz))
+            {
+                var neighbor = GetNodeAt(nx, ny, nz);
+                if (neighbor != null)
+                    neighbors.Add(neighbor);
+            }
+        }
+
+        return neighbors;
+    }
+
+    private List<Node> GetDiagonalNeighbors(int x, int y, int z)
+    {
+        List<Node> diagonals = new List<Node>();
+
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dy = -1; dy <= 1; dy++)
+                for (int dz = -1; dz <= 1; dz++)
+                {
+                    if (dx == 0 && dy == 0 && dz == 0) continue;
+                    if (Mathf.Abs(dx) + Mathf.Abs(dy) + Mathf.Abs(dz) == 1) continue; // skip orthogonals
+
+                    int nx = x + dx;
+                    int ny = y + dy;
+                    int nz = z + dz;
+
+                    var neighbor = GetNodeAt(nx, ny, nz);
+                    if (neighbor != null)
+                        diagonals.Add(neighbor);
+                }
+
+        return diagonals;
+    }
+
     private void SetNodePosition(Node node, int x, int y, int z)
     {
         // Calculate the idle position, as to where it should be without noise

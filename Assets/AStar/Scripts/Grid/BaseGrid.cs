@@ -3,7 +3,7 @@ using UnityEngine;
 
 public abstract class BaseGrid : MonoBehaviour
 {
-    private List<Node> navPath;
+    protected List<Node> navPath;
 
     public Node NodeObject;
     public GridColor GridColors;
@@ -16,7 +16,7 @@ public abstract class BaseGrid : MonoBehaviour
     protected float mObstacleDensity;
     
     protected Node startNode;
-    protected Node endNode;
+    protected Node goalNode;
 
     public virtual void Create(GridConfig config)
     {
@@ -31,7 +31,7 @@ public abstract class BaseGrid : MonoBehaviour
 
     public void SetStartNode(Node node) => SetNode(node, ref startNode, GridColors.StartNodeColor);
     
-    public void SetEndNode(Node node) => SetNode(node, ref endNode, GridColors.EndNodeColor);
+    public void SetEndNode(Node node) => SetNode(node, ref goalNode, GridColors.EndNodeColor);
     
     public void HighlightPath(List<Node> path)
     {
@@ -48,7 +48,7 @@ public abstract class BaseGrid : MonoBehaviour
             SetNodeColor(path[i], GridColors.PathNodeColor);
     }
 
-    public (Node start, Node end) GetStartEndNodes() => (startNode, endNode);
+    public (Node start, Node goal) GetStartEndNodes() => (startNode, goalNode);
     
     public List<Node> GetPath() => navPath;
 
@@ -64,8 +64,8 @@ public abstract class BaseGrid : MonoBehaviour
 
         if(startNode != null)
             SetNodeColor(startNode, GridColors.StartNodeColor);
-        if (endNode != null)
-            SetNodeColor(endNode, GridColors.EndNodeColor);
+        if (goalNode != null)
+            SetNodeColor(goalNode, GridColors.EndNodeColor);
     }
 
     protected void SetNodeIndex(Node node, int x, int y, int z = 0)

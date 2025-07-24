@@ -8,14 +8,12 @@ public partial class Controller : MonoBehaviour
     [SerializeField] private UI mUI;
     private SaveManager saveManager;
 
-    private PathfindingEvaluator evaluator;
-    private PathfindingManager pathfindingManager;
+    [SerializeField] private PathfindingEvaluator evaluator;
+    [SerializeField] private PathfindingManager pathfindingManager;
     
     private void Start()
     {
         saveManager = new SaveManager();
-        pathfindingManager = new PathfindingManager(mGrid);
-        evaluator = new PathfindingEvaluator(mGrid, mUI, pathfindingManager);
     }
 
     private void Update()

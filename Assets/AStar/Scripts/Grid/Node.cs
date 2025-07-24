@@ -2,17 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+    Orthogonal neighbors: Up, Down, Left : Right: Total = 6
+    Diagonal neighbors: Up-Left, Up-Right, Down-Left, Down-Right : Total = 8 corners +  
+ */
+
 public enum TerrainType { Ground, HillTop, Cave, Obstacle }
 
 public class Node : MonoBehaviour
 {
+    private List<Node> neighbors;
+    private List<Node> Neighbors_Orthogonal;
+    private List<Node> Neighbors_Diagonal;
+    [SerializeField] private Color defaultColor;
+
     public float gCost, hCost, fCost;
     public int gridX, gridY, gridZ;
     public Node parent;
     public TerrainType terrainType;
     public bool isBlocked;
-    [SerializeField] private List<Node> neighbors;
-    [SerializeField] private Color defaultColor;
 
     public void SetType(TerrainType type, string ColorHex, bool blocked)
     {
@@ -32,26 +40,32 @@ public class Node : MonoBehaviour
             SetColor(Color.black);
         }
     }
+    
     public void SetColor(Color color)
     {
         GetComponent<MeshRenderer>().material.color = color;
     }
-    public void SetNeighbors(List<Node> neighbors)
-    {
-        this.neighbors = neighbors;
-    }
-    public List<Node> GetNeighbors()
-    {
-        if (neighbors != null && neighbors.Count > 0)
-            return neighbors;
-        return new List<Node>();
-    }
+    
+    public void SetNeighbors(List<Node> neighbors) => this.neighbors = neighbors;
+    
+    public void SetOrthogonalNeighbours(List<Node> neighbors) => Neighbors_Orthogonal = neighbors;
+
+    public void SetDiagonalNeighbours(List<Node> neighbors) => Neighbors_Diagonal = neighbors;
+
+    public List<Node> GetNeighbors() => this.neighbors?? null;
+    
+    public List<Node> GetOrthogonalNeighbors() => Neighbors_Orthogonal ?? null;
+
+    public List<Node> GetDiagonalNeighbors() => Neighbors_Diagonal ?? null;
+
     public void SetNodeIndex(int x, int y, int z)
     {
         gridX = x;
         gridY = y;
         gridZ = z;
     }
+
+    public Vector3Int GetNodePositionOnGrid() => new Vector3Int(gridX, gridY, gridZ);
 
     public void ToggleNeighbours(bool value)
     {

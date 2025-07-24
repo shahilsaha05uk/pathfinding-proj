@@ -1,16 +1,29 @@
+using UnityEngine;
 
-
-public class PathfindingManager
+public class PathfindingManager : MonoBehaviour
 {
-    private Grid3D mGrid;
+    [SerializeField] private Grid3D mGrid;
 
-    public PathfindingManager(Grid3D grid)
-    {
-        mGrid = grid;
-    }
+    [SerializeField] private AStar aStar;
+    [SerializeField] private GBFS gbfs;
+    [SerializeField] private Dijkstra dijkstra;
+    [SerializeField] private ILS ils;
+    [SerializeField] private JPS jps;
 
-    public PathResult RunAStar(Node start, Node end) => AStar.Navigate(start, end);
-    public PathResult RunGBFS(Node start, Node end) => GBFS.Navigate(start, end);
-    public PathResult RunILS(Node start, Node end, ILSAlgorithm algorithm, int corridorWidth = 10) =>
-        ILS.Navigate(mGrid, start, end, corridorWidth, algorithm);
+    public PathResult RunAStar(Node start, Node end) => aStar.Navigate(start, end);
+
+    public PathResult RunGBFS(Node start, Node end) => gbfs.Navigate(start, end);
+
+    public PathResult RunJPS(Node start, Node end) => jps.Navigate(start, end);
+
+    public PathResult RunDijkstra(Node start, Node end) => dijkstra.Navigate(start, end);
+
+    public PathResult RunILSWithAStar(Node start, Node end, int corridorWidth = 10) =>
+        ils.Navigate(mGrid, start, end, corridorWidth, aStar);
+
+    public PathResult RunILSWithGBFS(Node start, Node end, int corridorWidth = 10) =>
+        ils.Navigate(mGrid, start, end, corridorWidth, gbfs);
+
+    public PathResult RunILSWithDijkstra(Node start, Node end, int corridorWidth = 10) =>
+        ils.Navigate(mGrid, start, end, corridorWidth, dijkstra);
 }

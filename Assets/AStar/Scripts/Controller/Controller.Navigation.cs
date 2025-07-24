@@ -1,5 +1,4 @@
-
-using UnityEngine;
+using UnityEngine.Profiling;
 
 public partial class Controller
 {
@@ -19,17 +18,17 @@ public partial class Controller
                 result = pathfindingManager.RunGBFS(start, end);
                 break;
             case AlgorithmType.ILS_AStar:
-                result = pathfindingManager.RunILS(start, end, ILSAlgorithm.AStar);
+                result = pathfindingManager.RunILSWithAStar(start, end);
                 break;
             case AlgorithmType.ILS_GBFS:
-                result = pathfindingManager.RunILS(start, end, ILSAlgorithm.GBFS);
+                result = pathfindingManager.RunILSWithGBFS(start, end);
                 break;
             default:
                 result = pathfindingManager.RunAStar(start, end);
                 break;
         }
-
-        if(result != null)
+        
+        if (result != null)
             mGrid.HighlightPath(result.Path);
         return EvaluationResult.FromPathResult(result);
     }

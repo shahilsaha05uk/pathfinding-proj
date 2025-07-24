@@ -1,41 +1,16 @@
 using System;
-using System.Diagnostics;
+using UnityEngine;
 
 public static class Stats
 {
-    public static StatData RecordStats(Action action)
-    {
-        long beforeMemory = GC.GetTotalMemory(false);
-        
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        action();
-        stopwatch.Stop();
-        
-        long afterMemory = GC.GetTotalMemory(false);
-
-        return new StatData
-        {
-            TimeTaken = (float)stopwatch.Elapsed.TotalMilliseconds,
-            SpaceTaken = (float)(afterMemory - beforeMemory) / (1024 * 1024) // Convert bytes to MB
-        };
-    }
-    
     public static (T result, StatData stats) RecordStats<T>(Func<T> func)
     {
-        long beforeMemory = GC.GetTotalMemory(false);
-        
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
+        float startTime = Time.realtimeSinceStartup;
         var result = func();
-        stopwatch.Stop();
-        
-        long afterMemory = GC.GetTotalMemory(false);
-
+        float endTime = Time.realtimeSinceStartup;
         return (result, new StatData
         {
-            TimeTaken = (float)stopwatch.Elapsed.TotalMilliseconds,
-            SpaceTaken = (float)(afterMemory - beforeMemory) / (1024 * 1024) // Convert bytes to MB
+            TimeTaken = (float)(endTime - startTime) * 1000f,
         });
     }
 }

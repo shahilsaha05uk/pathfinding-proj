@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 
-public static class ILS
+public class ILS : BasePathfinding
 {
-    public static PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, ILSAlgorithm algorithm)
+    public PathResult Navigate<T>(Grid3D grid, Node start, Node end, int maxCorridorWidth, T algorithm) where T : BasePathfinding
     {
         var (result, stats) = Stats.RecordStats(() =>
         {
@@ -16,7 +17,7 @@ public static class ILS
             {
                 var linePoints = GenerateLine(start, end);
                 var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
-                var pathResult = FindPath(start, end, corridor, algorithm);
+                var pathResult = algorithm.Navigate(start, end, corridor, false);
 
                 if (pathResult != null)
                 {
@@ -37,18 +38,17 @@ public static class ILS
         });
 
         result.TimeTaken = stats.TimeTaken;
-        result.SpaceTaken = stats.SpaceTaken;
         return result;
     }
     
     // Step 1: Get the Line from BLA
-    private static List<Vector3Int> GenerateLine(Node start, Node end)
+    private List<Vector3Int> GenerateLine(Node start, Node end)
     {
         return BLA.GenerateLine(start, end);
     }
     
     // Step 2: Define the corridor
-    private static HashSet<Node> DefineCorridor(
+    private HashSet<Node> DefineCorridor(
         List<Vector3Int> linePoints, 
         Grid3D grid, 
         Node start, Node end,
@@ -68,7 +68,7 @@ public static class ILS
         return corridorNodes;
     }
     
-    private static HashSet<Node> DefineCorridor(
+    private HashSet<Node> DefineCorridor(
         List<Vector3Int> linePoints, 
         Grid3D grid, 
         Node start, Node end,
@@ -89,17 +89,4 @@ public static class ILS
         return corridorNodes;
     }
     
-    // Step 3: Pass it to the pathfinding algorithm
-    private static PathResult FindPath(Node start, Node end, HashSet<Node> corridor, ILSAlgorithm algorithm)
-    {
-        switch (algorithm)
-        {
-            case ILSAlgorithm.AStar:
-                return AStar.Navigate(start, end, corridor);
-            case ILSAlgorithm.GBFS:
-                return GBFS.Navigate(start, end, corridor);
-            default:
-                return AStar.Navigate(start, end, corridor);
-        }
-    }
 }

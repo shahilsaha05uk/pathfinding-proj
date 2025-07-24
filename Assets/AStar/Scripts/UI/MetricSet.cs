@@ -10,7 +10,6 @@ public class MetricSet : MonoBehaviour
 
     public TMP_Text txtLabel;
     public PanelLabel Time;
-    public PanelLabel Space;
     public PanelLabel PathLength;
     public PanelLabel PathCost;
 
@@ -20,10 +19,11 @@ public class MetricSet : MonoBehaviour
         txtLabel.text = $"-- {Label} --";
     }
 
-    public virtual void UpdateMetric(EvaluationData data)
+    public virtual void UpdateMetric(AlgorithmType type, EvaluationData data)
     {
-        Time.SetValue(data.SpaceTaken.ToString());
-        Space.SetValue(data.TimeTaken.ToString());
+        txtLabel.text = $"-- {type.ToString()} --";
+
+        Time.SetValue(data.TimeTaken.ToString());
         PathCost.SetValue(data.PathCost.ToString());
         PathLength.SetValue(data.PathLength.ToString());
     }

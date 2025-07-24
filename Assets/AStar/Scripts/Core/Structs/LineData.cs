@@ -20,6 +20,6 @@ public struct LineData
 
         z0 = v1.z;
         z1 = v2.z;
-        deltas = BLAHelper.CalculateDeltas(this);
+        deltas = GridHelper.CalculateDeltas(this);
     }
 }
