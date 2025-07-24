@@ -5,9 +5,12 @@ using System;
 public class EvaluationResult
 {
     public EvaluationData AStar;
-    public EvaluationData ILSWithAStar;
     public EvaluationData GBFS;
+    public EvaluationData JPS;
+    public EvaluationData Dijkstra;
+    public EvaluationData ILSWithAStar;
     public EvaluationData ILSWithGBFS;
+    public EvaluationData ILSWithDijkstra;
     
     public static EvaluationData FromPathResult(PathResult result)
     {
@@ -16,6 +19,7 @@ public class EvaluationResult
             TimeTaken = result.TimeTaken,
             PathLength = result.PathLength,
             PathCost = result.PathCost,
+            VisitedNodes = result.VisitedNodes,
             CorridorIterations = result.CorridorIterations
         };
     }

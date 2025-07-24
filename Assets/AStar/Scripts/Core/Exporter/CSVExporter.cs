@@ -41,6 +41,7 @@ public static class CSVExporter
             "TimeTaken," +
             "PathLength," +
             "PathCost," +
+            "VisitedNodes," +
             "CorridorIterations");
 
         foreach (var data in saveData)
@@ -50,12 +51,14 @@ public static class CSVExporter
             foreach (var result in data.EvaluationResult)
             {
                 AppendRow(sb, data, "AStar", result.AStar);
-                AppendRow(sb, data, "ILSWithAStar", result.ILSWithAStar);
                 AppendRow(sb, data, "GBFS", result.GBFS);
+                AppendRow(sb, data, "JPS", result.JPS);
+                AppendRow(sb, data, "Dijkstra", result.Dijkstra);
+                AppendRow(sb, data, "ILSWithAStar", result.ILSWithAStar);
                 AppendRow(sb, data, "ILSWithGBFS", result.ILSWithGBFS);
+                AppendRow(sb, data, "ILSWithDijkstra", result.ILSWithDijkstra);
             }
         }
-
 
         File.WriteAllText(fullpath, sb.ToString());
         Debug.Log($"✅ CSV successfully exported to: {fullpath}");
@@ -77,6 +80,7 @@ public static class CSVExporter
             data.TimeTaken.ToString("F3"),
             data.PathLength.ToString(),
             data.PathCost.ToString("F3"),
+            data.VisitedNodes.ToString(),
             data.CorridorIterations.ToString()
         }));
     }
