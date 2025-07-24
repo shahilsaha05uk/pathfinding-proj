@@ -648,8 +648,44 @@ public class PriorityQueue<TElement, TPriority>
         }
     }
 
-    internal void UpdatePriority(Node jumpPoint, float fCost)
+    public void UpdatePriority(Node jumpPoint, float fCost)
     {
-        throw new NotImplementedException();
+        int index = -1;
+
+        // Locate the element
+        for (int i = 0; i < _size; i++)
+        {
+            if (EqualityComparer<TElement>.Default.Equals(_nodes[i].Element, (TElement)(object)jumpPoint))
+            {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1)
+            throw new InvalidOperationException("Element not found in priority queue.");
+
+        var oldPriority = _nodes[index].Priority;
+        var newPriority = (TPriority)(object)fCost;
+        _nodes[index] = ((TElement)(object)jumpPoint, newPriority);
+
+        // Determine if we need to move up or down the heap
+        if (_comparer == null)
+        {
+            if (Comparer<TPriority>.Default.Compare(newPriority, oldPriority) < 0)
+                MoveUpDefaultComparer(_nodes[index], index);
+            else
+                MoveDownDefaultComparer(_nodes[index], index);
+        }
+        else
+        {
+            if (_comparer.Compare(newPriority, oldPriority) < 0)
+                MoveUpCustomComparer(_nodes[index], index);
+            else
+                MoveDownCustomComparer(_nodes[index], index);
+        }
+
+        _version++;
     }
+
 }

@@ -42,16 +42,18 @@ public static class HeuristicHelper
 
     public static float GetDiagonalDistance(Node a, Node b)
     {
-        int dx = Mathf.Abs(a.gridX - b.gridX);
-        int dy = Mathf.Abs(a.gridY - b.gridY);
-        int dz = Mathf.Abs(a.gridZ - b.gridZ);
+        if (a == null || b == null) return 0f;
 
-        int max = Mathf.Max(dx, Mathf.Max(dy, dz));
-        int min = Mathf.Min(dx, Mathf.Min(dy, dz));
-        int mid = dx + dy + dz - max - min;
+        var delta = GridHelper.CalculateDeltas(a, b);
 
-        // √3 ≈ 1.732, √2 ≈ 1.414
-        return 1.732f * min + 1.414f * (mid - min) + (max - mid);
+        var dMin = Mathf.Min(delta.X, Mathf.Min(delta.Y, delta.Z));
+        var dMax = Mathf.Max(delta.X, Mathf.Max(delta.Y, delta.Z));
+        var dMid = delta.X + delta.Y + delta.Z - dMin - dMax;
+
+        var sqrt2 = Mathf.Sqrt(2f);
+        var sqrt3 = Mathf.Sqrt(3f);
+        var heuristic = (sqrt3 - sqrt2) * dMin + (sqrt2 - 1) * dMid + dMax;
+        return heuristic;
     }
 
     public static Node FindLowestF(List<Node> nodeList)

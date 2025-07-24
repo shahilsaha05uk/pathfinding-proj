@@ -17,8 +17,8 @@ public static class BLA
 { 
     public static List<Vector3Int> GenerateLine(Node start, Node end, float offset = 0.2f)
     {
-        var startPos = NodeMathHelper.GetPositionAs3DInt(start);
-        var endPos = NodeMathHelper.GetPositionAs3DInt(end);
+        var startPos = GridHelper.GetPositionAs3DInt(start);
+        var endPos = GridHelper.GetPositionAs3DInt(end);
         var lineData = new LineData(startPos, endPos);
 
         List<Vector3Int> points = new List<Vector3Int>();

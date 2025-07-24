@@ -8,10 +8,13 @@ public class PathfindingManager : MonoBehaviour
     [SerializeField] private GBFS gbfs;
     [SerializeField] private Dijkstra dijkstra;
     [SerializeField] private ILS ils;
+    [SerializeField] private JPS jps;
 
     public PathResult RunAStar(Node start, Node end) => aStar.Navigate(start, end);
 
     public PathResult RunGBFS(Node start, Node end) => gbfs.Navigate(start, end);
+
+    public PathResult RunJPS(Node start, Node end) => jps.Navigate(start, end);
 
     public PathResult RunDijkstra(Node start, Node end) => dijkstra.Navigate(start, end);
 

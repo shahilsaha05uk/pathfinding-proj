@@ -1,4 +1,3 @@
-using Assets.AStar.Scripts.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +8,7 @@ public class JPS : BasePathfinding
 
     private void Awake()
     {
-        AllDirections = GetAllDirections();
+        AllDirections = JPSHelper.CreateAllDirectionList();
     }
 
     protected override PathResult FindPath(Node start, Node goal, HashSet<Node> allowedNodes = null)
@@ -20,16 +19,14 @@ public class JPS : BasePathfinding
         var directionMap = new Dictionary<Node, Vector3Int>();
         var visited = 0;
 
-
         // initialise the start node  
         start.gCost = 0;
-        start.hCost = HeuristicHelper.GetManhattanDistance(start, goal);
+        start.hCost = HeuristicHelper.GetDiagonalDistance(start, goal);
         start.fCost = start.hCost;
 
         // add the start node to the open list  
         openList.Enqueue(start, start.fCost);
         directionMap[start] = Vector3Int.zero;
-
 
         // while the open list is not empty  
         while (openList.Count > 0)
@@ -42,47 +39,43 @@ public class JPS : BasePathfinding
             if (current == goal)
                 return ReturnPath(start, goal, visited);
 
-            //// get all the neighbors of the current node
-            //var currentDir = directionMap[current];
-            //var directions = (currentDir == Vector3Int.zero) ? AllDirections : GetNaturalNeighbours(currentDir);
-            //// for each of the neighbor:  
-            //foreach (var dir in directions)
-            //{
-            //    // Get the next jump point
-            //    Node jumpPoint = Jump(current, goal, dir);
-            //    // move to the next direction if the jump point in the current direction wasnt found
-            //    if (jumpPoint == null ||
-            //        closedSet.Contains(jumpPoint))
-            //        continue;
-            //    // this is the estimated cost from the start node to the current node
-            //    float tentativeG = current.gCost + HeuristicHelper.GetManhattanDistance(current, jumpPoint);
-            //    if (!openList.Contains(jumpPoint) ||
-            //        tentativeG < jumpPoint.gCost)
-            //    {
-            //        jumpPoint.gCost = tentativeG;
-            //        jumpPoint.hCost = HeuristicHelper.GetManhattanDistance(jumpPoint, goal);
-            //        jumpPoint.fCost = jumpPoint.gCost + jumpPoint.hCost;
-            //        jumpPoint.parent = current;
-            //        // add it to the open queue
-            //        if (!openList.Contains(jumpPoint))
-            //            openList.Enqueue(jumpPoint, jumpPoint.fCost);
-            //        else
-            //            openList.UpdatePriority(jumpPoint, jumpPoint.fCost);
-            //        visited++;
-            //    }
-            //}
-            //foreach (var forcedDir in GetForcedNeighbors(current, currentDir))
-            //{
-            //    Node jumpPoint = Jump(current, goal, forcedDir);
-            //    if (jumpPoint != null ||
-            //        !closedSet.Contains(jumpPoint))
-            //        directions.Add(forcedDir);
-            //}
+            // Get the jump points
+            var currentDir = directionMap[current];
+            var successors = IdentifySuccessors(current, start, goal, currentDir);
+
+            foreach (var jumpPoint in successors)
+            {
+                if (jumpPoint == null || closedSet.Contains(jumpPoint))
+                    continue;
+
+                float tentativeG = current.gCost + HeuristicHelper.GetDiagonalDistance(current, jumpPoint);
+
+                if(!openList.Contains(jumpPoint) || tentativeG < jumpPoint.gCost)
+                {
+                    // Calculate the costs of the jump point
+                    jumpPoint.gCost = tentativeG;
+                    jumpPoint.hCost = HeuristicHelper.GetDiagonalDistance(jumpPoint, goal);
+                    jumpPoint.fCost = jumpPoint.gCost + jumpPoint.hCost;
+                    jumpPoint.parent = current;
+
+                    Vector3Int dir = GridHelper.GetDirection(current, jumpPoint);
+                    directionMap[current] = dir;
+
+                    if (!openList.Contains(jumpPoint))
+                    {
+                        openList.Enqueue(jumpPoint, jumpPoint.fCost);
+                        visited++;
+                    }
+                    else
+                    {
+                        openList.UpdatePriority(jumpPoint, jumpPoint.fCost);
+                    }
+                }
+            }
         }
 
-        return base.FindPath(start, goal, allowedNodes);
+        return null;
     }
-
 
     /// <summary>
     /// This method checks if the node has a forced neighbor in the given direction.
@@ -118,19 +111,12 @@ public class JPS : BasePathfinding
         return false;
     }
 
-    private List<Vector3Int> GetAllDirections() => JPSHelper.CreateAllDirectionList();
-
     private Node GetNodeInDirection(Node node, Vector3Int direction)
     {
         if (node == null) return null;
 
         Vector3Int newPos = node.GetNodePositionOnGrid() + direction;
         return Grid3D.Instance.GetNodeAt(newPos);
-    }
-
-    private Vector3Int GetDirection(Node n1, Node n2)
-    {
-        return Vector3Int.zero;
     }
 
     /// <summary>
@@ -223,7 +209,7 @@ public class JPS : BasePathfinding
         List<Vector3Int> neighbors = new List<Vector3Int>();
 
         if (direction == Vector3Int.zero)
-            return GetAllDirections();
+            return AllDirections;
 
         // Cardinal directions
         if (direction.x != 0 && direction.y == 0 && direction.z == 0)

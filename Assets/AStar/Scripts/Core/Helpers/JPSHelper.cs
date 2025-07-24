@@ -294,7 +294,7 @@ public static class JPSHelper
         }
 
 };
-    
+
     public static List<Vector3Int> CreateAllDirectionList()
     {
         var directions = new List<Vector3Int>();

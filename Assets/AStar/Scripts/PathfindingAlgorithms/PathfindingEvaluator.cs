@@ -53,8 +53,9 @@ public class PathfindingEvaluator : MonoBehaviour
     private EvaluationResult GatherEvaluationData(Node start, Node goal)
     {
         var aStar = EvaluationResult.FromPathResult(mPathManager.RunAStar(start, goal));
-        var ilsWithAStar = EvaluationResult.FromPathResult(mPathManager.RunILSWithAStar(start, goal));
         var gbfs = EvaluationResult.FromPathResult(mPathManager.RunGBFS(start, goal));
+        var jps = EvaluationResult.FromPathResult(mPathManager.RunJPS(start, goal));
+        var ilsWithAStar = EvaluationResult.FromPathResult(mPathManager.RunILSWithAStar(start, goal));
         var ilsWithGBFS = EvaluationResult.FromPathResult(mPathManager.RunILSWithGBFS(start, goal));
 
         return new EvaluationResult
