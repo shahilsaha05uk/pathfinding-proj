@@ -23,6 +23,9 @@ public partial class Controller
             case AlgorithmType.ILS_GBFS:
                 result = pathfindingManager.RunILSWithGBFS(start, end);
                 break;
+            case AlgorithmType.JPS:
+                result = pathfindingManager.RunJPS(start, end);
+                break;
             default:
                 result = pathfindingManager.RunAStar(start, end);
                 break;

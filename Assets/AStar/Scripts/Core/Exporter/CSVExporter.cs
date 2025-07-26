@@ -22,7 +22,7 @@ public static class CSVExporter
 
         // Find next available file name
         int fileIndex = GetNextFileIndex(folderPath, filename);
-        string fileName = $"{filename}_{fileIndex}.csv";
+        string fileName = (filename == "data")? $"{filename}_{fileIndex}.csv" : $"{filename}.csv";
         string fullPath = Path.Combine(folderPath, fileName);
 
         bool success = CreateCSV(saveData, fullPath);

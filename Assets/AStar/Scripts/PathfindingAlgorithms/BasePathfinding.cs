@@ -1,7 +1,6 @@
 ﻿
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Profiling;
 
 public abstract class BasePathfinding : MonoBehaviour
 {
@@ -51,4 +50,6 @@ public abstract class BasePathfinding : MonoBehaviour
             VisitedNodes = visited,
         };
     }
+
+    protected virtual List<Node> GetAllNeighbors(Node node) => (List<Node>)NeighborHelper.GetNeighbors(node);
 }

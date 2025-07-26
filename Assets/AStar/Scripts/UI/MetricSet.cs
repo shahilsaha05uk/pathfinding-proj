@@ -2,21 +2,18 @@ using TMPro;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
-public class MetricSet : MonoBehaviour
+public class MetricSet : LabelledPanel
 {
     [Space(5)]
     [Header("Input Fields")]
-    public string Label;
 
-    public TMP_Text txtLabel;
     public PanelLabel Time;
     public PanelLabel PathLength;
     public PanelLabel PathCost;
 
-
     public void Start()
     {
-        txtLabel.text = $"-- {Label} --";
+        txtLabel.text = $"-- {txtLabel.text} --";
     }
 
     public virtual void UpdateMetric(AlgorithmType type, EvaluationData data)

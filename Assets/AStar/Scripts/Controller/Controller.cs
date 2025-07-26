@@ -6,14 +6,14 @@ public partial class Controller : MonoBehaviour
 {
     public Grid3D mGrid;
     [SerializeField] private UI mUI;
-    private SaveManager saveManager;
+    private EvaluationDataSaver evaluationDataSaveManager;
 
     [SerializeField] private PathfindingEvaluator evaluator;
     [SerializeField] private PathfindingManager pathfindingManager;
     
     private void Start()
     {
-        saveManager = new SaveManager();
+        evaluationDataSaveManager = new EvaluationDataSaver();
     }
 
     private void Update()
@@ -40,5 +40,5 @@ public partial class Controller : MonoBehaviour
         HandleCameraMovement();
     }
 
-    public SaveManager GetSaveManager() => saveManager;
+    public EvaluationDataSaver GetSaveManager() => evaluationDataSaveManager;
 }

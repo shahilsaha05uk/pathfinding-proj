@@ -3,7 +3,7 @@ using UnityEngine.Profiling;
 
 public partial class Controller
 {
-    public EvaluationResult OnEvaluate(int evalSize, bool bSaveAndExport)
+    public EvaluationResult OnEvaluate(int evalSize)
     {
         if (evalSize <= 0)
         {
@@ -17,22 +17,23 @@ public partial class Controller
         if (result == null) return null;
 
         // If bSave is true, save the evaluation results
-        if (bSaveAndExport)
-            Export();
-        
+        SaveAndExport();
+
         return result;
     }
 
     private EvaluationResult Evaluate(int evalSize) => evaluator.Evaluate(evalSize);
 
-    private void Export()
+    public string SaveAndExport()
     {
         var results = evaluator.GetEvaluationResults();
-        
-        var data = saveManager.CreateSaveData(mGrid.GetGridConfig(), results);
-        saveManager.AddSaveData(data);
-        saveManager.SaveAndExport();
+        var gridData = mGrid.GetGridData();
+
+        var data = evaluationDataSaveManager.CreateSaveData(gridData, results);
+        evaluationDataSaveManager.AddSaveData(data);
+        var status = evaluationDataSaveManager.SaveAndExport(gridData.GridSize, Mathf.FloorToInt(gridData.ObstacleDensity * 100));
 
         evaluator.ClearResults();
+        return status;
     }
 }

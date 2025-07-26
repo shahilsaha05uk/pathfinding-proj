@@ -5,14 +5,13 @@ public class UI : MonoBehaviour
 {
     public Controller Controller;
     public MetricsPanel metricsUI;
-    public ControlPanel controlPanel;
+    public SidePanel sidePanel;
 
     public PanelStatus statusPanel;
 
     private void Start()
     {
-        controlPanel.OnResultEvaluated += OnResultEvaluated;
-        controlPanel.OnNavigated += metricsUI.OnNavigated;
+        sidePanel.OnEvaluationDataChangedSignature += metricsUI.OnNavigated;
         metricsUI.OnSaveAndExport += OnSavedAndExport;
         Init(Controller);
     }
@@ -20,17 +19,12 @@ public class UI : MonoBehaviour
     public void Init(Controller controller)
     {
         Controller = controller;
-        controlPanel.Init(controller);
+        sidePanel.Init(controller);
     }
 
     private void OnSavedAndExport()
     {
-        var status = Controller.GetSaveManager().SaveAndExport();
+        var status = Controller.SaveAndExport();
         statusPanel.SetValue(status, "#00f");
-    }
-
-    private void OnResultEvaluated(EvaluationResult result)
-    {
-        statusPanel.SetValue("Evaluation completed", "#0f0");
     }
 }

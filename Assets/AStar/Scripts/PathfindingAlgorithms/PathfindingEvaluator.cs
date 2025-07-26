@@ -63,6 +63,7 @@ public class PathfindingEvaluator : MonoBehaviour
             AStar = aStar,
             ILSWithAStar = ilsWithAStar,
             GBFS = gbfs,
+            JPS = jps,
             ILSWithGBFS = ilsWithGBFS,
         };
     }

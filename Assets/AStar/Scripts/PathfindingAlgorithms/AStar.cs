@@ -39,7 +39,7 @@ public class AStar : BasePathfinding
 
 
             // Else, get all the neighbors of the current node
-            var neighbors = currentNode.GetNeighbors();
+            var neighbors = GetAllNeighbors(currentNode);
 
             // Loop through each neighbor
             foreach (var neighbor in neighbors)

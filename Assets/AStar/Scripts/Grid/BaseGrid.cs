@@ -3,7 +3,9 @@ using UnityEngine;
 
 public abstract class BaseGrid : MonoBehaviour
 {
-    protected List<Node> navPath;
+    [SerializeField] protected ObstacleManager obstacleManager;
+
+    protected List<Node> navPath = new();
 
     public Node NodeObject;
     public GridColor GridColors;
@@ -11,9 +13,7 @@ public abstract class BaseGrid : MonoBehaviour
     protected GridConfig mConfig;
     
     protected int mGridSize = 10;
-    protected float mTileSize = 1;
     protected float mTileSpacing = 0.1f;
-    protected float mObstacleDensity;
     
     protected Node startNode;
     protected Node goalNode;
@@ -22,12 +22,11 @@ public abstract class BaseGrid : MonoBehaviour
     {
         mConfig = config;
         mGridSize = mConfig.GridSize;
-        mTileSize = mConfig.TileSize;
-        mTileSpacing = mConfig.TileSpacing;
-        mObstacleDensity = mConfig.ObstacleDensity;
     }
     
     public virtual void Clear() { }
+
+    public virtual void ClearObstacles() { }
 
     public void SetStartNode(Node node) => SetNode(node, ref startNode, GridColors.StartNodeColor);
     
@@ -52,13 +51,16 @@ public abstract class BaseGrid : MonoBehaviour
     
     public List<Node> GetPath() => navPath;
 
-    public GridConfig GetGridConfig() => mConfig;
-
-    public void ResetPath()
+    public GridData GetGridData() => new GridData()
     {
-        if(navPath == null || navPath.Count == 0)
-            return;
+        GridSize = mGridSize,
+        MaxHeight = mConfig.MaxHeight,
+        NoiseScale = mConfig.NoiseScale,
+        ObstacleDensity = obstacleManager.GetCurrentPercent()
+    };
 
+    public virtual void ResetPath()
+    {
         foreach (var node in navPath)
             node.ResetNode();
 
@@ -84,9 +86,7 @@ public abstract class BaseGrid : MonoBehaviour
         }
     }
     
-    protected virtual void AssignNeighbors() { }
-
-    protected virtual void AddObstacles(List<Node> potentialObstacles) { }
+    protected virtual void AddObstacles(float percent) { }
 
     private void SetNode(Node newNode, ref Node targetNode, Color color)
     {
@@ -95,6 +95,7 @@ public abstract class BaseGrid : MonoBehaviour
         if (targetNode != null)
             targetNode.ResetNode();
         targetNode = newNode;
+        targetNode.SetEndpoint(true);
         SetNodeColor(newNode, color);
     }
 }

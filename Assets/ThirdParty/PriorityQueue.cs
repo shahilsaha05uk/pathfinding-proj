@@ -457,6 +457,9 @@ public class PriorityQueue<TElement, TPriority>
 
     public PriorityQueue(int initialCapacity, IComparer<TPriority>? comparer)
     {
+        if (initialCapacity < 0)
+            throw new ArgumentOutOfRangeException(nameof(initialCapacity), "Initial capacity must be non-negative.");
+
         _nodes = new (TElement, TPriority)[initialCapacity];
         _comparer = InitializeComparer(comparer);
     }
@@ -483,37 +486,82 @@ public class PriorityQueue<TElement, TPriority>
             MoveUpCustomComparer((element, priority), currentSize);
     }
 
+    public TElement Peek()
+    {
+        if (_size == 0)
+            throw new InvalidOperationException("The queue is empty");
+
+        return _nodes[0].Element;
+    }
+
     public TElement Dequeue()
     {
         if (_size == 0)
-            throw new Exception("The queue is empty");
+            throw new InvalidOperationException("The queue is empty");
 
         TElement element = _nodes[0].Element;
         RemoveRootNode();
         return element;
     }
 
-    public bool IsEmpty() => Count == 0;
+    public bool TryDequeue(out TElement element, out TPriority priority)
+    {
+        if (_size == 0)
+        {
+            element = default!;
+            priority = default!;
+            return false;
+        }
+
+        element = _nodes[0].Element;
+        priority = _nodes[0].Priority;
+        RemoveRootNode();
+        return true;
+    }
+
+    public bool IsEmpty() => _size == 0;
 
     public bool Contains(TElement element)
     {
+        var equalityComparer = EqualityComparer<TElement>.Default;
         for (int i = 0; i < _size; i++)
         {
-            if (EqualityComparer<TElement>.Default.Equals(_nodes[i].Element, element))
+            if (equalityComparer.Equals(_nodes[i].Element, element))
                 return true;
         }
         return false;
     }
 
+    public void Clear()
+    {
+        if (RuntimeHelpers.IsReferenceOrContainsReferences<(TElement, TPriority)>())
+        {
+            Array.Clear(_nodes, 0, _size);
+        }
+        _size = 0;
+        _version++;
+    }
+
     private void Grow(int minCapacity)
     {
-        int newCapacity = Math.Max(_nodes.Length * 2, _nodes.Length + 4);
+        const int MaxArrayLength = 0X7FEFFFFF; // This is the actual value used in .NET for Array.MaxLength
+
+        int newCapacity = _nodes.Length == 0 ? 4 : _nodes.Length * 2;
+
+        // Allow the list to grow to maximum possible capacity (~2G elements) before encountering overflow
+        if ((uint)newCapacity > MaxArrayLength)
+        {
+            newCapacity = MaxArrayLength;
+        }
+
+        // If we're still too small, set to requested minimum
         if (newCapacity < minCapacity)
+        {
             newCapacity = minCapacity;
+        }
 
         Array.Resize(ref _nodes, newCapacity);
     }
-
     private void RemoveRootNode()
     {
         int lastNodeIndex = --_size;
@@ -537,17 +585,23 @@ public class PriorityQueue<TElement, TPriority>
     private void MoveUpDefaultComparer((TElement Element, TPriority Priority) node, int nodeIndex)
     {
         var nodes = _nodes;
+        var nodePriority = node.Priority;
+        var defaultComparer = Comparer<TPriority>.Default;
+
         while (nodeIndex > 0)
         {
             int parentIndex = GetParentIndex(nodeIndex);
             var parent = nodes[parentIndex];
 
-            if (Comparer<TPriority>.Default.Compare(node.Priority, parent.Priority) < 0)
+            if (defaultComparer.Compare(nodePriority, parent.Priority) < 0)
             {
                 nodes[nodeIndex] = parent;
                 nodeIndex = parentIndex;
             }
-            else break;
+            else
+            {
+                break;
+            }
         }
         nodes[nodeIndex] = node;
     }
@@ -556,17 +610,22 @@ public class PriorityQueue<TElement, TPriority>
     {
         var comparer = _comparer!;
         var nodes = _nodes;
+        var nodePriority = node.Priority;
+
         while (nodeIndex > 0)
         {
             int parentIndex = GetParentIndex(nodeIndex);
             var parent = nodes[parentIndex];
 
-            if (comparer.Compare(node.Priority, parent.Priority) < 0)
+            if (comparer.Compare(nodePriority, parent.Priority) < 0)
             {
                 nodes[nodeIndex] = parent;
                 nodeIndex = parentIndex;
             }
-            else break;
+            else
+            {
+                break;
+            }
         }
         nodes[nodeIndex] = node;
     }
@@ -575,24 +634,27 @@ public class PriorityQueue<TElement, TPriority>
     {
         var nodes = _nodes;
         int size = _size;
+        var defaultComparer = Comparer<TPriority>.Default;
+        var nodePriority = node.Priority;
+
         int i;
         while ((i = GetFirstChildIndex(nodeIndex)) < size)
         {
             var minChild = nodes[i];
             int minChildIndex = i;
 
-            int upper = Math.Min(i + Arity, size);
-            while (++i < upper)
+            int childIndexUpperBound = Math.Min(i + Arity, size);
+            while (++i < childIndexUpperBound)
             {
                 var nextChild = nodes[i];
-                if (Comparer<TPriority>.Default.Compare(nextChild.Priority, minChild.Priority) < 0)
+                if (defaultComparer.Compare(nextChild.Priority, minChild.Priority) < 0)
                 {
                     minChild = nextChild;
                     minChildIndex = i;
                 }
             }
 
-            if (Comparer<TPriority>.Default.Compare(node.Priority, minChild.Priority) <= 0)
+            if (defaultComparer.Compare(nodePriority, minChild.Priority) <= 0)
                 break;
 
             nodes[nodeIndex] = minChild;
@@ -607,14 +669,16 @@ public class PriorityQueue<TElement, TPriority>
         var comparer = _comparer!;
         var nodes = _nodes;
         int size = _size;
+        var nodePriority = node.Priority;
+
         int i;
         while ((i = GetFirstChildIndex(nodeIndex)) < size)
         {
             var minChild = nodes[i];
             int minChildIndex = i;
 
-            int upper = Math.Min(i + Arity, size);
-            while (++i < upper)
+            int childIndexUpperBound = Math.Min(i + Arity, size);
+            while (++i < childIndexUpperBound)
             {
                 var nextChild = nodes[i];
                 if (comparer.Compare(nextChild.Priority, minChild.Priority) < 0)
@@ -624,7 +688,7 @@ public class PriorityQueue<TElement, TPriority>
                 }
             }
 
-            if (comparer.Compare(node.Priority, minChild.Priority) <= 0)
+            if (comparer.Compare(nodePriority, minChild.Priority) <= 0)
                 break;
 
             nodes[nodeIndex] = minChild;
@@ -648,14 +712,15 @@ public class PriorityQueue<TElement, TPriority>
         }
     }
 
-    public void UpdatePriority(Node jumpPoint, float fCost)
+    public void UpdatePriority(TElement element, TPriority priority)
     {
         int index = -1;
+        var equalityComparer = EqualityComparer<TElement>.Default;
 
         // Locate the element
         for (int i = 0; i < _size; i++)
         {
-            if (EqualityComparer<TElement>.Default.Equals(_nodes[i].Element, (TElement)(object)jumpPoint))
+            if (equalityComparer.Equals(_nodes[i].Element, element))
             {
                 index = i;
                 break;
@@ -666,26 +731,28 @@ public class PriorityQueue<TElement, TPriority>
             throw new InvalidOperationException("Element not found in priority queue.");
 
         var oldPriority = _nodes[index].Priority;
-        var newPriority = (TPriority)(object)fCost;
-        _nodes[index] = ((TElement)(object)jumpPoint, newPriority);
+        _nodes[index] = (element, priority);
 
         // Determine if we need to move up or down the heap
-        if (_comparer == null)
+        int compareResult = _comparer == null
+            ? Comparer<TPriority>.Default.Compare(priority, oldPriority)
+            : _comparer.Compare(priority, oldPriority);
+
+        if (compareResult < 0)
         {
-            if (Comparer<TPriority>.Default.Compare(newPriority, oldPriority) < 0)
+            if (_comparer == null)
                 MoveUpDefaultComparer(_nodes[index], index);
             else
-                MoveDownDefaultComparer(_nodes[index], index);
-        }
-        else
-        {
-            if (_comparer.Compare(newPriority, oldPriority) < 0)
                 MoveUpCustomComparer(_nodes[index], index);
+        }
+        else if (compareResult > 0)
+        {
+            if (_comparer == null)
+                MoveDownDefaultComparer(_nodes[index], index);
             else
                 MoveDownCustomComparer(_nodes[index], index);
         }
 
         _version++;
     }
-
 }

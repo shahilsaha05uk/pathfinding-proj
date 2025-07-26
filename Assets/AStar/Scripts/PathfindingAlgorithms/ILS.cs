@@ -26,6 +26,7 @@ public class ILS : BasePathfinding
                         Path = pathResult.Path,
                         PathLength = pathResult.PathLength,
                         PathCost = pathResult.PathCost,
+                        VisitedNodes = pathResult.VisitedNodes,
                         CorridorIterations = corridorIterations,
                     };
                 }
@@ -58,7 +59,7 @@ public class ILS : BasePathfinding
 
         foreach (var point in linePoints)
         {
-            var neighbors = grid.GetNeighbors(point, width);
+            var neighbors = NeighborHelper.GetNeighborsInRange(point, width);
             corridorNodes.UnionWith(neighbors);
         }
         

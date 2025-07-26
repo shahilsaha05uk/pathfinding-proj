@@ -21,7 +21,7 @@ public class Dijkstra : BasePathfinding
 
             visited.Add(current);
 
-            var neighbors = current.GetNeighbors();
+            var neighbors = GetAllNeighbors(current);
             foreach (var neighbor in neighbors)
             {
                 if(visited.Contains(neighbor) || 

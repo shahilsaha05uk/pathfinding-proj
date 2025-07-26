@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class JPSHelper
+public static class NeighborHelper
 {
     private static Dictionary<Vector3Int, List<(Vector3Int BlockedOffset, Vector3Int OpenOffset)>> ForcedNeighborRules = new()
 {
@@ -295,6 +295,8 @@ public static class JPSHelper
 
 };
 
+    private static List<Vector3Int> directions = CreateAllDirectionList();
+
     public static List<Vector3Int> CreateAllDirectionList()
     {
         var directions = new List<Vector3Int>();
@@ -312,21 +314,220 @@ public static class JPSHelper
         }
         return directions;
     }
-    
-    public static bool TryGetForcedNeighborRule(Vector3Int direction, out List<(Vector3Int BlockedOffset, Vector3Int OpenOffset)> rule)
+
+    public static List<Node> GetNeighbors(Node node, bool includeDiagonals = true)
     {
-        if (!HasForcedNeighborRule(direction))
+        var grid = Grid3D.Instance;
+
+        var neighbors = new List<Node>();
+        foreach (var dir in directions)
         {
-            rule = null;
+            // Get the position of the neighbor node
+            var neighborPos = node.GetNodePositionOnGrid() + dir;
+
+            // Check if the neighbor position is within the grid bounds
+            if(!grid.IsInsideGrid(neighborPos.x, neighborPos.y, neighborPos.z))
+                continue;
+
+            var neighborNode = grid.GetNodeAt(neighborPos);
+            if(neighborNode != null && !neighborNode.isBlocked)
+            {
+                neighbors.Add(neighborNode);
+            }
+        }
+
+        return neighbors;
+    }
+
+    public static List<Node> GetNeighborsInRange(Vector3Int point, int width = 1)
+    {
+        List<Node> neighbors = new List<Node>();
+        var grid = Grid3D.Instance;
+        for (int dx = -width; dx <= width; dx++)
+        {
+            for (int dy = -width; dy <= width; dy++)
+            {
+                for (int dz = -width; dz <= width; dz++)
+                {
+                    if (dx == 0 && dy == 0 && dz == 0)
+                        continue;
+
+                    int nx = point.x + dx;
+                    int ny = point.y + dy;
+                    int nz = point.z + dz;
+
+                    var neighbor = grid.GetNodeAt(nx, ny, nz);
+                    if (neighbor != null)
+                        neighbors.Add(neighbor);
+                }
+            }
+        }
+
+        return neighbors;
+    }
+
+    public static bool HasForcedNeighbor(Node current, Vector3Int direction)
+    {
+        var grid = Grid3D.Instance;
+        Vector3Int currentPos = current.GetNodePositionOnGrid();
+
+        // Check if there is any of the orthogonal directions are blocked
+        var orthogonalOffsets = GetOrthogonalOffsets(direction);
+        foreach (var offset in orthogonalOffsets)
+        {
+            // position to check for blockage
+            var blockedCheckPos = currentPos + offset;
+
+            // position of the forced neighbor
+            var forcedNeighborPos = currentPos + offset + direction;
+
+            // Check...
+            // if the forced neighbor or the assumed blocked node is not inside the grid,
+            // continue with the next node
+            if (!grid.IsInsideGrid(blockedCheckPos) &&
+                !grid.IsInsideGrid(forcedNeighborPos))
+                continue;
+
+            // Get the blocked node
+            var blockedNode = grid.GetNodeAt(blockedCheckPos);
+            var forcedNeighborNode = grid.GetNodeAt(forcedNeighborPos);
+
+            // if the blocked node is blocked AND
+            // the forced neighbor node is not blocked,
+            // its a forced neighbor
+            if (blockedNode != null && 
+                blockedNode.isBlocked &&
+                forcedNeighborNode != null &&
+               !forcedNeighborNode.isBlocked)
+            {
+                blockedNode.SetColor(Color.black);
+                //forcedNeighborNode.SetColor(Color.red);
+                return true;
+            }
+        }
+
+        // Else, its not a forced neighbor
+        return false;
+    }
+
+    // This method will add all the PERPENDICULAR offsets based on the given direction.
+    public static List<Vector3Int> GetOrthogonalOffsets(Vector3Int direction)
+    {
+        var offsets = new List<Vector3Int>();
+
+        if (direction.x == 0)
+        {
+            offsets.Add(new Vector3Int(1, 0, 0)); // Right
+            offsets.Add(new Vector3Int(-1, 0, 0)); // Left
+        }
+
+        if (direction.y == 0)
+        {
+            offsets.Add(new Vector3Int(0, 1, 0)); // Up
+            offsets.Add(new Vector3Int(0, -1, 0)); // Down
+        }
+
+        if (direction.z == 0)
+        {
+            offsets.Add(new Vector3Int(0, 0, 1)); // Forward
+            offsets.Add(new Vector3Int(0, 0, -1)); // Backward
+        }
+        return offsets;
+    }
+
+    /// <summary>
+    /// This method tries to get all the possible directions from the current node in the given direction.
+    /// So basically, if the idea is to get to Nepal and I am looking North-East, 
+    /// it will check the next nodes in that direction 
+    ///     and get the forced neighbors if there is any
+    /// </summary>
+    public static List<Node> GetForcedNeighbors(Node current, Vector3Int direction)
+    {
+        var grid = Grid3D.Instance;
+
+        var currentPos = current.GetNodePositionOnGrid();
+        var forcedNeighbors = new List<Node>();
+
+        // Check if the direction has a forced neighbor rule
+        if(!HasForcedNeighborRule(direction, out var forcedOffsets))
+        {
+            return forcedNeighbors;
+        }
+
+        // if the rule exists, iterate through the offsets and see if they are blocked or not
+        // for each possible blocked neighbor, there is a possible forced neighbor
+        // NOTE: At this point, its still a POSSIBILITY that there is a forced neighbor,
+        // this is why this loop will check if the possible forced neighbor qualify for the list entry
+        foreach (var (blockedOffset, openOffset) in forcedOffsets)
+        {
+            var blockedPos = currentPos + blockedOffset;
+            var openPos = currentPos + openOffset;
+
+            // if the blocked position or the open position is not inside the grid, continue with the next possibility
+            if (!grid.IsInsideGrid(blockedPos) || 
+               !grid.IsInsideGrid(openPos))
+                continue;
+
+            // Get the blocked node and the open node
+            var possibleBlockedNode = grid.GetNodeAt(blockedPos);
+            var possibleOpenNode = grid.GetNodeAt(openPos);
+
+            if (possibleBlockedNode != null &&
+                possibleBlockedNode.isBlocked &&
+                possibleOpenNode != null &&
+               !possibleOpenNode.isBlocked)
+            {
+                // If the blocked node is blocked and the open node is not blocked,
+                // add the open node to the list of forced neighbors
+                forcedNeighbors.Add(possibleOpenNode);
+            }
+        }
+
+        return forcedNeighbors;
+    }
+
+    /// <summary>
+    ///     so for instance:
+    ///         you start from the origin (0, 0, 0) // lets assume Delhi and North is Kashmir
+    ///         you want to go towards Nepal which is North-East (1, 0, 1)
+    ///         you move two steps in that direction, and you reach (3, 0, 3)
+    ///         your current direction is North-East
+    ///         so your natural direction (successors) would be: 
+    ///             North (0, 0, 1), 
+    ///             East (1, 0, 0), 
+    ///             North-East(1, 0, 1)
+    /// </summary>
+    public static List<Vector3Int> GetNaturalNeighbors(Vector3Int direction)
+    {
+        var natural = new List<Vector3Int>();
+
+        int[] dx = (direction.x == 0) ? new int[] { 0 } : new int[] { 0, direction.x };
+        int[] dy = (direction.y == 0) ? new int[] { 0 } : new int[] { 0, direction.y };
+        int[] dz = (direction.z == 0) ? new int[] { 0 } : new int[] { 0, direction.z };
+
+        foreach (var x in dx)
+        {
+            foreach (var y in dy)
+            {
+                foreach (var z in dz)
+                {
+                    if (x == 0 && y == 0 && z == 0) continue; // Skip the zero vector
+                    natural.Add(new Vector3Int(x, y, z));
+                }
+            }
+        }
+        return natural;
+    }
+
+    public static bool HasForcedNeighborRule(Vector3Int direction, out List<(Vector3Int blockOffset, Vector3Int openOffset)> Offsets)
+    {
+        if(!ForcedNeighborRules.ContainsKey(direction))
+        {
+            Offsets = null;
             return false;
         }
 
-        rule = ForcedNeighborRules[direction];
+        Offsets = ForcedNeighborRules[direction];
         return true;
-    }
-    
-    public static bool HasForcedNeighborRule(Vector3Int direction)
-    {
-        return ForcedNeighborRules.ContainsKey(direction);
     }
 }

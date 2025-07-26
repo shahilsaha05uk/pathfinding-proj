@@ -23,7 +23,7 @@ public class GBFS : BasePathfinding
                 return ReturnPath(start, goal, visitedNodes);
 
             // Expand the neighbors
-            var neighbors = currentNode.GetNeighbors();
+            var neighbors = GetAllNeighbors(currentNode);
             foreach (var neighbor in neighbors)
             {
                 // if the path is blocked or has already been evaluated, skip it
