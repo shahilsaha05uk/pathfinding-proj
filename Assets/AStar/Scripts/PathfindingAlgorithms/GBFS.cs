@@ -33,7 +33,7 @@ public class GBFS : BasePathfinding
                 if (!openList.Contains(neighbor))
                 {
                     neighbor.parent = currentNode;
-                    neighbor.hCost = HeuristicHelper.GetManhattanDistance(neighbor, goal);
+                    neighbor.hCost = CalculateHeuristicDistance(neighbor, goal);
                     openList.Add(neighbor);
                     visitedNodes++;
                 }

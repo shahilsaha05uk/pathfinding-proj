@@ -20,11 +20,14 @@ public class EvaluationDataSaver
 
     public string SaveAndExport(int gridSize, int obstacleDensity)
     {
-        return SaveManager.SaveAndExport(
+        var result = SaveManager.SaveAndExport(
             saveData,
             fileName: $"{gridSize}x_{gridSize}x_{gridSize}x_ob{obstacleDensity}",
             directory: "Exported Data"
         );
+
+        saveData.Clear();
+        return result;
     }
 
     public SaveData CreateSaveData(GridData data, List<EvaluationResult> results)
@@ -32,7 +35,7 @@ public class EvaluationDataSaver
         return new SaveData
         {
             GridSize = data.GridSize,
-            MaxHeight = data.MaxHeight,
+            ObstacleDensity = data.ObstacleDensity * 100,
             EvaluationResult = results,
         };
     }

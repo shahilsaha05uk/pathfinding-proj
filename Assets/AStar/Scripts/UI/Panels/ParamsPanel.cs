@@ -11,7 +11,6 @@ public class ParamsPanel : MonoBehaviour
     [Space(5)]
     [SerializeField] private PanelMinMax inputOffsetX;
     [SerializeField] private PanelMinMax inputOffsetY;
-    [SerializeField] private PanelMinMax inputOffsetZ;
 
     [Space(5)]
     public PanelSlider sliderNoise;
@@ -30,7 +29,6 @@ public class ParamsPanel : MonoBehaviour
     {
         config.OffsetX = inputOffsetX.GetValue();
         config.OffsetY = inputOffsetY.GetValue();
-        config.OffsetZ = inputOffsetZ.GetValue();
         config.GridSize = gridSize;
         config.ObstacleDensity = obstaclePanel.GetObstacleDensity();
         config.NoiseScale = sliderNoise.GetValue();

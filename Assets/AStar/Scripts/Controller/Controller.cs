@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Debug = UnityEngine.Debug;
 
 public partial class Controller : MonoBehaviour
@@ -28,7 +29,7 @@ public partial class Controller : MonoBehaviour
             }
             HandleOnShowNeighbours(node);
         }
-        if (Input.GetMouseButtonUp(0) && bIsNodeHit)
+        if (Input.GetMouseButtonUp(0) && bIsNodeHit && !EventSystem.current.IsPointerOverGameObject())
         {
             if(Execute_OnNodeSet()) UnsubscribeFrom_OnNodeSet();
         }

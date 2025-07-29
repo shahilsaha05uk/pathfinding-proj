@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class PanelLabel : LabelledPanel
+public class PanelLabel : TMP_LabelledPanel
 {
     private string value;
     public string defaultValue = "N/A";

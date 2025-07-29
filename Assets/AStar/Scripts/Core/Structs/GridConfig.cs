@@ -19,5 +19,4 @@ public class GridConfig
     public float ObstacleDensity;
     public (float min, float max) OffsetX;
     public (float min, float max) OffsetY;
-    public (float min, float max) OffsetZ;
 }

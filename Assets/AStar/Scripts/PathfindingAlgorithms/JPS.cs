@@ -204,6 +204,4 @@ public class JPS : BasePathfinding
 
         return components;
     }
-
-    private float CalculateHeuristicDistance(Node a, Node b) => HeuristicHelper.GetManhattanDistance(a, b);
 }

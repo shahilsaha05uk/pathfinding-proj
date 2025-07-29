@@ -35,14 +35,12 @@ public static class CSVExporter
 
         // Header
         sb.AppendLine("GridSize," +
-            "MaxHeight," +
-            "OffsetX,OffsetY,OffsetZ," +
+            "ObstacleDensity," +
             "Algorithm," +
             "TimeTaken," +
             "PathLength," +
             "PathCost," +
-            "VisitedNodes," +
-            "CorridorIterations");
+            "VisitedNodes,");
 
         foreach (var data in saveData)
         {
@@ -72,16 +70,12 @@ public static class CSVExporter
         sb.AppendLine(string.Join(",", new string[]
         {
             saveData.GridSize.ToString(),
-            saveData.MaxHeight.ToString(),
-            saveData.Offset.x.ToString("F3"),
-            saveData.Offset.y.ToString("F3"),
-            saveData.Offset.z.ToString("F3"),
+            saveData.ObstacleDensity.ToString("F3"),
             algorithmName,
             data.TimeTaken.ToString("F3"),
             data.PathLength.ToString(),
             data.PathCost.ToString("F3"),
             data.VisitedNodes.ToString(),
-            data.CorridorIterations.ToString()
         }));
     }
 

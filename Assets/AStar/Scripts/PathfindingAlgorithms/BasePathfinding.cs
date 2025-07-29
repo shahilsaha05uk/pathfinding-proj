@@ -29,7 +29,7 @@ public abstract class BasePathfinding : MonoBehaviour
         while (currentNode != start)
         {
             path.Add(currentNode);
-            totalCost += currentNode.gCost;
+            totalCost += CalculateHeuristicDistance(currentNode, currentNode.parent);
             currentNode = currentNode.parent;
         }
         path.Add(start);
@@ -51,5 +51,7 @@ public abstract class BasePathfinding : MonoBehaviour
         };
     }
 
-    protected virtual List<Node> GetAllNeighbors(Node node) => (List<Node>)NeighborHelper.GetNeighbors(node);
+    protected virtual float CalculateHeuristicDistance(Node a, Node b) => HeuristicHelper.GetEuclideanDistance(a, b);
+
+    protected virtual List<Node> GetAllNeighbors(Node node) => NeighborHelper.GetNeighbors(node);
 }

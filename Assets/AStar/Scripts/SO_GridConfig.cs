@@ -31,7 +31,6 @@ public class SO_GridConfig : ScriptableObject
         ObstacleDensity = ObstacleDensity,
         OffsetX = (MinOffsetX, MaxOffsetX),
         OffsetY = (MinOffsetY, MaxOffsetY),
-        OffsetZ = (MinOffsetZ, MaxOffsetZ)
     };
     
     public (Vector3Int start, Vector3Int end) GetStartEndNodes()

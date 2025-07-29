@@ -9,7 +9,7 @@ public class Grid3D : BaseGrid
 
     private int maxHeight;
     private float offsetX;
-    private float offsetZ;
+    private float offsetY;
 
     [SerializeField] private float waterLevel = 0.2f;  // Below this = lake
     [SerializeField] private float caveLevel = 0.4f;  // Below this = lake
@@ -33,7 +33,7 @@ public class Grid3D : BaseGrid
         base.Create(config);
 
         offsetX = Random.Range(config.OffsetX.min, config.OffsetX.max);
-        offsetZ = Random.Range(config.OffsetZ.min, config.OffsetZ.max);
+        offsetY = Random.Range(config.OffsetY.min, config.OffsetY.max);
 
         noiseScale = config.NoiseScale;
         maxHeight = config.MaxHeight;
@@ -46,7 +46,7 @@ public class Grid3D : BaseGrid
             for (int z = 0; z < mGridSize; z++)
             {
                 // This will create a random height based on the noise set
-                float noise = AddNoiseXZ(x, z, offsetX, offsetZ);
+                float noise = AddNoiseXY(x, z, offsetX, offsetY);
                 int terrainHeight = Mathf.FloorToInt(noise * maxHeight);
 
                 // This will create nodes for that height, one for each [step]
@@ -191,10 +191,12 @@ public class Grid3D : BaseGrid
     }
 
     public override void ClearObstacles() => obstacleManager.Clear();
+    
     public void UpdateObstacles(float percent) => obstacleManager.UpdateObstacleDensity(percent);
-    protected void RemoveObstacles(float percent) => obstacleManager.Remove(percent);
-
+    
     public Node[,,] GetAllNodes() => Nodes;
+    
+    protected void RemoveObstacles(float percent) => obstacleManager.Remove(percent);
 
     private void SetNodePosition(Node node, int x, int y, int z)
     {
@@ -209,8 +211,8 @@ public class Grid3D : BaseGrid
         node.transform.position = finalPosition;
     }
     
-    private float AddNoiseXZ(int x, int z, float offX, float offZ)
+    private float AddNoiseXY(int x, int y, float offX, float offY)
     {
-        return Mathf.PerlinNoise((x + offX) * noiseScale, (z + offZ) * noiseScale);
+        return Mathf.PerlinNoise((x + offX) * noiseScale, (y + offY) * noiseScale);
     }
 }

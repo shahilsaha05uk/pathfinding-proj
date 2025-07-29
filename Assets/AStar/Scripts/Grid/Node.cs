@@ -15,9 +15,9 @@ public class Node : MonoBehaviour
     private Color defaultColor;
     private bool defaultIsBlocked;
     private bool bIsEndPoint;
+    private TerrainType terrainType;
 
     public int gridX, gridY, gridZ;
-    private TerrainType terrainType;
 
     public Vector3Int travelDirection;
 

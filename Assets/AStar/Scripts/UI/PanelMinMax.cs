@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public class PanelMinMax : LabelledPanel
+public class PanelMinMax : TMP_LabelledPanel
 {
     private float minValue = 0f;
     private float maxValue = 1f;

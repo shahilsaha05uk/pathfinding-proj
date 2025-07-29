@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PanelSlider : LabelledPanel
+public class PanelSlider : TMP_LabelledPanel
 {
     private float currentValue;
     

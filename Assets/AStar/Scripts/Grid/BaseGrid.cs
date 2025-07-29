@@ -4,12 +4,7 @@ using UnityEngine;
 public abstract class BaseGrid : MonoBehaviour
 {
     [SerializeField] protected ObstacleManager obstacleManager;
-
     protected List<Node> navPath = new();
-
-    public Node NodeObject;
-    public GridColor GridColors;
-    
     protected GridConfig mConfig;
     
     protected int mGridSize = 10;
@@ -18,6 +13,9 @@ public abstract class BaseGrid : MonoBehaviour
     protected Node startNode;
     protected Node goalNode;
 
+    public Node NodeObject;
+    public GridColor GridColors;
+    
     public virtual void Create(GridConfig config)
     {
         mConfig = config;

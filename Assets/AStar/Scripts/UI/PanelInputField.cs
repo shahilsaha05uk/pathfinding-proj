@@ -2,7 +2,7 @@ using System;
 using TMPro;
 using UnityEngine;
 
-public class PanelInputField : LabelledPanel
+public class PanelInputField : TMP_LabelledPanel
 {
     private string fieldValue;
     public Action<string> onValueChanged;

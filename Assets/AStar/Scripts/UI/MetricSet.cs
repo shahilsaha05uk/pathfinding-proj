@@ -2,7 +2,7 @@ using TMPro;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
-public class MetricSet : LabelledPanel
+public class MetricSet : TMP_LabelledPanel
 {
     [Space(5)]
     [Header("Input Fields")]

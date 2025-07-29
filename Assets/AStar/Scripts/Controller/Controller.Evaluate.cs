@@ -3,7 +3,7 @@ using UnityEngine.Profiling;
 
 public partial class Controller
 {
-    public EvaluationResult OnEvaluate(int evalSize)
+    public EvaluationResult OnEvaluate(int evalSize, EvaluateAlgorithms evaluateAlgorithms)
     {
         if (evalSize <= 0)
         {
@@ -12,17 +12,14 @@ public partial class Controller
         }
 
         // Evaluate the algorithms and collect the results
-        var result = Evaluate(evalSize);
+        var result = evaluator.Evaluate(evalSize, evaluateAlgorithms);
 
         if (result == null) return null;
 
-        // If bSave is true, save the evaluation results
         SaveAndExport();
 
         return result;
     }
-
-    private EvaluationResult Evaluate(int evalSize) => evaluator.Evaluate(evalSize);
 
     public string SaveAndExport()
     {
