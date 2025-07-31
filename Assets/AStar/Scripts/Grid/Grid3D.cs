@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -6,13 +6,18 @@ public class Grid3D : BaseGrid
 {
     public static Grid3D Instance { get; private set; }
     private Node[,,] Nodes;
-    
+
     private int maxHeight;
     private float offsetX;
-    private float offsetZ;
-    private float randomizeOffset;
-    
-    private float noiseScale = 0.1f;
+    private float offsetY;
+
+    [SerializeField] private float waterLevel = 0.2f;  // Below this = lake
+    [SerializeField] private float caveLevel = 0.4f;  // Below this = lake
+    [SerializeField] private int maxTraversableHeight = 3; // Hills above this = non-traversable
+
+    [SerializeField] private SO_TerrainConfig terrainConfig;
+
+    private float noiseScale = 1f;
 
     private void Awake()
     {
@@ -22,31 +27,26 @@ public class Grid3D : BaseGrid
 
     public override void Create(GridConfig config)
     {
-        if(Nodes != null && Nodes.Length > 0) Clear();
+        List<Node> potentialObstacles = new();
+        if (Nodes != null && Nodes.Length > 0) Clear();
         
         base.Create(config);
-        
-        List<Node> potentialObstacles = new List<Node>();
-        
-        offsetX = config.Offset.x;
-        offsetZ = config.Offset.z;
-        randomizeOffset = config.OffsetRandomization;
+
+        offsetX = Random.Range(config.OffsetX.min, config.OffsetX.max);
+        offsetY = Random.Range(config.OffsetY.min, config.OffsetY.max);
+
         noiseScale = config.NoiseScale;
         maxHeight = config.MaxHeight;
         
         // Create the array of nodes
         Nodes = new Node[mGridSize, maxHeight, mGridSize];
         
-        // Randomize the offset values to create a more varied terrain
-        offsetX += Random.Range(-randomizeOffset, randomizeOffset);
-        offsetZ += Random.Range(-randomizeOffset, randomizeOffset);
-        
         for (int x = 0; x < mGridSize; x++)
         {
             for (int z = 0; z < mGridSize; z++)
             {
                 // This will create a random height based on the noise set
-                float noise = AddNoiseXZ(x, z, offsetX, offsetZ);
+                float noise = AddNoiseXY(x, z, offsetX, offsetY);
                 int terrainHeight = Mathf.FloorToInt(noise * maxHeight);
 
                 // This will create nodes for that height, one for each [step]
@@ -60,33 +60,47 @@ public class Grid3D : BaseGrid
                     SetNodeIndex(node, x, y, z);
                     Nodes[x, y, z] = node;
 
+                    node.Init(terrainConfig.GetData(TerrainType.Ground), new Vector3Int(x, y, z));
+
                     // Apply type, color, and block logic
-                    if (y == terrainHeight - 1)
+                    if (y == 0)
                     {
-                        // Hilltop
-                        node.SetType(TerrainType.HillTop, "#707070", false);
-                        potentialObstacles.Add(node);
+                        // Bottom layer → either cave or lake based on noise
+                        if (noise < waterLevel)
+                            node.Init(terrainConfig.GetData(TerrainType.Lake), new Vector3Int(x, y, z));
+                        else if (noise < caveLevel)
+                            node.Init(terrainConfig.GetData(TerrainType.Cave), new Vector3Int(x, y, z));
+                        else
+                        {
+                            node.Init(terrainConfig.GetData(TerrainType.Ground), new Vector3Int(x, y, z));
+                            potentialObstacles.Add(node);
+                        }
                     }
-                    else if (y == 0)
+                    else if (y == terrainHeight - 1)
                     {
-                        // Cave bottom
-                        node.SetType(TerrainType.Cave, "#290e04", true);
+                        // Surface level - determine if hilltop or ground
+                        if (terrainHeight > maxTraversableHeight)
+                            node.Init(terrainConfig.GetData(TerrainType.HillTop), new Vector3Int(x, y, z));
+                        else
+                        {
+                            node.Init(terrainConfig.GetData(TerrainType.Ground), new Vector3Int(x, y, z));
+                            potentialObstacles.Add(node);
+                        }
                     }
                     else
                     {
-                        // Middle ground
-                        node.SetType(TerrainType.Ground, "#0b4f0e", false);
+                        // In-between layers
+                        node.Init(terrainConfig.GetData(TerrainType.Ground), new Vector3Int(x, y, z));
                         potentialObstacles.Add(node);
-
                     }
                 }
             }
         }
 
-        AssignNeighbors(); // If pathfinding requires neighbor linking
-        AddObstacles(potentialObstacles); // Add obstacles based on the percentage
+        obstacleManager.Init(potentialObstacles); // Initialize the obstacle manager with potential nodes
+        UpdateObstacles(config.ObstacleDensity); // Add obstacles based on the percentage
     }
-    
+
     public override void Clear()
     {
         if (Nodes == null || Nodes.Length == 0)
@@ -110,34 +124,8 @@ public class Grid3D : BaseGrid
             }
         }
         Nodes = null;
-        navPath.Clear();
-    }
 
-    public List<Node> GetNeighbors(Vector3Int point, int width)
-    {
-        List<Node> neighbors = new List<Node>();
-
-        for (int dx = -width; dx <= width; dx++)
-        {
-            for (int dy = -width; dy <= width; dy++)
-            {
-                for (int dz = -width; dz <= width; dz++)
-                {
-                    if (dx == 0 && dy == 0 && dz == 0)
-                        continue;
-
-                    int nx = point.x + dx;
-                    int ny = point.y + dy;
-                    int nz = point.z + dz;
-
-                    var neighbor = GetNodeAt(nx, ny, nz);
-                    if (neighbor != null)
-                        neighbors.Add(neighbor);
-                }
-            }
-        }
-
-        return neighbors;
+        if(navPath != null && navPath.Count > 0) navPath.Clear();
     }
 
     public List<Node> GetManhattanRadius(Vector3Int point, int width, CorridorShape shape)
@@ -197,151 +185,34 @@ public class Grid3D : BaseGrid
                z >= 0 && z < mGridSize;
     }
 
-    protected override void AssignNeighbors()
+    public bool IsInsideGrid(Vector3Int point)
     {
-        for (int x = 0; x < mGridSize; x++)
-        {
-            for (int y = 0; y < maxHeight; y++)
-            {
-                for (int z = 0; z < mGridSize; z++)
-                {
-                    var node = Nodes[x, y, z];
-                    if (node == null) continue;
-                    
-                    // Set all the neighbors of this node
-                    AddAllNeighbors(ref node, x, y, z);
-
-                    // Set orthogonal neighbors
-                    AddOrthogonalNeighbors(ref node, x, y, z);
-
-                    // Set diagonal neighbors
-                    AddDiagonalNeighbors(ref node, x, y, z);
-                }
-            }
-        }
+        return IsInsideGrid(point.x, point.y, point.z);
     }
 
-    protected override void AddObstacles(List<Node> potentialObstacles)
-    {
-        int obstacleCount = Mathf.FloorToInt(potentialObstacles.Count * mObstacleDensity);
-        var shuffled = potentialObstacles.OrderBy(_ => Random.value).ToList();
-
-        for (int i = 0; i < obstacleCount; i++)
-        {
-            var node = shuffled[i];
-            node.SetType(TerrainType.Obstacle, "#a30808", true); // New type or reuse blocked
-        }
-    }
+    public override void ClearObstacles() => obstacleManager.Clear();
     
-    private void AddAllNeighbors(ref Node node, int x, int y, int z)
-    {
-        var neighbors = GetNeighbors(x, y, z);
-        node.SetNeighbors(neighbors);
-    }
-
-    private void AddOrthogonalNeighbors(ref Node node, int x, int y, int z)
-    {
-        var orthogonalNeighbors = GetOrthogonalNeighbors(x, y, z);
-        node.SetOrthogonalNeighbours(orthogonalNeighbors);
-    }
-
-    private void AddDiagonalNeighbors(ref Node node, int x, int y, int z)
-    {
-        var diagonalNeighbors = GetDiagonalNeighbors(x, y, z);
-        node.SetDiagonalNeighbours(diagonalNeighbors);
-    }
-
-    private List<Node> GetNeighbors(int x, int y, int z)
-    {
-        return GetNeighbors(new Vector3Int(x,y,z), 1);
-    }
-
-    private List<Node> GetOrthogonalNeighbors(int x, int y, int z)
-    {
-        var directions = new List<Vector3Int>
-        {
-            new Vector3Int(1, 0, 0),
-            new Vector3Int(-1, 0, 0),
-            new Vector3Int(0, 1, 0),
-            new Vector3Int(0, -1, 0),
-            new Vector3Int(0, 0, 1),
-            new Vector3Int(0, 0, -1)
-        };
-
-        return GetDirectionalNeighbors(x, y, z, directions);
-    }
-
-    private List<Node> GetDirectionalNeighbors(int x, int y, int z, List<Vector3Int> directions)
-    {
-        List<Node> neighbors = new List<Node>();
-
-        foreach (var dir in directions)
-        {
-            int nx = x + dir.x;
-            int ny = y + dir.y;
-            int nz = z + dir.z;
-
-            if (IsInsideGrid(nx, ny, nz))
-            {
-                var neighbor = GetNodeAt(nx, ny, nz);
-                if (neighbor != null)
-                    neighbors.Add(neighbor);
-            }
-        }
-
-        return neighbors;
-    }
-
-    private List<Node> GetDiagonalNeighbors(int x, int y, int z)
-    {
-        List<Node> diagonals = new List<Node>();
-
-        for (int dx = -1; dx <= 1; dx++)
-            for (int dy = -1; dy <= 1; dy++)
-                for (int dz = -1; dz <= 1; dz++)
-                {
-                    if (dx == 0 && dy == 0 && dz == 0) continue;
-                    if (Mathf.Abs(dx) + Mathf.Abs(dy) + Mathf.Abs(dz) == 1) continue; // skip orthogonals
-
-                    int nx = x + dx;
-                    int ny = y + dy;
-                    int nz = z + dz;
-
-                    var neighbor = GetNodeAt(nx, ny, nz);
-                    if (neighbor != null)
-                        diagonals.Add(neighbor);
-                }
-
-        return diagonals;
-    }
+    public void UpdateObstacles(float percent) => obstacleManager.UpdateObstacleDensity(percent);
+    
+    public Node[,,] GetAllNodes() => Nodes;
+    
+    protected void RemoveObstacles(float percent) => obstacleManager.Remove(percent);
 
     private void SetNodePosition(Node node, int x, int y, int z)
     {
         // Calculate the idle position, as to where it should be without noise
-        float baseX = transform.position.x + x * (mTileSize + mTileSpacing);
-        float baseY = transform.position.y + y * (mTileSize + mTileSpacing);
-        float baseZ = transform.position.z + z * (mTileSize + mTileSpacing);
+        float baseX = transform.position.x + x;
+        float baseY = transform.position.y + y;
+        float baseZ = transform.position.z + z;
 
-        // TODO: These values should be set dynamically
-        // Add random noise to the position
-        float noiseX = Random.Range(-0.2f, 0.2f);
-        float noiseY = Random.Range(-0.2f, 0.2f);
-        float noiseZ = Random.Range(-0.2f, 0.2f);
-
-        // Finally add the noise to the base position and create a final position
-        Vector3 finalPosition = new Vector3(
-            baseX + noiseX,
-            baseY + noiseY,
-            baseZ + noiseZ
-        );
+        Vector3 finalPosition = new Vector3(baseX, baseY, baseZ);
 
         // Set the node's transform properties
-        node.transform.localScale = new Vector3(mTileSize, mTileSize, 1);
         node.transform.position = finalPosition;
     }
     
-    private float AddNoiseXZ(int x, int z, float offX, float offZ)
+    private float AddNoiseXY(int x, int y, float offX, float offY)
     {
-        return Mathf.PerlinNoise((x + offX) * noiseScale, (z + offZ) * noiseScale);
+        return Mathf.PerlinNoise((x + offX) * noiseScale, (y + offY) * noiseScale);
     }
 }

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3593370797652740691}
-  - component: {fileID: 5705967157763002990}
+  - component: {fileID: 5827749209801056136}
   m_Layer: 0
   m_Name: JPS
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3753176820776727679}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5705967157763002990
+--- !u!114 &5827749209801056136
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 814597407457141228}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 010b5eb048c6194488dc21355f8f702f, type: 3}
+  m_Script: {fileID: 11500000, guid: b681209c69da09d479b91d5f5dc0be77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1138478031545685705
@@ -187,7 +187,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 134147797372271141}
-  - component: {fileID: 8893423696599815159}
   - component: {fileID: 8490356757849609649}
   m_Layer: 0
   m_Name: Dijkstra
@@ -211,18 +210,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3753176820776727679}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8893423696599815159
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6194125427792560827}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a56ca6a464a445ec91cb24bca3588753, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &8490356757849609649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -334,4 +321,4 @@ MonoBehaviour:
   gbfs: {fileID: 2146567032715355885}
   dijkstra: {fileID: 8490356757849609649}
   ils: {fileID: 2399236662088388762}
-  jps: {fileID: 5705967157763002990}
+  jps: {fileID: 5827749209801056136}

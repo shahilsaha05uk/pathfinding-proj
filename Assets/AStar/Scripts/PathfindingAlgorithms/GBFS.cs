@@ -23,7 +23,7 @@ public class GBFS : BasePathfinding
                 return ReturnPath(start, goal, visitedNodes);
 
             // Expand the neighbors
-            var neighbors = currentNode.GetNeighbors();
+            var neighbors = GetAllNeighbors(currentNode);
             foreach (var neighbor in neighbors)
             {
                 // if the path is blocked or has already been evaluated, skip it
@@ -33,7 +33,7 @@ public class GBFS : BasePathfinding
                 if (!openList.Contains(neighbor))
                 {
                     neighbor.parent = currentNode;
-                    neighbor.hCost = HeuristicHelper.GetManhattanDistance(neighbor, goal);
+                    neighbor.hCost = CalculateHeuristicDistance(neighbor, goal);
                     openList.Add(neighbor);
                     visitedNodes++;
                 }

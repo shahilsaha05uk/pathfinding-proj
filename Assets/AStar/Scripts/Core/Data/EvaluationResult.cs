@@ -1,7 +1,6 @@
-using System;
+using UnityEngine;
 
-
-[Serializable]
+[SerializeField]
 public class EvaluationResult
 {
     public EvaluationData AStar;
@@ -14,6 +13,12 @@ public class EvaluationResult
     
     public static EvaluationData FromPathResult(PathResult result)
     {
+        if(result == null)
+        {
+            Debug.LogError("Path result was null!!");
+            return new EvaluationData();
+        }
+
         return new EvaluationData
         {
             TimeTaken = result.TimeTaken,

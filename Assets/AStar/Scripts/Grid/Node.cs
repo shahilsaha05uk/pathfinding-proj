@@ -7,57 +7,54 @@ using UnityEngine;
     Diagonal neighbors: Up-Left, Up-Right, Down-Left, Down-Right : Total = 8 corners +  
  */
 
-public enum TerrainType { Ground, HillTop, Cave, Obstacle }
+public enum TerrainType { Ground, HillTop, Cave, Obstacle, Lake }
 
 public class Node : MonoBehaviour
 {
-    private List<Node> neighbors;
-    private List<Node> Neighbors_Orthogonal;
-    private List<Node> Neighbors_Diagonal;
-    [SerializeField] private Color defaultColor;
+    private TerrainType defaultTerrainType;
+    private Color defaultColor;
+    private bool defaultIsBlocked;
+    private bool bIsEndPoint;
+    private TerrainType terrainType;
+
+    public int gridX, gridY, gridZ;
+
+    public Vector3Int travelDirection;
 
     public float gCost, hCost, fCost;
-    public int gridX, gridY, gridZ;
     public Node parent;
-    public TerrainType terrainType;
     public bool isBlocked;
 
-    public void SetType(TerrainType type, string ColorHex, bool blocked)
+    public void Init(TerrainData tData, Vector3Int gridPos)
     {
-        if (ColorUtils.GetColorFromHex(ColorHex, out var color))
-        {
-            terrainType = type;
-            isBlocked = blocked;
-            SetColor(color);
-            defaultColor = color;
-        }
-        else
-        {
-            Debug.LogError($"Invalid color hex: {ColorHex}");
-            terrainType = type;
-            isBlocked = blocked;
-            defaultColor = Color.black;
-            SetColor(Color.black);
-        }
+        gridX = gridPos.x;
+        gridY = gridPos.y;
+        gridZ = gridPos.z;
+
+        defaultTerrainType = tData.Type;
+        defaultColor = tData.Color;
+        defaultIsBlocked = tData.IsBlocked;
+
+        terrainType = defaultTerrainType;
+        isBlocked = defaultIsBlocked;
+
+        SetColor(defaultColor);
     }
-    
+
+    public void UpdateNode(TerrainData data)
+    {
+        terrainType = data.Type;
+        isBlocked = data.IsBlocked;
+        SetColor(data.Color);
+    }
+
+    public void SetEndpoint(bool value) => bIsEndPoint = value;
+    public void SetIsBlocked(bool value) => isBlocked = value;
+    public void SetType(TerrainType type) => terrainType = type;
     public void SetColor(Color color)
     {
         GetComponent<MeshRenderer>().material.color = color;
     }
-    
-    public void SetNeighbors(List<Node> neighbors) => this.neighbors = neighbors;
-    
-    public void SetOrthogonalNeighbours(List<Node> neighbors) => Neighbors_Orthogonal = neighbors;
-
-    public void SetDiagonalNeighbours(List<Node> neighbors) => Neighbors_Diagonal = neighbors;
-
-    public List<Node> GetNeighbors() => this.neighbors?? null;
-    
-    public List<Node> GetOrthogonalNeighbors() => Neighbors_Orthogonal ?? null;
-
-    public List<Node> GetDiagonalNeighbors() => Neighbors_Diagonal ?? null;
-
     public void SetNodeIndex(int x, int y, int z)
     {
         gridX = x;
@@ -66,8 +63,9 @@ public class Node : MonoBehaviour
     }
 
     public Vector3Int GetNodePositionOnGrid() => new Vector3Int(gridX, gridY, gridZ);
-
-    public void ToggleNeighbours(bool value)
+    public TerrainType GetTerrainType() => terrainType;
+    public bool IsEndpoint() => bIsEndPoint;
+    public void ToggleNeighbours(bool value, List<Node> neighbors)
     {
         Color color = value ? Color.yellow : defaultColor;
         foreach (var n in neighbors)
@@ -77,8 +75,18 @@ public class Node : MonoBehaviour
     public void ResetNode()
     {
         parent = null;
-        SetColor(defaultColor);
+        gCost = 0;
+        hCost = 0;
+        fCost = 0;
+        travelDirection = Vector3Int.zero;
+        bIsEndPoint = false;
+        ResetColor();
+        ResetBlockStatus();
+        ResetTerrainType();
     }
+    public void ResetColor() => SetColor(defaultColor);
+    public void ResetBlockStatus() => isBlocked = defaultIsBlocked;
+    public void ResetTerrainType() => terrainType = defaultTerrainType;
 
     public void DestroyNode()
     {

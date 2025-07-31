@@ -7,8 +7,8 @@ public partial class Controller
     private Node selectedNode;
     
     public bool bIsNodeHit = false;
-    public Action<Node> OnNodeSet_Signature; 
-    
+    public Action<Node> OnNodeSet_Signature;
+
     public void EnableNodeHit() => bIsNodeHit = true;
     
     public void DisableNodeHit() => bIsNodeHit = false;
@@ -31,7 +31,11 @@ public partial class Controller
     public void CreateGrid(GridConfig config) => mGrid.Create(config);
     
     public void ClearGrid() => mGrid.Clear();
-    
+
+    public void OnUpdateObstacleDensity(float value) => mGrid.UpdateObstacles(value);
+
+    public void OnClearObstacleDensity() => mGrid.ClearObstacles();
+
     public void OnResetPath() => mGrid.ResetPath();
 
     public void SubscribeTo_StartNodeSet()
@@ -58,16 +62,16 @@ public partial class Controller
 
     private void HandleOnShowNeighbours(Node node)
     {
-        if (selectedNode != null && selectedNode == node)
-        {
-            selectedNode.ToggleNeighbours(false);
-            selectedNode = null;
-            return;
-        }
+        //if (selectedNode != null && selectedNode == node)
+        //{
+        //    selectedNode.ToggleNeighbours(false);
+        //    selectedNode = null;
+        //    return;
+        //}
 
-        selectedNode.ToggleNeighbours(false);
-        selectedNode = node;
-        selectedNode.ToggleNeighbours(true);
+        //selectedNode.ToggleNeighbours(false);
+        //selectedNode = node;
+        //selectedNode.ToggleNeighbours(true);
     }
 
     private bool Execute_OnNodeSet()

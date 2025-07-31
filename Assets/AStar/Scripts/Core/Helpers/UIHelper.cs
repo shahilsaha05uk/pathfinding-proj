@@ -20,6 +20,19 @@ public static class UIHelper
         return !string.IsNullOrWhiteSpace(value) && float.TryParse(value, out result);
     }
 
+    public static bool ValidateMinMaxAsFloat((string min, string max) value, out (float min, float max) result)
+    {
+        result = default;
+        if (string.IsNullOrWhiteSpace(value.min) || string.IsNullOrWhiteSpace(value.max))
+            return false;
+
+        float.TryParse(value.min, out float min);
+        float.TryParse(value.min, out float max);
+        
+        result = (min, max);
+        return true;
+    }
+
 
     public static List<TMP_Dropdown.OptionData> CreateOptionListFromEnum<T>() where T : Enum
     {

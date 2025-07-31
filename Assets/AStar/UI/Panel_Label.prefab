@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Label
+  m_text: Default Label
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7592094917b608441865e2a8e3be1e9d, type: 2}
   m_sharedMaterial: {fileID: 4802256234906076223, guid: 7592094917b608441865e2a8e3be1e9d, type: 2}
@@ -221,9 +221,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c244d4b863e6ba4598db9abb027fcb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  label: GBFS Time
+  defaultLabel: Default Label
+  txtLabel: {fileID: 1630434133609280811}
   defaultValue: N/A
-  labelText: {fileID: 1630434133609280811}
   valueText: {fileID: 153277221061653325}
 --- !u!1 &6897927512907859538
 GameObject:

@@ -12,62 +12,58 @@ public class AStar : BasePathfinding
 {
     protected override PathResult FindPath(Node start, Node goal, HashSet<Node> allowedNodes = null)
     {
+        var openQueue = new PriorityQueue<Node, float>();  // Priority queue for O(log n) operations
+        var openSet = new HashSet<Node>();                 // For O(1) contains checks
+        var closedSet = new HashSet<Node>();
         int visitedNodes = 0;
-        List<Node> openList = new List<Node>();
-        HashSet<Node> closedList = new HashSet<Node>();
 
-        openList.Add(start);
-        start.gCost = 0; // Cost of the start node is 0
-        start.hCost = HeuristicHelper.GetManhattanDistance(start, goal); // Heuristic cost from start to end
-        start.fCost = start.gCost + start.hCost; // Total cost of the path from start to end
+        // Initialize start node
+        start.gCost = 0;
+        start.hCost = CalculateHeuristicDistance(start, goal);
+        start.fCost = start.gCost + start.hCost;
 
-        // while there are nodes in the open list
-        while (openList.Count > 0)
+        openQueue.Enqueue(start, start.fCost);
+        openSet.Add(start);
+
+        while (openQueue.Count > 0)
         {
-            // Get the current Node with the lowest fCost
-            Node currentNode = HeuristicHelper.FindLowestF(openList);
+            var current = openQueue.Dequeue();
+            openSet.Remove(current);
 
-            // if the node is there in the open list, move it to the closed list
-            if (openList.Contains(currentNode))
-                openList.Remove(currentNode);
-
-            closedList.Add(currentNode);
-
-            // if the goal node is the current node, retrace the path and return it
-            if (currentNode == goal)
+            if (current == goal)
                 return ReturnPath(start, goal, visitedNodes);
 
+            closedSet.Add(current);
 
-            // Else, get all the neighbors of the current node
-            var neighbors = currentNode.GetNeighbors();
-
-            // Loop through each neighbor
-            foreach (var neighbor in neighbors)
+            foreach (var neighbor in GetAllNeighbors(current))
             {
-                // If the neighbor is already in the closed list or is blocked, skip it
-                if (closedList.Contains(neighbor) || 
-                   !HeuristicHelper.IsNodeAllowed(neighbor, allowedNodes))
+                if (closedSet.Contains(neighbor) ||
+                    !HeuristicHelper.IsNodeAllowed(neighbor, allowedNodes))
                     continue;
 
-                // Gets the distance from the current node to the neighbor
-                float tentativeGCost =
-                    currentNode.gCost + HeuristicHelper.GetManhattanDistance(currentNode, neighbor);
+                float tentativeGCost = current.gCost + CalculateHeuristicDistance(current, neighbor);
 
-                // calculate the cost of the path to the neighbor
-                if (tentativeGCost < neighbor.gCost || !openList.Contains(neighbor))
+                if (!openSet.Contains(neighbor) || tentativeGCost < neighbor.gCost)
                 {
+                    neighbor.parent = current;
                     neighbor.gCost = tentativeGCost;
-                    neighbor.hCost = HeuristicHelper.GetManhattanDistance(neighbor, goal);
+                    neighbor.hCost = CalculateHeuristicDistance(neighbor, goal);
                     neighbor.fCost = neighbor.gCost + neighbor.hCost;
-                    neighbor.parent = currentNode;
 
-                    openList.Add(neighbor);
-                    visitedNodes++;
+                    if (!openSet.Contains(neighbor))
+                    {
+                        openQueue.Enqueue(neighbor, neighbor.fCost);
+                        openSet.Add(neighbor);
+                        visitedNodes++;
+                    }
+                    else
+                    {
+                        openQueue.UpdatePriority(neighbor, neighbor.fCost);
+                    }
                 }
             }
         }
 
-        // No path was found, return null
         return null;
     }
 }

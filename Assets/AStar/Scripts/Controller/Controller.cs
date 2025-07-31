@@ -1,19 +1,20 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Debug = UnityEngine.Debug;
 
 public partial class Controller : MonoBehaviour
 {
     public Grid3D mGrid;
     [SerializeField] private UI mUI;
-    private SaveManager saveManager;
+    private EvaluationDataSaver evaluationDataSaveManager;
 
     [SerializeField] private PathfindingEvaluator evaluator;
     [SerializeField] private PathfindingManager pathfindingManager;
     
     private void Start()
     {
-        saveManager = new SaveManager();
+        evaluationDataSaveManager = new EvaluationDataSaver();
     }
 
     private void Update()
@@ -28,7 +29,7 @@ public partial class Controller : MonoBehaviour
             }
             HandleOnShowNeighbours(node);
         }
-        if (Input.GetMouseButtonUp(0) && bIsNodeHit)
+        if (Input.GetMouseButtonUp(0) && bIsNodeHit && !EventSystem.current.IsPointerOverGameObject())
         {
             if(Execute_OnNodeSet()) UnsubscribeFrom_OnNodeSet();
         }
@@ -40,5 +41,5 @@ public partial class Controller : MonoBehaviour
         HandleCameraMovement();
     }
 
-    public SaveManager GetSaveManager() => saveManager;
+    public EvaluationDataSaver GetSaveManager() => evaluationDataSaveManager;
 }

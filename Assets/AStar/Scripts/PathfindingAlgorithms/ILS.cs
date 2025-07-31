@@ -26,6 +26,7 @@ public class ILS : BasePathfinding
                         Path = pathResult.Path,
                         PathLength = pathResult.PathLength,
                         PathCost = pathResult.PathCost,
+                        VisitedNodes = pathResult.VisitedNodes,
                         CorridorIterations = corridorIterations,
                     };
                 }
@@ -58,28 +59,7 @@ public class ILS : BasePathfinding
 
         foreach (var point in linePoints)
         {
-            var neighbors = grid.GetNeighbors(point, width);
-            corridorNodes.UnionWith(neighbors);
-        }
-        
-        corridorNodes.Add(start);
-        corridorNodes.Add(end);
-        
-        return corridorNodes;
-    }
-    
-    private HashSet<Node> DefineCorridor(
-        List<Vector3Int> linePoints, 
-        Grid3D grid, 
-        Node start, Node end,
-        CorridorShape shape,
-        int width = 1)
-    {
-        var corridorNodes = new HashSet<Node>();
-
-        foreach (var point in linePoints)
-        {
-            var neighbors = grid.GetManhattanRadius(point, width, shape);
+            var neighbors = NeighborHelper.GetNeighborsInRange(point, width);
             corridorNodes.UnionWith(neighbors);
         }
         
