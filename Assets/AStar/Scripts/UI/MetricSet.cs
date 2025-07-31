@@ -10,6 +10,7 @@ public class MetricSet : TMP_LabelledPanel
     public PanelLabel Time;
     public PanelLabel PathLength;
     public PanelLabel PathCost;
+    public PanelLabel VisitedNodes;
 
     public void Start()
     {
@@ -23,5 +24,6 @@ public class MetricSet : TMP_LabelledPanel
         Time.SetValue(data.TimeTaken.ToString());
         PathCost.SetValue(data.PathCost.ToString());
         PathLength.SetValue(data.PathLength.ToString());
+        VisitedNodes.SetValue(data.VisitedNodes.ToString());
     }
 }

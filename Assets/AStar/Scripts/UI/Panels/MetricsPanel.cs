@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class MetricsPanel : MonoBehaviour
 {
     [Space(5)][Header("Metrics")]
-    public ILSMetricSet Metric;
+    public MetricSet Metric;
     
     public Action OnSaveAndExport;
 
