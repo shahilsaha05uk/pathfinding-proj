@@ -1,8 +1,10 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PathfindingManager : MonoBehaviour
 {
-    [SerializeField] private Grid3D mGrid;
+    [SerializeField] private Grid3D grid;
 
     [SerializeField] private AStar aStar;
     [SerializeField] private GBFS gbfs;
@@ -10,20 +12,60 @@ public class PathfindingManager : MonoBehaviour
     [SerializeField] private ILS ils;
     [SerializeField] private JPS jps;
 
-    public PathResult RunAStar(Node start, Node end) => aStar.Navigate(start, end);
+    private Dictionary<Type, INavigate> algorithms;
+    private Dictionary<AlgorithmType, Func<Node, Node, PathResult>> runners;
 
-    public PathResult RunGBFS(Node start, Node end) => gbfs.Navigate(start, end);
+    private void Awake()
+    {
+        algorithms = new Dictionary<Type, INavigate>
+        {
+            { typeof(AStar), aStar },
+            { typeof(GBFS), gbfs },
+            { typeof(Dijkstra), dijkstra },
+            { typeof(JPS), jps },
+        };
 
-    public PathResult RunJPS(Node start, Node end) => jps.Navigate(start, end);
+        runners = new Dictionary<AlgorithmType, Func<Node, Node, PathResult>>
+        {
+            { AlgorithmType.AStar,        (s,e) => RunAlgorithm<AStar>(s, e) },
+            { AlgorithmType.GBFS,         (s,e) => RunAlgorithm<GBFS>(s, e) },
+            { AlgorithmType.Dijkstra,     (s,e) => RunAlgorithm<Dijkstra>(s, e) },
+            { AlgorithmType.JPS,          (s,e) => RunAlgorithm<JPS>(s, e) },
+            { AlgorithmType.ILS_AStar,    (s,e) => RunILSWith<AStar>(s, e) },
+            { AlgorithmType.ILS_GBFS,     (s,e) => RunILSWith<GBFS>(s, e) },
+            { AlgorithmType.ILS_Dijkstra, (s,e) => RunILSWith<Dijkstra>(s, e) },
+        };
+    }
 
-    public PathResult RunDijkstra(Node start, Node end) => dijkstra.Navigate(start, end);
+    public PathResult RunAlgorithm<T>(Node start, Node end) where T: INavigate
+    {
+        if (!algorithms.TryGetValue(typeof(T), out var algo) || algo == null)
+        {
+            Debug.LogError($"Algorithm {typeof(T).Name} is not registered on {nameof(PathfindingManager)}.");
+            return null;
+        }
 
-    public PathResult RunILSWithAStar(Node start, Node end, int corridorWidth = 10) =>
-        ils.Navigate(mGrid, start, end, corridorWidth, aStar);
+        return algo.Navigate(start, end);
+    }
 
-    public PathResult RunILSWithGBFS(Node start, Node end, int corridorWidth = 10) =>
-        ils.Navigate(mGrid, start, end, corridorWidth, gbfs);
+    public PathResult RunILSWith<T>(Node start, Node end, int corridorWidth = 10) where T : INavigate
+    {
+        if (!algorithms.TryGetValue(typeof(T), out var algo) || algo == null)
+        {
+            Debug.LogError($"Inner algorithm {typeof(T).Name} is not registered on {nameof(PathfindingManager)}.");
+            return null;
+        }
 
-    public PathResult RunILSWithDijkstra(Node start, Node end, int corridorWidth = 10) =>
-        ils.Navigate(mGrid, start, end, corridorWidth, dijkstra);
+        return ils.Navigate(grid, start, end, corridorWidth, algo);
+    }
+
+    public PathResult RunAlgorithm(AlgorithmType type, Node start, Node end)
+    {
+        if (!runners.TryGetValue(type, out var run))
+        {
+            Debug.LogWarning($"AlgorithmType '{type}' not found. Falling back to A*.");
+            run = runners[AlgorithmType.AStar];
+        }
+        return run(start, end);
+    }
 }

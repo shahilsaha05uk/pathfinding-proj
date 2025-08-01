@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ILS : BasePathfinding
 {
-    public PathResult Navigate<T>(Grid3D grid, Node start, Node end, int maxCorridorWidth, T algorithm) where T : BasePathfinding
+    public PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, INavigate algorithm)
     {
         var (result, stats) = Stats.RecordStats(() =>
         {

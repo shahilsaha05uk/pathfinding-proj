@@ -1,44 +1,34 @@
-using UnityEngine.Profiling;
+using UnityEngine;
 
 public partial class Controller
 {
     public EvaluationData OnNavigate(AlgorithmType algorithmType, int corridorWidth = 1)
     {
-        mGrid.ResetPath();
+        grid.ResetPath();
 
-        var (start, end) = mGrid.GetStartEndNodes();
-        PathResult result = null;
-
-        switch (algorithmType)
-        {
-            case AlgorithmType.AStar:
-                result = pathfindingManager.RunAStar(start, end);
-                break;
-            case AlgorithmType.GBFS:
-                result = pathfindingManager.RunGBFS(start, end);
-                break;
-            case AlgorithmType.ILS_AStar:
-                result = pathfindingManager.RunILSWithAStar(start, end);
-                break;
-            case AlgorithmType.ILS_GBFS:
-                result = pathfindingManager.RunILSWithGBFS(start, end);
-                break;
-            case AlgorithmType.JPS:
-                result = pathfindingManager.RunJPS(start, end);
-                break;
-            case AlgorithmType.ILS_Dijkstra:
-                result = pathfindingManager.RunILSWithDijkstra(start, end);
-                break;
-            case AlgorithmType.Dijkstra:
-                result = pathfindingManager.RunDijkstra(start, end);
-                break;
-            default:
-                result = pathfindingManager.RunAStar(start, end);
-                break;
-        }
-        
+        var (start, end) = grid.GetStartEndNodes();
+        PathResult result = pathfindingManager.RunAlgorithm(algorithmType, start, end);
         if (result != null)
-            mGrid.HighlightPath(result.Path);
+            grid.HighlightPath(result.Path);
+
         return EvaluationResult.FromPathResult(result);
+    }
+
+    public EvaluationResult OnEvaluate(int evalSize, EvaluateAlgorithms evaluateAlgorithms)
+    {
+        if (evalSize <= 0)
+        {
+            Debug.LogError("Evaluation size must be greater than 0.");
+            return null;
+        }
+
+        // Evaluate the algorithms and collect the results
+        var result = evaluator.Evaluate(evalSize, evaluateAlgorithms);
+
+        if (result == null) return null;
+
+        SaveAndExport();
+
+        return result;
     }
 }

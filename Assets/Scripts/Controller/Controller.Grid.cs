@@ -4,11 +4,6 @@ using UnityEngine;
 
 public partial class Controller
 {
-    private Node selectedNode;
-    
-    public bool bIsNodeHit = false;
-    public Action<Node> OnNodeSet_Signature;
-
     public void EnableNodeHit() => bIsNodeHit = true;
     
     public void DisableNodeHit() => bIsNodeHit = false;
@@ -28,15 +23,15 @@ public partial class Controller
         return null;
     }
 
-    public void CreateGrid(GridConfig config) => mGrid.Create(config);
+    public void CreateGrid(GridConfig config) => grid.Create(config);
     
-    public void ClearGrid() => mGrid.Clear();
+    public void ClearGrid() => grid.Clear();
 
-    public void OnUpdateObstacleDensity(float value) => mGrid.UpdateObstacles(value);
+    public void OnUpdateObstacleDensity(float value) => grid.UpdateObstacles(value);
 
-    public void OnClearObstacleDensity() => mGrid.ClearObstacles();
+    public void OnClearObstacleDensity() => grid.ClearObstacles();
 
-    public void OnResetPath() => mGrid.ResetPath();
+    public void OnResetPath() => grid.ResetPath();
 
     public void SubscribeTo_StartNodeSet()
     {
@@ -56,9 +51,9 @@ public partial class Controller
         OnNodeSet_Signature = null;
     }
 
-    private void HandleOnStartNodeSet(Node node) => mGrid.SetStartNode(node);
+    private void HandleOnStartNodeSet(Node node) => grid.SetStartNode(node);
 
-    private void HandleOnEndNodeSet(Node node) => mGrid.SetEndNode(node);
+    private void HandleOnEndNodeSet(Node node) => grid.SetEndNode(node);
 
     private void HandleOnShowNeighbours(Node node)
     {

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-
-public abstract class BasePathfinding : MonoBehaviour
+public abstract class BasePathfinding : MonoBehaviour, INavigate
 {
     public PathResult Navigate(Node start, Node end, HashSet<Node> allowedNodes = null, bool trackStats = true)
     {

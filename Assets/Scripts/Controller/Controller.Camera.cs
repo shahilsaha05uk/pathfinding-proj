@@ -3,30 +3,20 @@ using UnityEngine;
 
 public partial class Controller : MonoBehaviour
 {
-    [Header("Camera Controls")]
-    public float cameraSpeed = 5f;
-    public float fastSpeedMultiplier = 3f;
-    public float mouseSensitivity = 2f;
-    public Transform cameraTransform;
-
-    private float yaw = 0f;
-    private float pitch = 0f;
-    private bool isRightMouseHeld = false;
-
     private void HandleCameraRotation()
     {
         if (Input.GetMouseButtonDown(1))
         {
-            isRightMouseHeld = true;
+            bIsRightMouseHeld = true;
             Cursor.lockState = CursorLockMode.Locked;
         }
         else if (Input.GetMouseButtonUp(1))
         {
-            isRightMouseHeld = false;
+            bIsRightMouseHeld = false;
             Cursor.lockState = CursorLockMode.None;
         }
 
-        if (isRightMouseHeld)
+        if (bIsRightMouseHeld)
         {
             float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
             float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
@@ -41,7 +31,7 @@ public partial class Controller : MonoBehaviour
 
     private void HandleCameraMovement()
     {
-        if (isRightMouseHeld)
+        if (bIsRightMouseHeld)
         {
             float speed = cameraSpeed * (Input.GetKey(KeyCode.LeftShift) ? fastSpeedMultiplier : 1f);
 

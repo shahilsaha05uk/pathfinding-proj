@@ -21,7 +21,7 @@ public class Node : MonoBehaviour
 
     public float gCost, hCost, fCost;
     public Node parent;
-    public bool isBlocked;
+    public bool bIsBlocked;
 
     public void Init(TerrainData tData, Vector3Int gridPos)
     {
@@ -34,7 +34,7 @@ public class Node : MonoBehaviour
         defaultIsBlocked = tData.IsBlocked;
 
         terrainType = defaultTerrainType;
-        isBlocked = defaultIsBlocked;
+        bIsBlocked = defaultIsBlocked;
 
         SetColor(defaultColor);
     }
@@ -42,12 +42,12 @@ public class Node : MonoBehaviour
     public void UpdateNode(TerrainData data)
     {
         terrainType = data.Type;
-        isBlocked = data.IsBlocked;
+        bIsBlocked = data.IsBlocked;
         SetColor(data.Color);
     }
 
     public void SetEndpoint(bool value) => bIsEndPoint = value;
-    public void SetIsBlocked(bool value) => isBlocked = value;
+    public void SetIsBlocked(bool value) => bIsBlocked = value;
     public void SetType(TerrainType type) => terrainType = type;
     public void SetColor(Color color)
     {
@@ -83,7 +83,7 @@ public class Node : MonoBehaviour
         ResetTerrainType();
     }
     public void ResetColor() => SetColor(defaultColor);
-    public void ResetBlockStatus() => isBlocked = defaultIsBlocked;
+    public void ResetBlockStatus() => bIsBlocked = defaultIsBlocked;
     public void ResetTerrainType() => terrainType = defaultTerrainType;
 
     public void DestroyNode()

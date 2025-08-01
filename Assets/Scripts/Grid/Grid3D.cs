@@ -3,20 +3,19 @@ using UnityEngine;
 
 public class Grid3D : BaseGrid
 {
-    public static Grid3D Instance { get; private set; }
     private Node[,,] Nodes;
 
     private int maxHeight;
     private float offsetX;
     private float offsetY;
+    private float noiseScale = 1f;
 
     [SerializeField] private float waterLevel = 0.2f;  // Below this = lake
     [SerializeField] private float caveLevel = 0.4f;  // Below this = lake
     [SerializeField] private int maxTraversableHeight = 3; // Hills above this = non-traversable
-
     [SerializeField] private SO_TerrainConfig terrainConfig;
 
-    private float noiseScale = 1f;
+    public static Grid3D Instance { get; private set; }
 
     private void Awake()
     {
@@ -52,7 +51,7 @@ public class Grid3D : BaseGrid
                 for (int y = 0; y < terrainHeight; y++)
                 {
                     // Instantiate the node and set its initial transform to 0
-                    var node = Instantiate(NodeObject, transform.position, Quaternion.identity, transform);
+                    var node = Instantiate(nodeObject, transform.position, Quaternion.identity, transform);
                     node.name = $"Node_{x}_{y}_{z}";
                     
                     SetNodePosition(node, x, y, z);

@@ -27,7 +27,7 @@ public class GBFS : BasePathfinding
             foreach (var neighbor in neighbors)
             {
                 // if the path is blocked or has already been evaluated, skip it
-                if(neighbor.isBlocked || closedList.Contains(neighbor))
+                if(neighbor.bIsBlocked || closedList.Contains(neighbor))
                     continue;
 
                 if (!openList.Contains(neighbor))

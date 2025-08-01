@@ -13,8 +13,8 @@ public abstract class BaseGrid : MonoBehaviour
     protected Node startNode;
     protected Node goalNode;
 
-    public Node NodeObject;
-    public GridColor GridColors;
+    public Node nodeObject;
+    public GridColor gridColors;
     
     public virtual void Create(GridConfig config)
     {
@@ -26,9 +26,9 @@ public abstract class BaseGrid : MonoBehaviour
 
     public virtual void ClearObstacles() { }
 
-    public void SetStartNode(Node node) => SetNode(node, ref startNode, GridColors.StartNodeColor);
+    public void SetStartNode(Node node) => SetNode(node, ref startNode, gridColors.StartNodeColor);
     
-    public void SetEndNode(Node node) => SetNode(node, ref goalNode, GridColors.EndNodeColor);
+    public void SetEndNode(Node node) => SetNode(node, ref goalNode, gridColors.EndNodeColor);
     
     public void HighlightPath(List<Node> path)
     {
@@ -42,7 +42,7 @@ public abstract class BaseGrid : MonoBehaviour
         int size = path.Count - 1;
         
         for(int i = 1; i < size; i++)
-            SetNodeColor(path[i], GridColors.PathNodeColor);
+            SetNodeColor(path[i], gridColors.PathNodeColor);
     }
 
     public (Node start, Node goal) GetStartEndNodes() => (startNode, goalNode);
@@ -63,9 +63,9 @@ public abstract class BaseGrid : MonoBehaviour
             node.ResetNode();
 
         if(startNode != null)
-            SetNodeColor(startNode, GridColors.StartNodeColor);
+            SetNodeColor(startNode, gridColors.StartNodeColor);
         if (goalNode != null)
-            SetNodeColor(goalNode, GridColors.EndNodeColor);
+            SetNodeColor(goalNode, gridColors.EndNodeColor);
     }
 
     protected void SetNodeIndex(Node node, int x, int y, int z = 0)
@@ -88,7 +88,7 @@ public abstract class BaseGrid : MonoBehaviour
 
     private void SetNode(Node newNode, ref Node targetNode, Color color)
     {
-        if (newNode == null || newNode.isBlocked) return;
+        if (newNode == null || newNode.bIsBlocked) return;
 
         if (targetNode != null)
             targetNode.ResetNode();

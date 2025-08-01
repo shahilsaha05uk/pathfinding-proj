@@ -4,52 +4,52 @@ using UnityEngine;
 
 public class ObstacleManager : MonoBehaviour
 {
-    private List<Node> PotentialNodes = new();
-    private List<Node> ObstacleNodes = new();
+    private List<Node> potentialNodes = new();
+    private List<Node> obstacleNodes = new();
 
     private float currentPercent = 0f;
     [SerializeField] private SO_TerrainConfig terrainConfig;
 
     public void Init(List<Node> nodes)
     {
-        if (PotentialNodes != null || PotentialNodes.Count > 0)
-            PotentialNodes.Clear();
-        if (ObstacleNodes != null || ObstacleNodes.Count > 0)
-            ObstacleNodes.Clear();
+        if (potentialNodes != null || potentialNodes.Count > 0)
+            potentialNodes.Clear();
+        if (obstacleNodes != null || obstacleNodes.Count > 0)
+            obstacleNodes.Clear();
 
-        PotentialNodes = nodes;
+        potentialNodes = nodes;
     }
 
     public void UpdateObstacleDensity(float newDensity)
     {
         newDensity = Mathf.Clamp01(newDensity);
 
-        if (PotentialNodes == null || PotentialNodes.Count == 0)
+        if (potentialNodes == null || potentialNodes.Count == 0)
             return;
 
-        int targetCount = Mathf.FloorToInt(PotentialNodes.Count * newDensity);
-        int currentCount = ObstacleNodes.Count;
+        int targetCount = Mathf.FloorToInt(potentialNodes.Count * newDensity);
+        int currentCount = obstacleNodes.Count;
         int difference = targetCount - currentCount;
 
         if (difference > 0)
         {
-            var availableNodes = PotentialNodes.Except(ObstacleNodes).ToList();
+            var availableNodes = potentialNodes.Except(obstacleNodes).ToList();
             var nodesToAdd = availableNodes.OrderBy(_ => Random.value).Take(difference).ToList();
 
             foreach (var node in nodesToAdd)
             {
                 node.UpdateNode(terrainConfig.GetData(TerrainType.Obstacle));
-                ObstacleNodes.Add(node);
+                obstacleNodes.Add(node);
             }
         }
         else if (difference < 0)
         {
-            var nodesToRemove = ObstacleNodes.OrderBy(_ => Random.value).Take(-difference).ToList();
+            var nodesToRemove = obstacleNodes.OrderBy(_ => Random.value).Take(-difference).ToList();
 
             foreach (var node in nodesToRemove)
             {
                 node.ResetNode();
-                ObstacleNodes.Remove(node);
+                obstacleNodes.Remove(node);
             }
         }
 
@@ -65,16 +65,16 @@ public class ObstacleManager : MonoBehaviour
         if (newPercent == currentPercent) return;
 
 
-        int currentObstacleCount = Mathf.FloorToInt(PotentialNodes.Count * currentPercent);
-        int newObstacleCount = Mathf.FloorToInt(PotentialNodes.Count * newPercent);
+        int currentObstacleCount = Mathf.FloorToInt(potentialNodes.Count * currentPercent);
+        int newObstacleCount = Mathf.FloorToInt(potentialNodes.Count * newPercent);
         int countToRemove = currentObstacleCount - newObstacleCount;
 
-        var shuffled = ObstacleNodes.OrderBy(_ => Random.value).Take(countToRemove).ToList();
+        var shuffled = obstacleNodes.OrderBy(_ => Random.value).Take(countToRemove).ToList();
 
         foreach (var node in shuffled)
         {
             node.ResetNode();
-            ObstacleNodes.Remove(node);
+            obstacleNodes.Remove(node);
         }
 
         currentPercent = newPercent;
@@ -82,12 +82,12 @@ public class ObstacleManager : MonoBehaviour
 
     public void Clear()
     {
-        foreach (var node in ObstacleNodes)
+        foreach (var node in obstacleNodes)
         {
             node.ResetNode();
         }
 
-        ObstacleNodes.Clear();
+        obstacleNodes.Clear();
     }
 
     public float GetCurrentPercent()

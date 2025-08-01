@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class JPS : BasePathfinding
 {
-    private List<Vector3Int> AllDirections;
+    private List<Vector3Int> allDirections;
 
     private void Awake()
     {
-        AllDirections = NeighborHelper.CreateAllDirectionList();
+        allDirections = NeighborHelper.CreateAllDirectionList();
     }
 
     protected override PathResult FindPath(Node start, Node goal, HashSet<Node> allowedNodes = null)
@@ -91,7 +91,7 @@ public class JPS : BasePathfinding
         if (currentDir == Vector3Int.zero)
         {
             // First node: explore all directions
-            foreach (var dir in AllDirections)
+            foreach (var dir in allDirections)
             {
                 var jumpPoint = Jump(node, goal, dir);
                 if (jumpPoint != null)
@@ -140,7 +140,7 @@ public class JPS : BasePathfinding
             return null;
 
         Node nextNode = Grid3D.Instance.GetNodeAt(nextPos);
-        if (nextNode == null || nextNode.isBlocked)
+        if (nextNode == null || nextNode.bIsBlocked)
             return null;
 
         if (nextNode == goal)

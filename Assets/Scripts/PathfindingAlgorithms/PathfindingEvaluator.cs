@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class PathfindingEvaluator : MonoBehaviour
 {
-    [SerializeField] private Grid3D mGrid;
-    [SerializeField] private PathfindingManager mPathManager;
+    [SerializeField] private Grid3D grid;
+    [SerializeField] private PathfindingManager pathManager;
     private List<EvaluationResult> evaluationResults = new List<EvaluationResult>();
 
     public List<EvaluationResult> GetEvaluationResults() => evaluationResults;
@@ -21,7 +21,7 @@ public class PathfindingEvaluator : MonoBehaviour
         // -- Clear data if exists.
         ClearResults();
 
-        var nodes = mGrid.GetStartEndNodes();
+        var nodes = grid.GetStartEndNodes();
 
         // Evaluate the algorithms
         StartEvaluation(evalSize, nodes.start, nodes.goal, evaluateAlgorithms);
@@ -52,13 +52,16 @@ public class PathfindingEvaluator : MonoBehaviour
 
     private EvaluationResult GatherEvaluationData(Node start, Node goal, EvaluateAlgorithms evaluateAlgorithms)
     {
-        var aStar = (evaluateAlgorithms.AStar)? EvaluationResult.FromPathResult(mPathManager.RunAStar(start, goal)) : null;
-        var gbfs = (evaluateAlgorithms.GBFS)? EvaluationResult.FromPathResult(mPathManager.RunGBFS(start, goal)) : null;
-        var jps = (evaluateAlgorithms.JPS) ? EvaluationResult.FromPathResult(mPathManager.RunJPS(start, goal)) : null;
-        var dijkstra = (evaluateAlgorithms.Dijkstra) ? EvaluationResult.FromPathResult(mPathManager.RunDijkstra(start, goal)) : null;
-        var ilsWithAStar = (evaluateAlgorithms.ILSAStar) ? EvaluationResult.FromPathResult(mPathManager.RunILSWithAStar(start, goal)) : null;
-        var ilsWithGBFS = (evaluateAlgorithms.ILSGBFS) ? EvaluationResult.FromPathResult(mPathManager.RunILSWithGBFS(start, goal)) : null;
-        var ilsWithDijkstra = (evaluateAlgorithms.ILSDijkstra) ? EvaluationResult.FromPathResult(mPathManager.RunILSWithDijkstra(start, goal)) : null;
+        // Basic algorithms
+        var aStar = (evaluateAlgorithms.AStar)? GetEvaluationData<AStar>(start, goal) : null;
+        var gbfs = (evaluateAlgorithms.GBFS)? GetEvaluationData<Dijkstra>(start, goal) : null;
+        var jps = (evaluateAlgorithms.JPS) ? GetEvaluationData<JPS>(start, goal) : null;
+        var dijkstra = (evaluateAlgorithms.Dijkstra) ? GetEvaluationData<Dijkstra>(start, goal) : null;
+
+        // ILS algorithms
+        var ilsWithAStar = (evaluateAlgorithms.ILSAStar) ? GetILSEvaluationData<AStar>(start, goal) : null;
+        var ilsWithGBFS = (evaluateAlgorithms.ILSGBFS) ? GetILSEvaluationData<GBFS>(start, goal) : null;
+        var ilsWithDijkstra = (evaluateAlgorithms.ILSDijkstra) ? GetILSEvaluationData<Dijkstra>(start, goal) : null;
 
         return new EvaluationResult
         {
@@ -70,5 +73,27 @@ public class PathfindingEvaluator : MonoBehaviour
             ILSWithDijkstra = ilsWithDijkstra,
             ILSWithGBFS = ilsWithGBFS,
         };
+    }
+
+    private EvaluationData GetEvaluationData<T>(Node start, Node end) where T : INavigate
+    {
+        var result = RunAlgorithm<T>(start, end);
+        return EvaluationResult.FromPathResult(result);
+    }
+
+    private EvaluationData GetILSEvaluationData<T>(Node start, Node end) where T : INavigate
+    {
+        var result = RunILSAlgorithm<T>(start, end);
+        return EvaluationResult.FromPathResult(result);
+    }
+
+    private PathResult RunAlgorithm<T>(Node start, Node end) where T: INavigate
+    {
+        return pathManager.RunAlgorithm<T>(start, end);
+    }
+    
+    private PathResult RunILSAlgorithm<T>(Node start, Node end) where T: INavigate
+    {
+        return pathManager.RunILSWith<T>(start, end);
     }
 }

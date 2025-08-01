@@ -98,6 +98,6 @@ public static class HeuristicHelper
 
     public static bool IsNodeAllowed(Node n, HashSet<Node> allowedNodes = null) =>
         allowedNodes == null || 
-        (!n.isBlocked && 
+        (!n.bIsBlocked && 
         allowedNodes.Contains(n));
 }

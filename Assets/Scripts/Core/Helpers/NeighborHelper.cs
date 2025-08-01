@@ -330,7 +330,7 @@ public static class NeighborHelper
                 continue;
 
             var neighborNode = grid.GetNodeAt(neighborPos);
-            if(neighborNode != null && !neighborNode.isBlocked)
+            if(neighborNode != null && !neighborNode.bIsBlocked)
             {
                 neighbors.Add(neighborNode);
             }
@@ -396,9 +396,9 @@ public static class NeighborHelper
             // the forced neighbor node is not blocked,
             // its a forced neighbor
             if (blockedNode != null && 
-                blockedNode.isBlocked &&
+                blockedNode.bIsBlocked &&
                 forcedNeighborNode != null &&
-               !forcedNeighborNode.isBlocked)
+               !forcedNeighborNode.bIsBlocked)
             {
                 blockedNode.SetColor(Color.black);
                 //forcedNeighborNode.SetColor(Color.red);
@@ -473,9 +473,9 @@ public static class NeighborHelper
             var possibleOpenNode = grid.GetNodeAt(openPos);
 
             if (possibleBlockedNode != null &&
-                possibleBlockedNode.isBlocked &&
+                possibleBlockedNode.bIsBlocked &&
                 possibleOpenNode != null &&
-               !possibleOpenNode.isBlocked)
+               !possibleOpenNode.bIsBlocked)
             {
                 // If the blocked node is blocked and the open node is not blocked,
                 // add the open node to the list of forced neighbors
