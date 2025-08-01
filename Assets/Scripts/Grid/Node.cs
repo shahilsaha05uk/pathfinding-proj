@@ -53,6 +53,13 @@ public class Node : MonoBehaviour
     {
         GetComponent<MeshRenderer>().material.color = color;
     }
+    public void SetColor(string hex)
+    {
+        Color color;
+        ColorUtils.GetColorFromHex(hex, out color);
+        SetColor(color);
+    }
+
     public void SetNodeIndex(int x, int y, int z)
     {
         gridX = x;

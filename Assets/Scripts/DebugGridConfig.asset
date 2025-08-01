@@ -13,16 +13,16 @@ MonoBehaviour:
   m_Name: DebugGridConfig
   m_EditorClassIdentifier: 
   GridSize: 16
-  MaxHeight: 8
-  NoiseScale: 0.1
-  ObstacleDensity: 0
-  MinOffsetX: -3
-  MaxOffsetX: 3
-  MinOffsetY: -3
-  MaxOffsetY: 3
+  MaxHeight: 3
+  NoiseScale: 0
+  ObstacleDensity: 0.3
+  MinOffsetX: 0
+  MaxOffsetX: 0
+  MinOffsetY: 0
+  MaxOffsetY: 0
   MinOffsetZ: 0
   MaxOffsetZ: 0
-  bSetEndpoints: 0
-  StartNode: {x: 0, y: 0, z: 0}
-  EndNode: {x: 0, y: 0, z: 0}
-  AlgorithmType: 1
+  bSetEndpoints: 1
+  StartNode: {x: 15, y: 0, z: 0}
+  EndNode: {x: 0, y: 0, z: 15}
+  AlgorithmType: 5

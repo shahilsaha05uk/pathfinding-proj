@@ -400,8 +400,6 @@ public static class NeighborHelper
                 forcedNeighborNode != null &&
                !forcedNeighborNode.bIsBlocked)
             {
-                blockedNode.SetColor(Color.black);
-                //forcedNeighborNode.SetColor(Color.red);
                 return true;
             }
         }

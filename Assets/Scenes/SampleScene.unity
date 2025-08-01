@@ -368,6 +368,78 @@ PrefabInstance:
       propertyPath: m_Name
       value: Grid
       objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.EndNodeColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.EndNodeColor.b
+      value: 0.6731367
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.EndNodeColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.EndNodeColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.PathNodeColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.PathNodeColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.PathNodeColor.g
+      value: 0.95226884
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.PathNodeColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.StartNodeColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.StartNodeColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.VisitedNodeColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.VisitedNodeColor.b
+      value: 0.84191275
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.VisitedNodeColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.VisitedNodeColor.r
+      value: 0.4509434
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.ObstacleNodeColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.ObstacleNodeColor.b
+      value: 0.3679244
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.ObstacleNodeColor.g
+      value: 0.3679244
+      objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColors.ObstacleNodeColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7665792249558207773, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -516,6 +588,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2399236662088388762, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
+      propertyPath: blockedThreshold
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3162446283526828595, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
       propertyPath: jps
       value: 
@@ -577,9 +653,17 @@ PrefabInstance:
       value: Pathfinder
       objectReference: {fileID: 0}
     - target: {fileID: 9130011144360012354, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
+      propertyPath: grid
+      value: 
+      objectReference: {fileID: 1631289692}
+    - target: {fileID: 9130011144360012354, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
       propertyPath: mGrid
       value: 
       objectReference: {fileID: 1631289692}
+    - target: {fileID: 9130011144360012354, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
+      propertyPath: pathManager
+      value: 
+      objectReference: {fileID: 2106419156}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
