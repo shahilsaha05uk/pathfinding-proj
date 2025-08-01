@@ -1117,7 +1117,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6996960895451842561, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Text
-      value: A*
+      value: ILS_Dijkstra
       objectReference: {fileID: 0}
     - target: {fileID: 9185475838216931839, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Name
@@ -2017,7 +2017,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6996960895451842561, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Text
-      value: A*
+      value: GBFS
       objectReference: {fileID: 0}
     - target: {fileID: 9185475838216931839, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Name
@@ -2689,7 +2689,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6996960895451842561, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Text
-      value: A*
+      value: Dijkstra
       objectReference: {fileID: 0}
     - target: {fileID: 9185475838216931839, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Name
@@ -5646,7 +5646,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6996960895451842561, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Text
-      value: A*
+      value: ILS_GBFS
       objectReference: {fileID: 0}
     - target: {fileID: 9185475838216931839, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Name
@@ -6040,7 +6040,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6996960895451842561, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Text
-      value: A*
+      value: JPS
       objectReference: {fileID: 0}
     - target: {fileID: 9185475838216931839, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Name
@@ -7091,7 +7091,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6996960895451842561, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Text
-      value: A*
+      value: ILS_A*
       objectReference: {fileID: 0}
     - target: {fileID: 9185475838216931839, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: m_Name
@@ -8338,6 +8338,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3375908157453906154, guid: de7eabaed6f84024682ded445065b43d, type: 3}
       propertyPath: defaultLabel
+      value: A*
+      objectReference: {fileID: 0}
+    - target: {fileID: 6996960895451842561, guid: de7eabaed6f84024682ded445065b43d, type: 3}
+      propertyPath: m_Text
       value: A*
       objectReference: {fileID: 0}
     - target: {fileID: 9185475838216931839, guid: de7eabaed6f84024682ded445065b43d, type: 3}
