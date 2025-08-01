@@ -33,10 +33,6 @@ public class JPS : BasePathfinding
             {
                 var path = ReturnPath(start, goal, visited);
                 return path;
-                //foreach (var p in path.Path)
-                //{
-                //    p.SetColor(Color.blue);
-                //}
             }
 
             var currentDir = directionMap[current];
@@ -130,9 +126,6 @@ public class JPS : BasePathfinding
     /// </summary>
     private Node Jump(Node current, Node goal, Vector3Int direction)
     {
-        //var cPos = current.GetNodePositionOnGrid();
-        //if(!current.IsEndpoint())
-        //    current.SetColor(Color.blue);
         if (current == goal) return current;
 
         Vector3Int nextPos = current.GetNodePositionOnGrid() + direction;
@@ -146,10 +139,6 @@ public class JPS : BasePathfinding
         if (nextNode == goal)
             return nextNode;
 
-        // Forced neighbor check
-        //if (NeighborHelper.HasForcedNeighbor(nextNode, direction))
-        //    return nextNode;
-
         // -- updates
         var forcedNeighbors = NeighborHelper.GetForcedNeighbors(nextNode, direction);
         if (forcedNeighbors != null && forcedNeighbors.Count > 0)
@@ -158,8 +147,6 @@ public class JPS : BasePathfinding
             return nextNode;
         }
 
-
-        // nextNode.SetColor(Color.orange);
         // Diagonal movement: check component directions
         if (IsDiagonal(direction))
         {
@@ -171,7 +158,7 @@ public class JPS : BasePathfinding
                 if (jumpPoint != null)
                 {
                     jumpPoint.SetColor(Color.orange);
-                    return nextNode; // Return the DIAGONAL jump point, not the component!
+                    return nextNode;
                 }
             }
         }

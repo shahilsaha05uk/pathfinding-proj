@@ -110,18 +110,4 @@ public static class BLA
 
         return points;
     }
-
-    public static void DrawLine(List<Vector3Int> points,
-        float duration = 500f, Color? color = null)
-    {
-        if (points == null || points.Count < 2)
-            return;
-
-        Color drawColor = color ?? Color.red;
-
-        for (int i = 0; i < points.Count - 1; i++)
-        {
-            Debug.DrawLine(points[i], points[i + 1], drawColor, duration);
-        }
-    }
 }

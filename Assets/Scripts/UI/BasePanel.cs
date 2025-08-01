@@ -1,8 +1,3 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-public abstract class BasePanel : MonoBehaviour
-{
-}
-
+public abstract class BasePanel : MonoBehaviour {}
