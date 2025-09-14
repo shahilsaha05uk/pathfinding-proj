@@ -368,6 +368,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Grid
       objectReference: {fileID: 0}
+    - target: {fileID: 7616832128631517232, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
+      propertyPath: gridColorConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: bd0d32bf25249634fb2b236e0398fd4d, type: 2}
     - target: {fileID: 7665792249558207773, guid: f0760c9def15afd49ac588344173e5e9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

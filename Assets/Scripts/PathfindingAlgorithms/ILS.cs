@@ -7,9 +7,8 @@ public class ILS : BasePathfinding
     public PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, INavigate algorithm) {
         // Record stats for the pathfinding operation
         var (result, stats) = Stats.RecordStats(() => {
-            int currentWidth = 1;
+            int currentWidth = 1, corridorIterations = 1;
             int maxWidth = maxCorridorWidth;
-            int corridorIterations = 1;
             var linePoints = GenerateLine(start, end);
 
             // Keep increasing the size of the corridor until a path is found or the maximum width is reached

@@ -14,8 +14,10 @@ public class SidePanel : MonoBehaviour
     [SerializeField] private NavigatorsPanel navigatorsPanel;
     [SerializeField] private EvaluatorsPanel evaluatorsPanel;
 
-    public void Start()
+
+    public void Init(Controller controller)
     {
+        Controller = controller;
         controlPanel.Init(Controller);
         controlPanel.OnCreateGrid += OnCreateGrid;
         controlPanel.OnCreateDebugGrid += OnDebugCreateButtonClick;
@@ -26,11 +28,6 @@ public class SidePanel : MonoBehaviour
         navigatorsPanel.OnNavigatedSignature += OnNavigate;
 
         evaluatorsPanel.Init(Controller);
-    }
-
-    public void Init(Controller controller)
-    {
-        Controller = controller;
     }
 
     private void OnNavigate(AlgorithmType type, EvaluationData data)

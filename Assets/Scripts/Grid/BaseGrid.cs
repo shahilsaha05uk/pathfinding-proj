@@ -6,6 +6,7 @@ public abstract class BaseGrid : MonoBehaviour
     [SerializeField] protected ObstacleManager obstacleManager;
     protected List<Node> navPath = new();
     protected GridConfig mConfig;
+    [SerializeField] private SO_GridColor gridColorConfig;
     
     protected int mGridSize = 10;
     protected float mTileSpacing = 0.1f;
@@ -14,12 +15,13 @@ public abstract class BaseGrid : MonoBehaviour
     protected Node goalNode;
 
     public Node nodeObject;
-    public GridColor gridColors;
+    private GridColor gridColors;
     
     public virtual void Create(GridConfig config)
     {
         mConfig = config;
         mGridSize = mConfig.GridSize;
+        gridColors = gridColorConfig.GetGridColor();
     }
     
     public virtual void Clear() { }
