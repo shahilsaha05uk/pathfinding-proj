@@ -3,24 +3,21 @@ using UnityEngine;
 
 public class ILS : BasePathfinding
 {
-    public PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, INavigate algorithm)
-    {
+
+    public PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, INavigate algorithm) {
         // Record stats for the pathfinding operation
-        var (result, stats) = Stats.RecordStats(() =>
-        {
+        var (result, stats) = Stats.RecordStats(() => {
             int currentWidth = 1;
             int maxWidth = maxCorridorWidth;
             int corridorIterations = 1;
+            var linePoints = GenerateLine(start, end);
 
             // Keep increasing the size of the corridor until a path is found or the maximum width is reached
-            while (currentWidth <= maxWidth)
-            {
-                var linePoints = GenerateLine(start, end);
+            while (currentWidth <= maxWidth) {
                 var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
                 var pathResult = algorithm.Navigate(start, end, corridor, false);
 
-                if (pathResult != null)
-                {
+                if (pathResult != null) {
                     return new PathResult
                     {
                         Path = pathResult.Path,
@@ -30,17 +27,17 @@ public class ILS : BasePathfinding
                         CorridorIterations = corridorIterations,
                     };
                 }
-                
                 currentWidth++;
                 corridorIterations++;
             }
-            Debug.LogWarning("No path found!");
             return new PathResult { Path = null };
         });
 
         result.TimeTaken = stats.TimeTaken;
         return result;
     }
+
+
     
     // Step 1: Get the Line from BLA
     private List<Vector3Int> GenerateLine(Node start, Node end)
