@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class ILS : BasePathfinding
 {
+    public bool debugCorridor;
+    public Color debugColor;
 
     public PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, INavigate algorithm) {
         // Record stats for the pathfinding operation
@@ -14,6 +16,7 @@ public class ILS : BasePathfinding
             // Keep increasing the size of the corridor until a path is found or the maximum width is reached
             while (currentWidth <= maxWidth) {
                 var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
+                ColorCorridor(corridor);
                 var pathResult = algorithm.Navigate(start, end, corridor, false);
 
                 if (pathResult != null) {
@@ -63,6 +66,16 @@ public class ILS : BasePathfinding
         corridorNodes.Add(end);
         
         return corridorNodes;
+    }
+
+    private void ColorCorridor(HashSet<Node> nodes)
+    {
+        if (!debugCorridor) return;
+
+        foreach (var n in nodes)
+        {
+            n.SetColor(debugColor);
+        }
     }
     
 }

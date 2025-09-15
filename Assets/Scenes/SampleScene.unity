@@ -520,6 +520,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2399236662088388762, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
+      propertyPath: debugColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2399236662088388762, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
+      propertyPath: debugColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2399236662088388762, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
+      propertyPath: debugColor.g
+      value: 0.8667673
+      objectReference: {fileID: 0}
+    - target: {fileID: 2399236662088388762, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
+      propertyPath: debugColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2399236662088388762, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
+      propertyPath: debugCorridor
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3162446283526828595, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
       propertyPath: jps
       value: 
