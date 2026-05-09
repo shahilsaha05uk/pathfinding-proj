@@ -642,6 +642,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5110b6c9d88b9c47b0b9ecebee65b53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &2003686134 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 92209351373357408, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+  m_PrefabInstance: {fileID: 5558830062972481854}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2106419156 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3162446283526828595, guid: c72caac6ef037cb4692cb56bbe2398fb, type: 3}
@@ -1287,6 +1292,110 @@ PrefabInstance:
     - target: {fileID: 1447294792994093435, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: togglePrefab
+      value: 
+      objectReference: {fileID: 3375908157453906154, guid: de7eabaed6f84024682ded445065b43d, type: 3}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: togglesContainer
+      value: 
+      objectReference: {fileID: 2003686134}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[1].Key
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[2].Key
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[3].Key
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[4].Key
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[5].Key
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[6].Key
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[7].Key
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[0].Value.IsOn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[1].Value.IsOn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[2].Value.IsOn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[3].Value.IsOn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[4].Value.IsOn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[5].Value.IsOn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[6].Value.IsOn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[7].Value.IsOn
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[0].Value.Label
+      value: A*
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[1].Value.Label
+      value: JPS
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[2].Value.Label
+      value: GBFS
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[3].Value.Label
+      value: Dijkstra
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[4].Value.Label
+      value: ILS_Dijkstra
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[5].Value.Label
+      value: ILS_A*
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[6].Value.Label
+      value: ILS_GBFS
+      objectReference: {fileID: 0}
+    - target: {fileID: 1532493938604045167, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+      propertyPath: algorithmToggles._serializedList.Array.data[7].Value.Label
+      value: ILS_Dijkstra
       objectReference: {fileID: 0}
     - target: {fileID: 2047743713927115867, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
       propertyPath: m_AnchorMax.y
@@ -2330,7 +2439,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7247070701414167218, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -931.82996
+      value: -860.82996
       objectReference: {fileID: 0}
     - target: {fileID: 7348008835770788338, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
       propertyPath: m_SizeDelta.y
@@ -2901,7 +3010,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1574944455918737499, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+    - {fileID: 8718283394845552890, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+    - {fileID: 4880266500076081455, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+    - {fileID: 3983522625339895067, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+    - {fileID: 5410574773078902780, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+    - {fileID: 5074520752640365635, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
+    - {fileID: 5381396886271539974, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 147174041578104996, guid: edd7e1d5f48feb8478dedfe35de420f7, type: 3}
       insertIndex: 1

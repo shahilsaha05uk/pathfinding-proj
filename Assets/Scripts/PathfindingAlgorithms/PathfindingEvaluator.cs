@@ -8,11 +8,11 @@ public class PathfindingEvaluator : MonoBehaviour
 {
     [SerializeField] private Grid3D grid;
     [SerializeField] private PathfindingManager pathManager;
-    private List<EvaluationResult> evaluationResults = new List<EvaluationResult>();
+    private readonly List<EvaluationResult> evaluationResults = new();
 
     public List<EvaluationResult> GetEvaluationResults() => evaluationResults;
 
-    public EvaluationResult Evaluate(int evalSize, EvaluateAlgorithms evaluateAlgorithms)
+    public EvaluationResult Evaluate(int evalSize, HashSet<AlgorithmType> algorithms)
     {
         // Pre evaluation
         if (evalSize <= 0)
@@ -26,7 +26,7 @@ public class PathfindingEvaluator : MonoBehaviour
 
         var (start, goal) = grid.GetStartEndNodes();
         // Evaluate the algorithms
-        StartEvaluation(evalSize, start, goal, evaluateAlgorithms);
+        StartEvaluation(evalSize, start, goal, algorithms);
 
         // Post evaluation
         if (evaluationResults.Count <= 0) return null;
@@ -43,31 +43,39 @@ public class PathfindingEvaluator : MonoBehaviour
     private void StartEvaluation(
         int evalSize, 
         Node start, 
-        Node goal, 
-        EvaluateAlgorithms evaluateAlgorithms)
+        Node goal,
+        HashSet<AlgorithmType> algorithms)
     {
         int count = 0;
 
         while (count < evalSize)
         {
-            var results = GatherEvaluationData(start, goal, evaluateAlgorithms);
+            var results = GatherEvaluationData(start, goal, algorithms);
             evaluationResults.Add(results);
             count++;
         }
     }
 
-    private EvaluationResult GatherEvaluationData(Node start, Node goal, EvaluateAlgorithms evaluateAlgorithms)
+    private EvaluationResult GatherEvaluationData(
+        Node start, 
+        Node goal,
+        HashSet<AlgorithmType> algorithms)
     {
-        return new EvaluationResult
+        var result = new EvaluationResult();
+
+        foreach (var type in algorithms)
         {
-            AStar = (evaluateAlgorithms.AStar) ? GetEvaluationData<AStar>(start, goal) : null,
-            GBFS = (evaluateAlgorithms.GBFS) ? GetEvaluationData<GBFS>(start, goal) : null,
-            JPS = (evaluateAlgorithms.JPS) ? GetEvaluationData<JPS>(start, goal) : null,
-            Dijkstra = (evaluateAlgorithms.Dijkstra) ? GetEvaluationData<Dijkstra>(start, goal) : null,
-            ILSWithAStar = (evaluateAlgorithms.ILSAStar) ? GetEvaluationData<AStar>(start, goal, true) : null,
-            ILSWithDijkstra = (evaluateAlgorithms.ILSDijkstra) ? GetEvaluationData<Dijkstra>(start, goal, true) : null,
-            ILSWithGBFS = (evaluateAlgorithms.ILSGBFS) ? GetEvaluationData<GBFS>(start, goal, true) : null,
-        };
+            if (!IsSupported(type))
+            {
+                Debug.LogWarning($"Algorithm {type} is not supported for evaluation.");
+                continue;
+            }
+
+            var data = GetEvaluationData(type, start, goal);
+            result.AddResult(type, data);
+        }
+
+        return result;
     }
 
     private EvaluationData GetEvaluationData<T>(Node start, Node end, bool ils = false) where T : INavigate
@@ -98,6 +106,32 @@ public class PathfindingEvaluator : MonoBehaviour
             TimeTaken = stats.TimeTaken,
             MeasuredTimeMs = stats.MeasuredTimeMs,
             MemoryUsedBytes = stats.MemoryUsedBytes,
+        };
+    }
+
+    private bool IsSupported(AlgorithmType type)
+    {
+        return type == AlgorithmType.AStar
+            || type == AlgorithmType.GBFS
+            || type == AlgorithmType.Dijkstra
+            || type == AlgorithmType.JPS
+            || type == AlgorithmType.ILS_AStar
+            || type == AlgorithmType.ILS_GBFS
+            || type == AlgorithmType.ILS_Dijkstra;
+    }
+
+    private EvaluationData GetEvaluationData(AlgorithmType type, Node start, Node end)
+    {
+        return type switch
+        {
+            AlgorithmType.AStar => Evaluator(start, end, (s, e) => pathManager.RunAlgorithm<AStar>(s, e)),
+            AlgorithmType.GBFS => Evaluator(start, end, (s, e) => pathManager.RunAlgorithm<GBFS>(s, e)),
+            AlgorithmType.Dijkstra => Evaluator(start, end, (s, e) => pathManager.RunAlgorithm<Dijkstra>(s, e)),
+            AlgorithmType.JPS => Evaluator(start, end, (s, e) => pathManager.RunAlgorithm<JPS>(s, e)),
+            AlgorithmType.ILS_AStar => Evaluator(start, end, (s, e) => pathManager.RunILSWith<AStar>(s, e)),
+            AlgorithmType.ILS_GBFS => Evaluator(start, end, (s, e) => pathManager.RunILSWith<GBFS>(s, e)),
+            AlgorithmType.ILS_Dijkstra => Evaluator(start, end, (s, e) => pathManager.RunILSWith<Dijkstra>(s, e)),
+            _ => new EvaluationData { Message = $"Unsupported algorithm: {type}" },
         };
     }
 }

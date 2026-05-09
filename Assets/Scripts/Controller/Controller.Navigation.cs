@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
@@ -29,7 +30,7 @@ public partial class Controller
         }
     }
 
-    public EvaluationResult OnEvaluate(int evalSize, EvaluateAlgorithms evaluateAlgorithms)
+    public EvaluationResult OnEvaluate(int evalSize, HashSet<AlgorithmType> algorithms)
     {
         if (evalSize <= 0)
         {
@@ -38,7 +39,7 @@ public partial class Controller
         }
 
         // Evaluate the algorithms and collect the results
-        var result = evaluator.Evaluate(evalSize, evaluateAlgorithms);
+        var result = evaluator.Evaluate(evalSize, algorithms);
 
         if (result == null) return null;
 

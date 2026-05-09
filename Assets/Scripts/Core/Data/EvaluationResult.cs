@@ -1,23 +1,24 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EvaluationResult
 {
-    public EvaluationData AStar;
-    public EvaluationData GBFS;
-    public EvaluationData JPS;
-    public EvaluationData Dijkstra;
-    public EvaluationData ILSWithAStar;
-    public EvaluationData ILSWithGBFS;
-    public EvaluationData ILSWithDijkstra;
-    
-    public static EvaluationData FromPathResult(
-        PathResult result, 
-        StatData stats = null)
+    public Dictionary<AlgorithmType, EvaluationData> Results = new();
+
+    public void AddResult(AlgorithmType type, EvaluationData data)
     {
-        if(result == null)
+        Results[type] = data;
+    }
+
+    public static EvaluationData FromPathResult(PathResult result, StatData stats = null)
+    {
+        if (result == null)
         {
             Debug.LogError("Path result was null!!");
-            return new EvaluationData();
+            return new EvaluationData
+            {
+                Message = "Path result was null!!"
+            };
         }
 
         return new EvaluationData
@@ -27,14 +28,13 @@ public class EvaluationResult
             VisitedNodes = result.VisitedNodes,
             CorridorIterations = result.CorridorIterations,
 
-            // Stats
             TimeTaken = stats?.TimeTaken ?? 0,
             MeasuredTimeMs = stats?.MeasuredTimeMs ?? 0,
             MemoryUsedBytes = stats?.MemoryUsedBytes ?? 0,
 
-            Message = stats != null 
-                ? "Stats collected successfully." 
-                : "Stats wasnt recorded!!"
+            Message = stats != null
+                ? "Stats collected successfully."
+                : "Stats wasn't recorded!!"
         };
     }
 }

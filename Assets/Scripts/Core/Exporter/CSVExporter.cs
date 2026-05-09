@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 public static class CSVExporter
@@ -31,7 +32,7 @@ public static class CSVExporter
 
     private static bool CreateCSV(List<SaveData> saveData, string fullpath)
     {
-        var sb = new System.Text.StringBuilder();
+        var sb = new StringBuilder();
 
         // Header
         sb.AppendLine("GridSize," +
@@ -40,7 +41,10 @@ public static class CSVExporter
             "TimeTaken," +
             "PathLength," +
             "PathCost," +
-            "VisitedNodes,");
+            "VisitedNodes," +
+            "MeasuredTimeMs," +
+            "MemoryUsedBytes" + 
+            "MemoryUsedInKb");
 
         foreach (var data in saveData)
         {
@@ -48,13 +52,9 @@ public static class CSVExporter
 
             foreach (var result in data.EvaluationResult)
             {
-                AppendRow(sb, data, "AStar", result.AStar);
-                AppendRow(sb, data, "GBFS", result.GBFS);
-                AppendRow(sb, data, "JPS", result.JPS);
-                AppendRow(sb, data, "Dijkstra", result.Dijkstra);
-                AppendRow(sb, data, "ILSWithAStar", result.ILSWithAStar);
-                AppendRow(sb, data, "ILSWithGBFS", result.ILSWithGBFS);
-                AppendRow(sb, data, "ILSWithDijkstra", result.ILSWithDijkstra);
+                var r = result.Results;
+                foreach (var item in r)
+                    AppendRow(sb, data, item.Key.ToString(), item.Value);
             }
         }
 
@@ -63,7 +63,11 @@ public static class CSVExporter
         return true;
     }
 
-    private static void AppendRow(System.Text.StringBuilder sb, SaveData saveData, string algorithmName, EvaluationData data)
+    private static void AppendRow(
+        StringBuilder sb, 
+        SaveData saveData, 
+        string algorithmName, 
+        EvaluationData data)
     {
         if (data == null) return;
 
@@ -76,6 +80,9 @@ public static class CSVExporter
             data.PathLength.ToString(),
             data.PathCost.ToString("F3"),
             data.VisitedNodes.ToString(),
+            data.MeasuredTimeMs.ToString("F3"),
+            data.MemoryUsedBytes.ToString(),
+            (data.MemoryUsedBytes / 1024f).ToString("F3") // Memory in KB
         }));
     }
 
