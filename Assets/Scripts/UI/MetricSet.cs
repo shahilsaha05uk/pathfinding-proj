@@ -11,6 +11,7 @@ public class MetricSet : TMP_LabelledPanel
     public PanelLabel PathLength;
     public PanelLabel PathCost;
     public PanelLabel VisitedNodes;
+    public PanelLabel Memory;
 
     public void Start()
     {
@@ -25,5 +26,7 @@ public class MetricSet : TMP_LabelledPanel
         PathCost.SetValue(data.PathCost.ToString());
         PathLength.SetValue(data.PathLength.ToString());
         VisitedNodes.SetValue(data.VisitedNodes.ToString());
+        Memory.SetValue(
+            $"{data.MemoryUsedBytes / 1024} kb");
     }
 }

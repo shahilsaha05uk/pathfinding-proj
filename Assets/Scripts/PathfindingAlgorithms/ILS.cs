@@ -5,43 +5,33 @@ public class ILS : BasePathfinding
 {
 
     public PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, INavigate algorithm) {
-        // Record stats for the pathfinding operation
-        var (result, stats) = Stats.RecordStats(() => {
-            int currentWidth = 1, corridorIterations = 1;
-            int maxWidth = maxCorridorWidth;
-            var linePoints = GenerateLine(start, end);
+        int currentWidth = 1, corridorIterations = 1;
+        int maxWidth = maxCorridorWidth;
+        var linePoints = BLA.GenerateLine(start, end);
 
-            // Keep increasing the size of the corridor until a path is found or the maximum width is reached
-            while (currentWidth <= maxWidth) {
-                var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
-                var pathResult = algorithm.Navigate(start, end, corridor, false);
+        // Keep increasing the size of the corridor until a path is found or the maximum width is reached
+        while (currentWidth <= maxWidth)
+        {
+            var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
+            var pathResult = algorithm.Navigate(start, end, corridor);
 
-                if (pathResult != null) {
-                    return new PathResult
-                    {
-                        Path = pathResult.Path,
-                        PathLength = pathResult.PathLength,
-                        PathCost = pathResult.PathCost,
-                        VisitedNodes = pathResult.VisitedNodes,
-                        CorridorIterations = corridorIterations,
-                    };
-                }
-                currentWidth++;
-                corridorIterations++;
+            if (pathResult.Success)
+            {
+                return new PathResult
+                {
+                    Path = pathResult.Path,
+                    PathLength = pathResult.PathLength,
+                    PathCost = pathResult.PathCost,
+                    VisitedNodes = pathResult.VisitedNodes,
+                    CorridorIterations = corridorIterations,
+                    Success = pathResult.Success,
+                    Message = pathResult.Message,
+                };
             }
-            return new PathResult { Path = null };
-        });
-
-        result.TimeTaken = stats.TimeTaken;
-        return result;
-    }
-
-
-    
-    // Step 1: Get the Line from BLA
-    private List<Vector3Int> GenerateLine(Node start, Node end)
-    {
-        return BLA.GenerateLine(start, end);
+            currentWidth++;
+            corridorIterations++;
+        }
+        return DefaultPath();
     }
     
     // Step 2: Define the corridor

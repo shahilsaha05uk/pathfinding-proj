@@ -1,6 +1,5 @@
 using UnityEngine;
 
-[SerializeField]
 public class EvaluationResult
 {
     public EvaluationData AStar;
@@ -11,7 +10,9 @@ public class EvaluationResult
     public EvaluationData ILSWithGBFS;
     public EvaluationData ILSWithDijkstra;
     
-    public static EvaluationData FromPathResult(PathResult result)
+    public static EvaluationData FromPathResult(
+        PathResult result, 
+        StatData stats = null)
     {
         if(result == null)
         {
@@ -21,11 +22,19 @@ public class EvaluationResult
 
         return new EvaluationData
         {
-            TimeTaken = result.TimeTaken,
             PathLength = result.PathLength,
             PathCost = result.PathCost,
             VisitedNodes = result.VisitedNodes,
-            CorridorIterations = result.CorridorIterations
+            CorridorIterations = result.CorridorIterations,
+
+            // Stats
+            TimeTaken = stats?.TimeTaken ?? 0,
+            MeasuredTimeMs = stats?.MeasuredTimeMs ?? 0,
+            MemoryUsedBytes = stats?.MemoryUsedBytes ?? 0,
+
+            Message = stats != null 
+                ? "Stats collected successfully." 
+                : "Stats wasnt recorded!!"
         };
     }
 }

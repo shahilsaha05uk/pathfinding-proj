@@ -40,7 +40,6 @@ public class GBFS : BasePathfinding
 
             }
         }
-        Debug.LogWarning("No path found to the goal!");
-        return null;
+        return DefaultPath();
     }
 }

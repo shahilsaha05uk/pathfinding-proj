@@ -67,8 +67,7 @@ public class JPS : BasePathfinding
                 }
             }
         }
-
-        return null;
+        return DefaultPath();
     }
 
     /// <summary>
@@ -119,52 +118,96 @@ public class JPS : BasePathfinding
     }
 
     /// <summary>
-    /// This method will recursively check in the given direction to see:
-    ///     if the goal can be reached
-    ///     if the next node is blocked (forced neighbor)
-    ///     if it can move further
+    /// Iterative Jump implementation to avoid deep recursion.
+    /// Returns the jump point node or null if none found.
     /// </summary>
     private Node Jump(Node current, Node goal, Vector3Int direction)
     {
         if (current == goal) return current;
 
-        Vector3Int nextPos = current.GetNodePositionOnGrid() + direction;
-        if (!Grid3D.Instance.IsInsideGrid(nextPos.x, nextPos.y, nextPos.z))
-            return null;
+        Node node = current;
+        var grid = Grid3D.Instance;
 
-        Node nextNode = Grid3D.Instance.GetNodeAt(nextPos);
-        if (nextNode == null || nextNode.bIsBlocked)
-            return null;
-
-        if (nextNode == goal)
-            return nextNode;
-
-        // -- updates
-        var forcedNeighbors = NeighborHelper.GetForcedNeighbors(nextNode, direction);
-        if (forcedNeighbors != null && forcedNeighbors.Count > 0)
+        while (true)
         {
-            // Found forced neighbors, nextNode is a jump point
-            return nextNode;
-        }
+            Vector3Int nextPos = node.GetNodePositionOnGrid() + direction;
+            if (!grid.IsInsideGrid(nextPos.x, nextPos.y, nextPos.z))
+                return null;
 
-        // Diagonal movement: check component directions
-        if (IsDiagonal(direction))
-        {
-            // Check for jump points in component directions
-            foreach (var component in GetComponentDirections(direction))
+            Node nextNode = grid.GetNodeAt(nextPos);
+            if (nextNode == null || nextNode.bIsBlocked)
+                return null;
+
+            if (nextNode == goal)
+                return nextNode;
+
+            var forcedNeighbors = NeighborHelper.GetForcedNeighbors(nextNode, direction);
+            if (forcedNeighbors != null && forcedNeighbors.Count > 0)
             {
-                var jumpPoint = Jump(nextNode, goal, component);
+                // Found forced neighbors, nextNode is a jump point
+                return nextNode;
+            }
 
-                if (jumpPoint != null)
+            // Diagonal movement: check component directions by iterative jump
+            if (IsDiagonal(direction))
+            {
+                foreach (var component in GetComponentDirections(direction))
                 {
-                    jumpPoint.SetColor(Color.orange);
-                    return nextNode;
+                    var jp = JumpIterative(nextNode, goal, component);
+                    if (jp != null)
+                    {
+                        // mark and return nextNode (since presence in component makes nextNode a jump point)
+                        nextNode.SetColor(new Color(1f, 0.65f, 0f)); // orange
+                        return nextNode;
+                    }
                 }
             }
-        }
 
-        // Recurse
-        return Jump(nextNode, goal, direction);
+            node = nextNode;
+        }
+    }
+
+    /// <summary>
+    /// Iterative helper used for component-direction checks (avoids recursion).
+    /// Returns a non-null node when a jump point or goal is detected along the component.
+    /// </summary>
+    private Node JumpIterative(Node startNode, Node goal, Vector3Int direction)
+    {
+        Node node = startNode;
+        var grid = Grid3D.Instance;
+
+        while (true)
+        {
+            Vector3Int nextPos = node.GetNodePositionOnGrid() + direction;
+            if (!grid.IsInsideGrid(nextPos.x, nextPos.y, nextPos.z))
+                return null;
+
+            Node nextNode = grid.GetNodeAt(nextPos);
+            if (nextNode == null || nextNode.bIsBlocked)
+                return null;
+
+            if (nextNode == goal)
+                return nextNode;
+
+            var forcedNeighbors = NeighborHelper.GetForcedNeighbors(nextNode, direction);
+            if (forcedNeighbors != null && forcedNeighbors.Count > 0)
+            {
+                return nextNode;
+            }
+
+            // For safety: if direction is diagonal (shouldn't happen for components) check recursively/iteratively
+            if (IsDiagonal(direction))
+            {
+                foreach (var comp in GetComponentDirections(direction))
+                {
+                    var result = JumpIterative(nextNode, goal, comp);
+                    if (result != null)
+                        return nextNode;
+                }
+            }
+
+            node = nextNode;
+        }
     }
 
     private bool IsDiagonal(Vector3Int dir)

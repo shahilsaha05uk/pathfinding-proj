@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class PathfindingEvaluator : MonoBehaviour
 {
@@ -21,10 +24,9 @@ public class PathfindingEvaluator : MonoBehaviour
         // -- Clear data if exists.
         ClearResults();
 
-        var nodes = grid.GetStartEndNodes();
-
+        var (start, goal) = grid.GetStartEndNodes();
         // Evaluate the algorithms
-        StartEvaluation(evalSize, nodes.start, nodes.goal, evaluateAlgorithms);
+        StartEvaluation(evalSize, start, goal, evaluateAlgorithms);
 
         // Post evaluation
         if (evaluationResults.Count <= 0) return null;
@@ -34,11 +36,15 @@ public class PathfindingEvaluator : MonoBehaviour
 
     public void ClearResults()
     {
-        if (evaluationResults != null && evaluationResults.Count > 0)
+        if (evaluationResults is { Count: > 0 })
             evaluationResults.Clear();
     }
 
-    private void StartEvaluation(int evalSize, Node start, Node goal, EvaluateAlgorithms evaluateAlgorithms)
+    private void StartEvaluation(
+        int evalSize, 
+        Node start, 
+        Node goal, 
+        EvaluateAlgorithms evaluateAlgorithms)
     {
         int count = 0;
 
@@ -52,48 +58,46 @@ public class PathfindingEvaluator : MonoBehaviour
 
     private EvaluationResult GatherEvaluationData(Node start, Node goal, EvaluateAlgorithms evaluateAlgorithms)
     {
-        // Basic algorithms
-        var aStar = (evaluateAlgorithms.AStar)? GetEvaluationData<AStar>(start, goal) : null;
-        var gbfs = (evaluateAlgorithms.GBFS)? GetEvaluationData<Dijkstra>(start, goal) : null;
-        var jps = (evaluateAlgorithms.JPS) ? GetEvaluationData<JPS>(start, goal) : null;
-        var dijkstra = (evaluateAlgorithms.Dijkstra) ? GetEvaluationData<Dijkstra>(start, goal) : null;
-
-        // ILS algorithms
-        var ilsWithAStar = (evaluateAlgorithms.ILSAStar) ? GetILSEvaluationData<AStar>(start, goal) : null;
-        var ilsWithGBFS = (evaluateAlgorithms.ILSGBFS) ? GetILSEvaluationData<GBFS>(start, goal) : null;
-        var ilsWithDijkstra = (evaluateAlgorithms.ILSDijkstra) ? GetILSEvaluationData<Dijkstra>(start, goal) : null;
-
         return new EvaluationResult
         {
-            AStar = aStar,
-            GBFS = gbfs,
-            JPS = jps,
-            Dijkstra = dijkstra,
-            ILSWithAStar = ilsWithAStar,
-            ILSWithDijkstra = ilsWithDijkstra,
-            ILSWithGBFS = ilsWithGBFS,
+            AStar = (evaluateAlgorithms.AStar) ? GetEvaluationData<AStar>(start, goal) : null,
+            GBFS = (evaluateAlgorithms.GBFS) ? GetEvaluationData<GBFS>(start, goal) : null,
+            JPS = (evaluateAlgorithms.JPS) ? GetEvaluationData<JPS>(start, goal) : null,
+            Dijkstra = (evaluateAlgorithms.Dijkstra) ? GetEvaluationData<Dijkstra>(start, goal) : null,
+            ILSWithAStar = (evaluateAlgorithms.ILSAStar) ? GetEvaluationData<AStar>(start, goal, true) : null,
+            ILSWithDijkstra = (evaluateAlgorithms.ILSDijkstra) ? GetEvaluationData<Dijkstra>(start, goal, true) : null,
+            ILSWithGBFS = (evaluateAlgorithms.ILSGBFS) ? GetEvaluationData<GBFS>(start, goal, true) : null,
         };
     }
 
-    private EvaluationData GetEvaluationData<T>(Node start, Node end) where T : INavigate
-    {
-        var result = RunAlgorithm<T>(start, end);
-        return EvaluationResult.FromPathResult(result);
-    }
+    private EvaluationData GetEvaluationData<T>(Node start, Node end, bool ils = false) where T : INavigate
+        => ils 
+            ? Evaluator(
+                start, 
+                end, 
+                (start, end) => pathManager.RunILSWith<T>(start, end)) 
+            : Evaluator(
+                start, 
+                end, 
+                (start, end) => pathManager.RunAlgorithm<T>(start, end));
 
-    private EvaluationData GetILSEvaluationData<T>(Node start, Node end) where T : INavigate
+    private EvaluationData Evaluator(
+        Node start,
+        Node end,
+        Func<Node, Node, PathResult> fn)
     {
-        var result = RunILSAlgorithm<T>(start, end);
-        return EvaluationResult.FromPathResult(result);
-    }
+        var (results, stats) = Stats.RecordStats(() => fn(start, end));
 
-    private PathResult RunAlgorithm<T>(Node start, Node end) where T: INavigate
-    {
-        return pathManager.RunAlgorithm<T>(start, end);
-    }
-    
-    private PathResult RunILSAlgorithm<T>(Node start, Node end) where T: INavigate
-    {
-        return pathManager.RunILSWith<T>(start, end);
+        return new EvaluationData
+        {
+            PathLength = results?.PathLength ?? 0,
+            PathCost = results?.PathCost ?? 0f,
+            VisitedNodes = results?.VisitedNodes ?? 0,
+            CorridorIterations = results?.CorridorIterations ?? 0,
+
+            TimeTaken = stats.TimeTaken,
+            MeasuredTimeMs = stats.MeasuredTimeMs,
+            MemoryUsedBytes = stats.MemoryUsedBytes,
+        };
     }
 }

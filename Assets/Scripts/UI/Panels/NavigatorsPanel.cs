@@ -8,6 +8,7 @@ public class NavigatorsPanel : MonoBehaviour
     private Controller Controller;
     [SerializeField] private AlgorithmType algorithmType;
 
+    public PanelToggle chkEnableStats;
     public TMP_Dropdown optionAlgorithmType;
     public Button btnNavigate;
     public Button btnResetNodes;
@@ -38,7 +39,10 @@ public class NavigatorsPanel : MonoBehaviour
 
     private void OnNavigate()
     {
-        var data = Controller.OnNavigate(algorithmType);
+        var data = Controller.OnNavigate(
+            algorithmType: algorithmType,
+            corridorWidth: 1,
+            enableStats: chkEnableStats.GetIsOn());
         OnNavigatedSignature?.Invoke(algorithmType, data);
     }
 

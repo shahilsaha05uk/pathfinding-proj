@@ -71,7 +71,6 @@ public class AStar : BasePathfinding
                 }
             }
         }
-
-        return null;
+        return DefaultPath();
     }
 }

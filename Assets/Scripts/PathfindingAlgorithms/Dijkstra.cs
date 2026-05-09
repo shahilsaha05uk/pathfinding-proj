@@ -78,7 +78,6 @@ public class Dijkstra : BasePathfinding
                 }
             }
         }
-
-        return null;
+        return DefaultPath();
     }
 }
