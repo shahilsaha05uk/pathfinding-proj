@@ -26,8 +26,10 @@ public class GBFS : BasePathfinding
             var neighbors = GetAllNeighbors(currentNode);
             foreach (var neighbor in neighbors)
             {
-                // if the path is blocked or has already been evaluated, skip it
-                if(neighbor.bIsBlocked || closedList.Contains(neighbor))
+                // if the path is blocked, outside allowed corridor,
+                // or has already been evaluated, skip it
+                if (!HeuristicHelper.IsNodeAllowed(neighbor, allowedNodes) ||
+                    closedList.Contains(neighbor))
                     continue;
 
                 if (!openList.Contains(neighbor))

@@ -11,9 +11,13 @@ public class EvaluatorsPanel : MonoBehaviour
     [SerializeField] private Button btnEvaluate;
     [SerializeField] private PanelInputField inputEvaluationSize;
 
+    [SerializeField] private NavigatorsPanel navigatorsPanel;
     [SerializeField] private GameObject togglesContainer;
     [SerializeField] private PanelToggle togglePrefab;
     [SerializeField] private SO_AlgorithmConfig algorithmConfig;
+    [SerializeField] private SO_EvaluatorConfig evaluatorConfig;
+
+
 
     private SerializedDictionary<AlgorithmType, TogglerData> algorithmToggles;
 
@@ -38,7 +42,6 @@ public class EvaluatorsPanel : MonoBehaviour
 
     private void OnEvaluateButtonClick()
     {
-        UIHelper.ValidateInputAsInt(inputEvaluationSize.GetValue(), out int size);
-        Controller.OnEvaluate(size, algorithmConfig.FilterEnabledAlgorithms());
+        Controller.OnEvaluate();
     }
 }

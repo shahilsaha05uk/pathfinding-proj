@@ -36,11 +36,13 @@ public class JPS : BasePathfinding
             }
 
             var currentDir = directionMap[current];
-            var successors = IdentifySuccessors(current, start, goal, currentDir);
+            var successors = IdentifySuccessors(current, start, goal, currentDir, allowedNodes);
 
             foreach (var jumpPoint in successors)
             {
-                if (jumpPoint == null || closedSet.Contains(jumpPoint))
+                if (jumpPoint == null ||
+                    closedSet.Contains(jumpPoint) ||
+                    !HeuristicHelper.IsNodeAllowed(jumpPoint, allowedNodes))
                     continue;
 
                 float tentativeG = current.gCost + CalculateHeuristicDistance(current, jumpPoint);
@@ -79,7 +81,7 @@ public class JPS : BasePathfinding
     ///         this means, it will only get the nodes that are reachable in the current direction (natural neighbors)
     ///         once you have these directions, you continue to jump in the same direction
     /// </summary>
-    private List<Node> IdentifySuccessors(Node node, Node start, Node goal, Vector3Int currentDir)
+    private List<Node> IdentifySuccessors(Node node, Node start, Node goal, Vector3Int currentDir, HashSet<Node> allowedNodes = null)
     {
         var successors = new List<Node>();
 
@@ -88,7 +90,7 @@ public class JPS : BasePathfinding
             // First node: explore all directions
             foreach (var dir in allDirections)
             {
-                var jumpPoint = Jump(node, goal, dir);
+                var jumpPoint = Jump(node, goal, dir, allowedNodes);
                 if (jumpPoint != null)
                     successors.Add(jumpPoint);
             }
@@ -98,7 +100,7 @@ public class JPS : BasePathfinding
             // Natural directions
             foreach (var dir in NeighborHelper.GetNaturalNeighbors(currentDir))
             {
-                var jumpPoint = Jump(node, goal, dir);
+                var jumpPoint = Jump(node, goal, dir, allowedNodes);
                 if (jumpPoint != null)
                     successors.Add(jumpPoint);
             }
@@ -108,7 +110,7 @@ public class JPS : BasePathfinding
             foreach (var forced in forcedNeighbors)
             {
                 var dir = GridHelper.GetDirection(node, forced);
-                var jumpPoint = Jump(node, goal, dir);
+                var jumpPoint = Jump(node, goal, dir, allowedNodes);
                 if (jumpPoint != null)
                     successors.Add(jumpPoint);
             }
@@ -121,7 +123,7 @@ public class JPS : BasePathfinding
     /// Iterative Jump implementation to avoid deep recursion.
     /// Returns the jump point node or null if none found.
     /// </summary>
-    private Node Jump(Node current, Node goal, Vector3Int direction)
+    private Node Jump(Node current, Node goal, Vector3Int direction, HashSet<Node> allowedNodes = null)
     {
         if (current == goal) return current;
 
@@ -135,7 +137,8 @@ public class JPS : BasePathfinding
                 return null;
 
             Node nextNode = grid.GetNodeAt(nextPos);
-            if (nextNode == null || nextNode.bIsBlocked)
+            if (nextNode == null ||
+                !HeuristicHelper.IsNodeAllowed(nextNode, allowedNodes))
                 return null;
 
             if (nextNode == goal)
@@ -153,7 +156,7 @@ public class JPS : BasePathfinding
             {
                 foreach (var component in GetComponentDirections(direction))
                 {
-                    var jp = JumpIterative(nextNode, goal, component);
+                    var jp = JumpIterative(nextNode, goal, component, allowedNodes);
                     if (jp != null)
                     {
                         // mark and return nextNode (since presence in component makes nextNode a jump point)
@@ -171,7 +174,7 @@ public class JPS : BasePathfinding
     /// Iterative helper used for component-direction checks (avoids recursion).
     /// Returns a non-null node when a jump point or goal is detected along the component.
     /// </summary>
-    private Node JumpIterative(Node startNode, Node goal, Vector3Int direction)
+    private Node JumpIterative(Node startNode, Node goal, Vector3Int direction, HashSet<Node> allowedNodes = null)
     {
         Node node = startNode;
         var grid = Grid3D.Instance;
@@ -183,7 +186,8 @@ public class JPS : BasePathfinding
                 return null;
 
             Node nextNode = grid.GetNodeAt(nextPos);
-            if (nextNode == null || nextNode.bIsBlocked)
+            if (nextNode == null ||
+                !HeuristicHelper.IsNodeAllowed(nextNode, allowedNodes))
                 return null;
 
             if (nextNode == goal)
@@ -200,7 +204,7 @@ public class JPS : BasePathfinding
             {
                 foreach (var comp in GetComponentDirections(direction))
                 {
-                    var result = JumpIterative(nextNode, goal, comp);
+                    var result = JumpIterative(nextNode, goal, comp, allowedNodes);
                     if (result != null)
                         return nextNode;
                 }

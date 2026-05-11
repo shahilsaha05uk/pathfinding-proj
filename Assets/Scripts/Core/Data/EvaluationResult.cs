@@ -32,9 +32,7 @@ public class EvaluationResult
             MeasuredTimeMs = stats?.MeasuredTimeMs ?? 0,
             MemoryUsedBytes = stats?.MemoryUsedBytes ?? 0,
 
-            Message = stats != null
-                ? "Stats collected successfully."
-                : "Stats wasn't recorded!!"
+            Message = result.Message,
         };
     }
 }

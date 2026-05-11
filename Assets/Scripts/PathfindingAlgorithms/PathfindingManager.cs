@@ -40,7 +40,8 @@ public class PathfindingManager : MonoBehaviour
     public PathResult RunAlgorithm<T>(Node start, Node end) where T: INavigate
     {
         if (!algorithms.TryGetValue(typeof(T), out var algo) || algo == null)
-            throw new InvalidOperationException($"Inner algorithm {typeof(T).Name} is not registered on {nameof(PathfindingManager)}.");
+            throw new InvalidOperationException(
+                $"Inner algorithm {typeof(T).Name} is not registered on {nameof(PathfindingManager)}.");
 
         return algo.Navigate(start, end);
     }

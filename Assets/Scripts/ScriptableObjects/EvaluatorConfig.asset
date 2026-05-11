@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e15a52140007eeb4ca300c05e9e98e8f, type: 3}
+  m_Name: EvaluatorConfig
+  m_EditorClassIdentifier: Assembly-CSharp::SO_EvaluatorConfig
+  Algorithms: 00000000010000000200000003000000040000000500000006000000
+  SetCustomGridSize: 0
+  GridSizes: 10000000
+  GridSizeCount: 1
+  lastGridSize: 16
+  ObstacleDensities:
+  - 0.1
+  - 0.2
+  - 0.3
+  ObstacleDensityDeviation: 0.02
+  BatchSize: 10
+  NoiseScaleMin: 0.2
+  NoiseScaleMax: 0.3
+  NoiseScaleMultiplier: 0.2
+  OffsetXMinRange: 0.1
+  OffsetXMaxRange: 0.3
+  OffsetYMinRange: 0.1
+  OffsetYMaxRange: 0.3
+  OffsetMultiplier: 0.15
+  HeightRange: 7
+  MaxHeightDeviation: 0.5
+  AnimatePaths: 1
+  PathAnimationDelay: 0.0000001

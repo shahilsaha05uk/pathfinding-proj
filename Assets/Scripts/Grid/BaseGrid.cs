@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -51,13 +52,15 @@ public abstract class BaseGrid : MonoBehaviour
     
     public List<Node> GetPath() => navPath;
 
+    public GridConfig GetGridConfig() => mConfig;
     public GridData GetGridData() => new GridData()
     {
         GridSize = mGridSize,
         MaxHeight = mConfig.MaxHeight,
         NoiseScale = mConfig.NoiseScale,
-        ObstacleDensity = obstacleManager.GetCurrentPercent()
+        ObstacleDensity = obstacleManager.GetCurrentPercent(),
     };
+
 
     public virtual void ResetPath()
     {

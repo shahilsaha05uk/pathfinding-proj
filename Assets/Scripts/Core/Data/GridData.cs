@@ -4,7 +4,7 @@
 public class GridData
 {
     public int GridSize;
-    public int MaxHeight;
+    public float MaxHeight;
     public float NoiseScale;
     public float ObstacleDensity;
 }

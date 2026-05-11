@@ -3,13 +3,17 @@ using UnityEngine;
 
 public class EvaluationDataSaver
 {
-    private List<SaveData> saveData = new List<SaveData>();
+    private readonly List<SaveData> saveData = new();
 
-    public void AddSaveData(SaveData data)
+    public void AddToMemory(
+        AutoEvaluationConfig settings,
+        GridConfig config,
+        List<EvaluationResult> results)
     {
-        if (data != null)
+        var save = CreateSaveData(settings, config, results);
+        if (save != null)
         {
-            saveData.Add(data);
+            saveData.Add(save);
         }
         else
         {
@@ -18,9 +22,13 @@ public class EvaluationDataSaver
     }
 
 
-    public string SaveAndExport(int gridSize, int obstacleDensity)
+    public string Export(GridConfig config, AutoEvaluationConfig settings)
     {
-        var result = SaveManager.SaveAndExport(
+        var gridSize = config.GridSize;
+        var obstacleDensity = Mathf.RoundToInt(config.ObstacleDensity * 100);
+        var result = SaveManager.Export(
+            config,
+            settings,
             saveData,
             fileName: $"{gridSize}x_{gridSize}x_{gridSize}x_ob{obstacleDensity}",
             directory: "Exported Data"
@@ -30,13 +38,19 @@ public class EvaluationDataSaver
         return result;
     }
 
-    public SaveData CreateSaveData(GridData data, List<EvaluationResult> results)
+    private SaveData CreateSaveData(
+        AutoEvaluationConfig settings,
+        GridConfig config, 
+        List<EvaluationResult> results)
     {
         return new SaveData
         {
-            GridSize = data.GridSize,
-            ObstacleDensity = data.ObstacleDensity * 100,
+            GridSize = config.GridSize,
+            ObstacleDensity = config.ObstacleDensity * 100,
             EvaluationResult = results,
+            MaxHeight = config.MaxHeight,
+            NoiseScale = config.NoiseScale,
+            BatchSize = settings.BatchSize,
         };
     }
 }

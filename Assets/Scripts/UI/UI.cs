@@ -6,13 +6,14 @@ public class UI : MonoBehaviour
     public Controller Controller;
     public MetricsPanel metricsUI;
     public SidePanel sidePanel;
+    public ColorKeyPanel colorKeyPanel;
+    public ConfigPanel configPanel;
 
     public PanelStatus statusPanel;
 
     private void Start()
     {
         sidePanel.OnEvaluationDataChangedSignature += metricsUI.OnNavigated;
-        metricsUI.OnSaveAndExport += OnSavedAndExport;
         Init(Controller);
     }
 
@@ -20,11 +21,5 @@ public class UI : MonoBehaviour
     {
         Controller = controller;
         sidePanel.Init(controller);
-    }
-
-    private void OnSavedAndExport()
-    {
-        var status = Controller.SaveAndExport();
-        statusPanel.SetValue(status, "#00f");
     }
 }

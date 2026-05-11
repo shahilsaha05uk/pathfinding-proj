@@ -9,6 +9,7 @@ public class NavigatorsPanel : MonoBehaviour
     [SerializeField] private AlgorithmType algorithmType;
 
     public PanelToggle chkEnableStats;
+    public PanelToggle chkAnimatePaths;
     public TMP_Dropdown optionAlgorithmType;
     public Button btnNavigate;
     public Button btnResetNodes;
@@ -30,6 +31,9 @@ public class NavigatorsPanel : MonoBehaviour
     {
         Controller = controller;
     }
+
+    public bool GetAnimatePaths() 
+        => chkAnimatePaths != null && chkAnimatePaths.GetIsOn();
 
     public void UpdateAlgorithmType(AlgorithmType type)
     {

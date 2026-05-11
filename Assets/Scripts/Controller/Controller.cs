@@ -7,7 +7,7 @@ public partial class Controller : MonoBehaviour
     [SerializeField] private UI ui;
     [SerializeField] private PathfindingEvaluator evaluator;
     [SerializeField] private PathfindingManager pathfindingManager;
-    private EvaluationDataSaver evaluationDataSaveManager;
+    private EvaluationDataSaver saveManager;
 
     [SerializeField] private Grid3D grid;
 
@@ -27,7 +27,7 @@ public partial class Controller : MonoBehaviour
 
     private void Start()
     {
-        evaluationDataSaveManager = new EvaluationDataSaver();
+        saveManager = new EvaluationDataSaver();
     }
 
     private void Update()
@@ -54,18 +54,10 @@ public partial class Controller : MonoBehaviour
         HandleCameraMovement();
     }
 
-    public EvaluationDataSaver GetSaveManager() => evaluationDataSaveManager;
+    public void UpdateConfigPanel(EvaluationLog data)
+        => ui.configPanel.OnConfigChanged?.Invoke(data);
+    public void UpdateConfigPanelCompletedAlgorithmType(AlgorithmType type)
+        => ui.configPanel.OnAlgorithmComplete?.Invoke(type);
 
-    public string SaveAndExport()
-    {
-        var results = evaluator.GetEvaluationResults();
-        var gridData = grid.GetGridData();
-
-        var data = evaluationDataSaveManager.CreateSaveData(gridData, results);
-        evaluationDataSaveManager.AddSaveData(data);
-        var status = evaluationDataSaveManager.SaveAndExport(gridData.GridSize, Mathf.FloorToInt(gridData.ObstacleDensity * 100));
-
-        evaluator.ClearResults();
-        return status;
-    }
+    public EvaluationDataSaver GetSaveManager() => saveManager;
 }

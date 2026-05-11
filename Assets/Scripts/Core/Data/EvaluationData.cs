@@ -11,7 +11,7 @@ public class EvaluationData
     // Stats
     public float TimeTaken;
     public float MeasuredTimeMs;
-    public long MemoryUsedBytes;
+    public float MemoryUsedBytes;
 
     public string Message;
 }
