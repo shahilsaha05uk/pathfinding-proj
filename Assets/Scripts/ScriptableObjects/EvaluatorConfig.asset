@@ -12,26 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e15a52140007eeb4ca300c05e9e98e8f, type: 3}
   m_Name: EvaluatorConfig
   m_EditorClassIdentifier: Assembly-CSharp::SO_EvaluatorConfig
+  ExportOption: 3
+  NumberOfIterations: 15000
   Algorithms: 00000000010000000200000003000000040000000500000006000000
-  SetCustomGridSize: 0
-  GridSizes: 10000000
-  GridSizeCount: 1
-  lastGridSize: 16
+  SetCustomGridSize: 1
+  GridSizes: 8000000000010000
+  GridSizeCount: 5
+  lastGridSize: 256
   ObstacleDensities:
   - 0.1
   - 0.2
   - 0.3
-  ObstacleDensityDeviation: 0.02
-  BatchSize: 10
+  ObstacleDensityDeviation: 0
+  BatchSize: 200
   NoiseScaleMin: 0.2
-  NoiseScaleMax: 0.3
+  NoiseScaleMax: 0.5
   NoiseScaleMultiplier: 0.2
   OffsetXMinRange: 0.1
   OffsetXMaxRange: 0.3
   OffsetYMinRange: 0.1
   OffsetYMaxRange: 0.3
   OffsetMultiplier: 0.15
-  HeightRange: 7
+  HeightRange: 8
   MaxHeightDeviation: 0.5
-  AnimatePaths: 1
+  AnimatePaths: 0
   PathAnimationDelay: 0.0000001

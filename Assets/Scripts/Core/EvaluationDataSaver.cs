@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class EvaluationDataSaver
 {
     private readonly List<SaveData> saveData = new();
+    public int ResultDataCount => saveData.Select(s => s.EvaluationResult.Select(r => r.ResultCount).Sum()).Sum();
+    public int SaveDataCount => saveData.Count;
 
     public void AddToMemory(
         AutoEvaluationConfig settings,

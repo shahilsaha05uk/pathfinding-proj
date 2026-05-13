@@ -3,6 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
+public enum EExportType
+{
+    EveryObstacleDensity,
+    EveryGridSize,
+    EveryAlgorithm,
+    EveryIteration,
+    EveryBatch,
+}
+
+[Serializable]
 public class AutoEvaluationConfig
 {
     public readonly int BatchSize;
@@ -20,6 +30,10 @@ public class AutoEvaluationConfig
     public readonly bool Animate;
     public readonly float AnimationDelay;
 
+    // Evaluator configs
+    public readonly EExportType ExportOption;
+    public readonly int NumberOfIterations;
+
     public AutoEvaluationConfig(
         int batchSize,
         HashSet<int> gridSizes,
@@ -34,7 +48,9 @@ public class AutoEvaluationConfig
         float offsetMultiplier,
         bool animate,
         float animationDelay,
-        HashSet<AlgorithmType> algorithms)
+        HashSet<AlgorithmType> algorithms,
+        EExportType exportOption,
+        int numberOfIterations)
     {
         BatchSize = batchSize;
         GridSizes = gridSizes;
@@ -50,5 +66,8 @@ public class AutoEvaluationConfig
         HeightDeviation = heightDeviation;
         Animate = animate;
         AnimationDelay = animationDelay;
+
+        ExportOption = exportOption;
+        NumberOfIterations = numberOfIterations;
     }
 }

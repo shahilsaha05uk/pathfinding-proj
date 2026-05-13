@@ -14,6 +14,7 @@ public class Grid3D : BaseGrid
     [SerializeField] private float caveLevel = 0.4f;  // Below this = lake
     [SerializeField] private int maxTraversableHeight = 3; // Hills above this = non-traversable
     [SerializeField] private SO_TerrainConfig terrainConfig;
+    [SerializeField] private float nodeSpacing = 0.5f;
 
     public static Grid3D Instance { get; private set; }
 
@@ -52,6 +53,7 @@ public class Grid3D : BaseGrid
                 {
                     // Instantiate the node and set its initial transform to 0
                     var node = Instantiate(nodeObject, transform.position, Quaternion.identity, transform);
+                   // node.gameObject.GetComponent<MeshRenderer>().enabled = false;
                     node.name = $"Node_{x}_{y}_{z}";
                     
                     SetNodePosition(node, x, y, z);
@@ -199,9 +201,9 @@ public class Grid3D : BaseGrid
     private void SetNodePosition(Node node, int x, int y, int z)
     {
         // Calculate the idle position, as to where it should be without noise
-        float baseX = transform.position.x + x;
-        float baseY = transform.position.y + y;
-        float baseZ = transform.position.z + z;
+        float baseX = transform.position.x + x * nodeSpacing;
+        float baseY = transform.position.y + y * nodeSpacing;
+        float baseZ = transform.position.z + z * nodeSpacing;
 
         Vector3 finalPosition = new Vector3(baseX, baseY, baseZ);
 

@@ -20,18 +20,46 @@ public static class CSVExporter
             Debug.LogWarning("No data to export.");
             return default;
         }
-
-        string projectRoot = Directory.GetParent(Application.dataPath).FullName;
-        string folderPath = Path.Combine(projectRoot, directory);
-        if (!Directory.Exists(folderPath))
-            Directory.CreateDirectory(folderPath);
-
-        int fileIndex = GetNextFileIndex(folderPath, filename);
-        string fileName = (filename == "data") ? $"{filename}_{fileIndex}.csv" : $"{filename}.csv";
+        string folderPath = PrepareDir(directory);
+        string fileName = CreateFileName(filename, folderPath);
         string fullPath = Path.Combine(folderPath, fileName);
 
         bool success = CreateCSV(config, settings, saveData, fullPath);
         return success ? fullPath : null;
+    }
+
+    private static string CreateFileName(string filename, string folderPath)
+    {
+        int fileIndex = GetNextFileIndex(folderPath, filename);
+        string fileName = (fileIndex == 0) ? $"{filename}.csv" : $"{filename}_{fileIndex}.csv";
+        return fileName;
+    }
+
+    private static string PrepareDir(string directory)
+    {
+        string folderPath = GetExportDir(directory);
+        if (!Directory.Exists(folderPath))
+            Directory.CreateDirectory(folderPath);
+        else
+        {
+            // if there are any files in there, delete them first
+            //if (Directory.GetFiles(folderPath).Length > 0)
+            //{
+            //    foreach (var file in Directory.GetFiles(folderPath))
+            //    {
+            //        File.Delete(file);
+            //    }
+            //}
+        }
+
+        return folderPath;
+    }
+
+    private static string GetExportDir(string directory)
+    {
+        string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+        string folderPath = Path.Combine(projectRoot, directory);
+        return folderPath;
     }
 
     private static bool CreateCSV(
@@ -112,20 +140,10 @@ public static class CSVExporter
 
     private static int GetNextFileIndex(string folderPath, string baseFileName)
     {
+        if(Directory.GetFiles(folderPath).Length == 0)
+            return 0;
+
         var files = Directory.GetFiles(folderPath, $"{baseFileName}_*{extension}");
-        int maxIndex = 0;
-
-        foreach (var file in files)
-        {
-            string name = Path.GetFileNameWithoutExtension(file);
-            string[] parts = name.Split('_');
-            if (parts.Length >= 2 && int.TryParse(parts[1], out int index))
-            {
-                if (index > maxIndex)
-                    maxIndex = index;
-            }
-        }
-
-        return maxIndex + 1;
+        return files.Length + 1;
     }
 }

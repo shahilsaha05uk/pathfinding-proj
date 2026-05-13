@@ -19,6 +19,8 @@ public static class AutoEvaluatorExtensions
             heightRange: config.HeightRange,
             heightDeviation: config.MaxHeightDeviation,
             animate: config.AnimatePaths,
-            animationDelay: config.PathAnimationDelay);
+            animationDelay: config.PathAnimationDelay,
+            exportOption: config.ExportOption,
+            numberOfIterations: config.NumberOfIterations);
     }
 }

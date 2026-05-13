@@ -2,6 +2,7 @@ using AYellowpaper.SerializedCollections;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public partial class Controller
@@ -55,15 +56,17 @@ public partial class Controller
         // For every grid size
         foreach(var size in settings.GridSizes)
         {
+            GridConfig config = null;
             // Batch to run for each grid size and obstacle density
             // for each obstacle density
             foreach (var density in settings.ObstacleDensities)
             {
+                // For every batch 
                 for (int i = 0; i < settings.BatchSize; i++)
                 {
                     Debug.Log($"Starting batch {i + 1} of {settings.BatchSize} for grid size {size}x{size}.");
 
-                    var config = BuildRandomGridConfig(settings, size, density);
+                    config = BuildRandomGridConfig(settings, size, density);
                     grid.Clear();
                     grid.Create(config);
 
@@ -82,7 +85,6 @@ public partial class Controller
                     grid.SetStartNode(start);
                     grid.SetEndNode(goal);
 
-                    var batchResult = new EvaluationResult();
                     var offsetX = (config.OffsetX.min + config.OffsetX.max) / 2f;
                     var offsetY = (config.OffsetY.min + config.OffsetY.max) / 2f;
 
@@ -94,12 +96,21 @@ public partial class Controller
                         offsets: (X: offsetX, Y: offsetY),
                         height: config.MaxHeight));
 
+                    // Execute for every algorithm
+                    var algoEvalResults = new EvaluationResult();
                     foreach (var algorithm in settings.Algorithms)
                     {
                         UpdateConfigPanelCompletedAlgorithmType(algorithm);
                         var (data, path) = EvaluateAlgorithm(algorithm, start, goal);
 
-                        batchResult.AddResult(algorithm, data);
+                        algoEvalResults.AddResult(algorithm, data);
+
+                        HandleSaveAndExport(
+                            settings.ExportOption == EExportType.EveryAlgorithm
+                            || (settings.ExportOption == EExportType.EveryIteration
+                            && saveManager.ResultDataCount >= settings.NumberOfIterations),
+                            config,
+                            settings);
 
                         if (settings.Animate && path != null && path.Count > 0)
                         {
@@ -115,16 +126,32 @@ public partial class Controller
                         yield return null;
                     }
 
-                    evaluator.AddEvaluationResult(batchResult);
-
-                    SaveToMemory(config, settings);
-
+                    evaluator.AddEvaluationResult(algoEvalResults);
+                    HandleSaveAndExport(settings.ExportOption == EExportType.EveryBatch, config, settings);
                     grid.ResetPath();
                     grid.Clear();
                 }
+
+                // This will save and export after every obstacle density, regardless of the grid size batches
+                HandleSaveAndExport(settings.ExportOption == EExportType.EveryObstacleDensity, config, settings);
             }
+
+            // This will save and export after every grid size, regardless of the obstacle density batches
+            HandleSaveAndExport(settings.ExportOption == EExportType.EveryGridSize, config, settings);
+        }
+    }
+
+    void HandleSaveAndExport(bool condition, GridConfig config, AutoEvaluationConfig settings)
+    {
+        if (condition)
+        {
+            SaveToMemory(config, settings);
             Export(settings);
             evaluator.ClearResults();
+        }
+        else
+        {
+            SaveToMemory(config, settings);
         }
     }
 
@@ -135,6 +162,7 @@ public partial class Controller
             config,
             evaluator.GetEvaluationResults());
     }
+    
     void Export(AutoEvaluationConfig settings)
     {
         var config = grid.GetGridConfig();

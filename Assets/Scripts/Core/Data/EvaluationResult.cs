@@ -4,6 +4,7 @@ using UnityEngine;
 public class EvaluationResult
 {
     public Dictionary<AlgorithmType, EvaluationData> Results = new();
+    public int ResultCount => Results.Count;
 
     public void AddResult(AlgorithmType type, EvaluationData data)
     {

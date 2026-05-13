@@ -1,13 +1,14 @@
-using AYellowpaper.SerializedCollections;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "EvaluatorConfig", menuName = "EvaluatorConfig", order = 1)]
 public class SO_EvaluatorConfig : ScriptableObject
 {
+    [Header("Export Options")]
+    public EExportType ExportOption;
+    public int NumberOfIterations;
+
     public List<AlgorithmType> Algorithms;
 
     public bool SetCustomGridSize;
@@ -57,7 +58,7 @@ public class SO_EvaluatorConfig : ScriptableObject
         {
             GenerateGridSizes();
         }
-        
+
         // Update the display field
         UpdateLastGridSize();
     }

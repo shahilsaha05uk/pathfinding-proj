@@ -8,7 +8,11 @@ public class SO_EvaluatorConfigEditor : Editor
     {
         serializedObject.Update();
 
-        // Draw properties manually for better control
+        EditorGUILayout.LabelField("Export Options", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("ExportOption"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("NumberOfIterations"));
+
+        EditorGUILayout.Space();
         EditorGUILayout.PropertyField(serializedObject.FindProperty("Algorithms"));
 
         EditorGUILayout.Space();
