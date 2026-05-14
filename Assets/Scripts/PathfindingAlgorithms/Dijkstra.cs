@@ -8,6 +8,7 @@ public class Dijkstra : BasePathfinding
         var openQueue = new PriorityQueue<Node, float>();
         var visited = new HashSet<Node>();
         var inOpenQueue = new Dictionary<Node, float>(); // To track nodes and their current priorities in queue
+        int maxOpenSize = 0;
 
         // Initialize all nodes' gCost to infinity
         var allNodes = Grid3D.Instance.GetAllNodes();
@@ -25,13 +26,17 @@ public class Dijkstra : BasePathfinding
         // while there are nodes in the open queue
         while (openQueue.Count > 0)
         {
+            // Track max open list size
+            if (openQueue.Count > maxOpenSize)
+                maxOpenSize = openQueue.Count;
+
             // get the next node in the queue
             var current = openQueue.Dequeue();
             inOpenQueue.Remove(current);
 
             // if we reached the goal, return the path
             if (current == goal)
-                return ReturnPath(start, goal, visited.Count);
+                return ReturnPath(start, goal, visited.Count, maxOpenSize);
 
             // if the current node has already been visited, skip it
             if (visited.Contains(current))

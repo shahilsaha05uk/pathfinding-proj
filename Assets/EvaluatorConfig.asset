@@ -13,15 +13,13 @@ MonoBehaviour:
   m_Name: EvaluatorConfig
   m_EditorClassIdentifier: Assembly-CSharp::SO_EvaluatorConfig
   ExportOption: 3
-  NumberOfIterations: 15000
+  NumberOfIterations: 30000
   Algorithms: 00000000010000000200000003000000040000000500000006000000
   SetCustomGridSize: 1
-  GridSizes: 8000000000010000
+  GridSizes: 80000000
   GridSizeCount: 5
-  lastGridSize: 256
+  lastGridSize: 128
   ObstacleDensities:
-  - 0.1
-  - 0.2
   - 0.3
   ObstacleDensityDeviation: 0
   BatchSize: 200

@@ -15,7 +15,7 @@ public abstract class BaseGrid : MonoBehaviour
     protected Node startNode;
     protected Node goalNode;
 
-    public Node nodeObject;
+    public NodeView nodeObject;
     private GridColor gridColors;
     
     public virtual void Create(GridConfig config)

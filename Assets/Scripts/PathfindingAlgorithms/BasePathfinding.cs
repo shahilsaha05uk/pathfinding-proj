@@ -36,20 +36,28 @@ public abstract class BasePathfinding : MonoBehaviour, INavigate
             PathCost = 0,
             VisitedNodes = 0,
             Message = "No valid path found.",
-            Success = false,
+            Success = 0, // 0 = failure
+            PeakMemoryBytes = 0,
+            MaxOpenListSize = 0,
         };
 
-    protected virtual PathResult ReturnPath(Node start, Node goal, int visited = 0)
+    protected virtual PathResult ReturnPath(Node start, Node goal, int visited = 0, int maxOpenSize = 0)
     {
         var (path, totalCost) = RetracePath(start, goal);
+        
+        // Record peak memory
+        long peakMemory = GC.GetTotalMemory(false);
+        
         return new PathResult
         {
             Path = path,
             PathLength = path.Count,
             PathCost = totalCost,
             VisitedNodes = visited,
-            Success = true,
+            Success = 1, // 1 = success
             Message = $"Path found with length {path.Count} and total cost {totalCost}.",
+            PeakMemoryBytes = peakMemory,
+            MaxOpenListSize = maxOpenSize,
         };
     }
 

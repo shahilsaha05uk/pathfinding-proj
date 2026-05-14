@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 5311975750779405464}
   - component: {fileID: 7536566206247997232}
   - component: {fileID: 5408617322525560817}
-  - component: {fileID: 3023195866892656414}
   - component: {fileID: 3918869337376853361}
+  - component: {fileID: 1747311128450785583}
   m_Layer: 0
   m_Name: Node
   m_TagString: Untagged
@@ -114,27 +114,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3023195866892656414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5296330758859777151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06de837cdcce4dbe8b8b4166936a3c1a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gridX: 0
-  gridY: 0
-  gridZ: 0
-  travelDirection: {x: 0, y: 0, z: 0}
-  gCost: 0
-  hCost: 0
-  fCost: 0
-  parent: {fileID: 0}
-  bIsBlocked: 0
 --- !u!205 &3918869337376853361
 LODGroup:
   m_ObjectHideFlags: 0
@@ -160,3 +139,16 @@ LODGroup:
     renderers: []
   m_Enabled: 1
   m_GlobalIlluminationLOD: 0
+--- !u!114 &1747311128450785583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5296330758859777151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 882fd45e64cb59f4ba0227ca05d6b154, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NodeView
+  targetRenderer: {fileID: 7536566206247997232}

@@ -44,6 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ae0e77dd69f3bb42b23d95c3b2f826b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PathAnimationDelay: 0.1
+  EvaluatorConfig: {fileID: 11400000, guid: c3800776eca89a442bad28a809c684f7, type: 2}
+  AlgorithmConfig: {fileID: 11400000, guid: 4c18548d36e2d9d4b891cd0853948248, type: 2}
   ui: {fileID: 0}
   evaluator: {fileID: 0}
   pathfindingManager: {fileID: 0}

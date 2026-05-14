@@ -14,6 +14,7 @@ public class AStar : BasePathfinding
         var openSet = new HashSet<Node>();                 // For O(1) contains checks
         var closedSet = new HashSet<Node>();
         int visitedNodes = 0;
+        int maxOpenSize = 0;
 
         // Initialize start node
         start.gCost = 0;
@@ -26,13 +27,17 @@ public class AStar : BasePathfinding
 
         while (openQueue.Count > 0)
         {
+            // Track max open list size
+            if (openQueue.Count > maxOpenSize)
+                maxOpenSize = openQueue.Count;
+
             // Get the next node in the queue
             var current = openQueue.Dequeue();
             openSet.Remove(current);
 
             // If we reached the goal, return the path
             if (current == goal)
-                return ReturnPath(start, goal, visitedNodes);
+                return ReturnPath(start, goal, visitedNodes, maxOpenSize);
 
             // Add current node to closed set
             closedSet.Add(current);

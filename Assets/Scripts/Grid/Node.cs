@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,13 +6,15 @@ using UnityEngine;
     Diagonal neighbors: Up-Left, Up-Right, Down-Left, Down-Right : Total = 8 corners +  
  */
 
-public class Node : MonoBehaviour
+public class Node
 {
     private TerrainType defaultTerrainType;
     private Color defaultColor;
+    private Color currentColor;
     private bool defaultIsBlocked;
     private bool bIsEndPoint;
     private TerrainType terrainType;
+    private NodeView boundView;
 
     public int gridX, gridY, gridZ;
 
@@ -35,6 +36,7 @@ public class Node : MonoBehaviour
 
         terrainType = defaultTerrainType;
         bIsBlocked = defaultIsBlocked;
+        currentColor = defaultColor;
 
         SetColor(defaultColor);
     }
@@ -43,6 +45,10 @@ public class Node : MonoBehaviour
     {
         terrainType = data.Type;
         bIsBlocked = data.IsBlocked;
+        defaultTerrainType = data.Type;
+        defaultColor = data.Color;
+        defaultIsBlocked = data.IsBlocked;
+        currentColor = data.Color;
         SetColor(data.Color);
     }
 
@@ -51,8 +57,25 @@ public class Node : MonoBehaviour
     public void SetType(TerrainType type) => terrainType = type;
     public void SetColor(Color color)
     {
-        GetComponent<MeshRenderer>().material.color = color;
+        currentColor = color;
+        boundView?.SetColor(color);
     }
+
+    public void AttachView(NodeView view)
+    {
+        boundView = view;
+        boundView?.SetColor(currentColor);
+    }
+
+    public void DetachView(NodeView view)
+    {
+        if (boundView == view)
+            boundView = null;
+    }
+
+    public Color GetCurrentColor() => currentColor;
+    public bool HasView() => boundView != null;
+
     public void SetNodeIndex(int x, int y, int z)
     {
         gridX = x;
@@ -88,6 +111,8 @@ public class Node : MonoBehaviour
 
     public void DestroyNode()
     {
-        Destroy(gameObject);
+        if (boundView != null)
+            Object.Destroy(boundView.gameObject);
+        boundView = null;
     }
 }
