@@ -9,6 +9,7 @@ public class Dijkstra : BasePathfinding
         var visited = new HashSet<Node>();
         var inOpenQueue = new Dictionary<Node, float>(); // To track nodes and their current priorities in queue
         int maxOpenSize = 0;
+        int maxClosedSize = 0;
 
         // Initialize all nodes' gCost to infinity
         var allNodes = Grid3D.Instance.GetAllNodes();
@@ -23,6 +24,9 @@ public class Dijkstra : BasePathfinding
         openQueue.Enqueue(start, 0);
         inOpenQueue[start] = 0;
 
+        // Reset and sample initial memory
+        peakedMemoryDuringSearch = System.GC.GetTotalMemory(false);
+
         // while there are nodes in the open queue
         while (openQueue.Count > 0)
         {
@@ -30,13 +34,18 @@ public class Dijkstra : BasePathfinding
             if (openQueue.Count > maxOpenSize)
                 maxOpenSize = openQueue.Count;
 
+            // Sample memory during search
+            long currentMemory = System.GC.GetTotalMemory(false);
+            if (currentMemory > peakedMemoryDuringSearch)
+                peakedMemoryDuringSearch = currentMemory;
+
             // get the next node in the queue
             var current = openQueue.Dequeue();
             inOpenQueue.Remove(current);
 
             // if we reached the goal, return the path
             if (current == goal)
-                return ReturnPath(start, goal, visited.Count, maxOpenSize);
+                return ReturnPath(start, goal, visited.Count, maxOpenSize, maxClosedSize);
 
             // if the current node has already been visited, skip it
             if (visited.Contains(current))
@@ -44,6 +53,8 @@ public class Dijkstra : BasePathfinding
 
             // mark the current node as visited
             visited.Add(current);
+            if (visited.Count > maxClosedSize)
+                maxClosedSize = visited.Count;
 
             // check all neighbors of the current node
             var neighbors = GetAllNeighbors(current);
@@ -56,7 +67,7 @@ public class Dijkstra : BasePathfinding
                     continue;
 
                 // Calculate the distance from the current node to the neighbor
-                float distance = CalculateHeuristicDistance(current, neighbor);
+                float distance = CalculateStepCost(current, neighbor);
                 var tentativeGCost = current.gCost + distance;
 
                 // If the tentative gCost is less than the neighbor's current gCost

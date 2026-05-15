@@ -1,39 +1,77 @@
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ObstaclePanel : MonoBehaviour
 {
     [SerializeField] private Controller Controller;
-
-    public Button btnUpdateObstacleDensity;
-    public Button btnClearObstacles;
-    public Button btn10Obstacles;
-    public Button btn20Obstacles;
-    public Button btn30Obstacles;
-
-    public PanelSlider sliderObstacleDensity;
+    public TMP_InputField seed;
+    public TMP_InputField min;
+    public TMP_InputField max;
 
     void Start()
     {
-        btnUpdateObstacleDensity.onClick.AddListener(OnUpdateObstacleDensityButtonClick);
-        btnClearObstacles.onClick.AddListener(OnClearObstaclesButtonClick);
+    }
+
+    /// <summary>
+    /// Get the seed value as an integer
+    /// </summary>
+    public int GetSeed()
+    {
+        if (seed == null || string.IsNullOrEmpty(seed.text))
+            return 1000; // Default seed
         
-        btn10Obstacles.onClick.AddListener(() => OnDensityPercentButtonClick(0.1f));
-        btn20Obstacles.onClick.AddListener(() => OnDensityPercentButtonClick(0.2f));
-        btn30Obstacles.onClick.AddListener(() => OnDensityPercentButtonClick(0.3f));
+        if (int.TryParse(seed.text, out int seedValue))
+            return seedValue;
+        
+        Debug.LogWarning($"Invalid seed value: {seed.text}, using default 1000");
+        return 1000;
     }
 
-    public float GetObstacleDensity() => sliderObstacleDensity.GetValue();
-
-    private void OnDensityPercentButtonClick(float density)
+    /// <summary>
+    /// Get the minimum density value, normalized between 0 and 1
+    /// </summary>
+    public float GetMinDensity()
     {
-        sliderObstacleDensity.UpdateValue(density);
+        if (min == null || string.IsNullOrEmpty(min.text))
+            return 0.1f; // Default min
+
+        if (float.TryParse(min.text, out float minValue))
+            return Mathf.Clamp01(minValue);
+
+        Debug.LogWarning($"Invalid min value: {min.text}, using default 0.1");
+        return 0.1f;
     }
 
-    private void OnUpdateObstacleDensityButtonClick()
+    /// <summary>
+    /// Get the maximum density value, normalized between 0 and 1
+    /// </summary>
+    public float GetMaxDensity()
     {
-        Controller.OnUpdateObstacleDensity(sliderObstacleDensity.GetValue());
+        if (max == null || string.IsNullOrEmpty(max.text))
+            return 0.5f; // Default max
+
+        if (float.TryParse(max.text, out float maxValue))
+            return Mathf.Clamp01(maxValue);
+
+        Debug.LogWarning($"Invalid max value: {max.text}, using default 0.5");
+        return 0.5f;
     }
 
-    private void OnClearObstaclesButtonClick() => Controller.OnClearObstacleDensity();
+    /// <summary>
+    /// Get a validated density range with min <= max
+    /// </summary>
+    public DensityRange GetDensityRange()
+    {
+        float minDensity = GetMinDensity();
+        float maxDensity = GetMaxDensity();
+
+        // Ensure min <= max
+        if (minDensity > maxDensity)
+        {
+            Debug.LogWarning($"Min density ({minDensity}) > Max density ({maxDensity}), swapping values");
+            (minDensity, maxDensity) = (maxDensity, minDensity);
+        }
+
+        return new DensityRange(minDensity, maxDensity);
+    }
 }

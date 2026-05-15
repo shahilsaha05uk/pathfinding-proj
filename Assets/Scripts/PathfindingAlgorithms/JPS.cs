@@ -16,6 +16,8 @@ public class JPS : BasePathfinding
         var closedSet = new HashSet<Node>();
         var directionMap = new Dictionary<Node, Vector3Int>();
         var visited = 0;
+        int maxOpenSize = 0;
+        int maxClosedSize = 0;
 
         start.gCost = 0;
         start.hCost = CalculateHeuristicDistance(start, goal);
@@ -24,14 +26,28 @@ public class JPS : BasePathfinding
         openList.Enqueue(start, start.fCost);
         directionMap[start] = Vector3Int.zero;
 
+        // Reset and sample initial memory
+        peakedMemoryDuringSearch = System.GC.GetTotalMemory(false);
+
         while (openList.Count > 0)
         {
+            // Track max open list size
+            if (openList.Count > maxOpenSize)
+                maxOpenSize = openList.Count;
+
+            // Sample memory during search
+            long currentMemory = System.GC.GetTotalMemory(false);
+            if (currentMemory > peakedMemoryDuringSearch)
+                peakedMemoryDuringSearch = currentMemory;
+
             var current = openList.Dequeue();
             closedSet.Add(current);
+            if (closedSet.Count > maxClosedSize)
+                maxClosedSize = closedSet.Count;
 
             if (current == goal)
             {
-                var path = ReturnPath(start, goal, visited);
+                var path = ReturnPath(start, goal, visited, maxOpenSize, maxClosedSize);
                 return path;
             }
 
@@ -45,7 +61,7 @@ public class JPS : BasePathfinding
                     !HeuristicHelper.IsNodeAllowed(jumpPoint, allowedNodes))
                     continue;
 
-                float tentativeG = current.gCost + CalculateHeuristicDistance(current, jumpPoint);
+                float tentativeG = current.gCost + CalculateStepCost(current, jumpPoint);
 
                 if (!openList.Contains(jumpPoint) || tentativeG < jumpPoint.gCost)
                 {
@@ -235,5 +251,42 @@ public class JPS : BasePathfinding
             components.Add(new Vector3Int(0, 0, dir.z));
 
         return components;
+    }
+
+    protected override float CalculateStepCost(Node from, Node to)
+    {
+        if (from == null || to == null)
+            return 0f;
+
+        Vector3Int fromPos = from.GetNodePositionOnGrid();
+        Vector3Int toPos = to.GetNodePositionOnGrid();
+        Vector3Int direction = new Vector3Int(
+            Mathf.Clamp(toPos.x - fromPos.x, -1, 1),
+            Mathf.Clamp(toPos.y - fromPos.y, -1, 1),
+            Mathf.Clamp(toPos.z - fromPos.z, -1, 1));
+
+        if (direction == Vector3Int.zero)
+            return 0f;
+
+        float stepDistance = Mathf.Sqrt(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
+        float total = 0f;
+
+        var grid = Grid3D.Instance;
+        var cursor = fromPos;
+
+        while (cursor != toPos)
+        {
+            cursor += direction;
+            if (!grid.IsInsideGrid(cursor))
+                break;
+
+            var stepNode = grid.GetNodeAt(cursor);
+            if (stepNode == null)
+                break;
+
+            total += stepDistance * stepNode.GetMovementCost();
+        }
+
+        return total;
     }
 }

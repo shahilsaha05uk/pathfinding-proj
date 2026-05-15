@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b94a6ca3a0d3b5a4c8807e879c95ecbd, type: 3}
   m_Name: DebugGridConfig
   m_EditorClassIdentifier: 
-  GridSize: 16
-  MaxHeight: 8
+  GridSize: 64
+  MaxHeight: 12
   NoiseScale: 0.1
-  ObstacleDensity: 0
+  ObstacleSeed: 0
   MinOffsetX: -3
   MaxOffsetX: 3
   MinOffsetY: -3

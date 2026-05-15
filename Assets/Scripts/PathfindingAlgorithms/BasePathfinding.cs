@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
 public abstract class BasePathfinding : MonoBehaviour, INavigate
 {
+    // Track peak memory during search - made public so ILS can access it
+    public long peakedMemoryDuringSearch = 0;
+
     public PathResult Navigate(Node start, Node end, HashSet<Node> allowedNodes = null)
         => FindPath(start, end, allowedNodes) ?? DefaultPath();
 
@@ -16,7 +20,7 @@ public abstract class BasePathfinding : MonoBehaviour, INavigate
         while (currentNode != start)
         {
             path.Add(currentNode);
-            totalCost += CalculateHeuristicDistance(currentNode, currentNode.parent);
+            totalCost += CalculateStepCost(currentNode.parent, currentNode);
             currentNode = currentNode.parent;
         }
         path.Add(start);
@@ -37,17 +41,18 @@ public abstract class BasePathfinding : MonoBehaviour, INavigate
             VisitedNodes = 0,
             Message = "No valid path found.",
             Success = 0, // 0 = failure
-            PeakMemoryBytes = 0,
             MaxOpenListSize = 0,
         };
 
-    protected virtual PathResult ReturnPath(Node start, Node goal, int visited = 0, int maxOpenSize = 0)
+    protected virtual PathResult ReturnPath(Node start, Node goal, int visited = 0, int maxOpenSize = 0, int maxClosedSize = 0)
     {
         var (path, totalCost) = RetracePath(start, goal);
-        
-        // Record peak memory
-        long peakMemory = GC.GetTotalMemory(false);
-        
+
+        // Record current peak memory
+        long currentMemory = System.GC.GetTotalMemory(false);
+        if (currentMemory > peakedMemoryDuringSearch)
+            peakedMemoryDuringSearch = currentMemory;
+
         return new PathResult
         {
             Path = path,
@@ -56,12 +61,19 @@ public abstract class BasePathfinding : MonoBehaviour, INavigate
             VisitedNodes = visited,
             Success = 1, // 1 = success
             Message = $"Path found with length {path.Count} and total cost {totalCost}.",
-            PeakMemoryBytes = peakMemory,
             MaxOpenListSize = maxOpenSize,
+            MaxClosedListSize = maxClosedSize,
+            PeakedMemoryBytes = peakedMemoryDuringSearch,
         };
     }
 
     protected virtual float CalculateHeuristicDistance(Node a, Node b) => HeuristicHelper.GetEuclideanDistance(a, b);
+
+    protected virtual float CalculateStepCost(Node from, Node to)
+    {
+        if (from == null || to == null) return 0f;
+        return CalculateHeuristicDistance(from, to) * to.GetMovementCost();
+    }
 
     protected virtual List<Node> GetAllNeighbors(Node node) => NeighborHelper.GetNeighbors(node);
 }

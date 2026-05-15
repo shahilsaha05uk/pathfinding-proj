@@ -28,12 +28,12 @@ public class EvaluationDataSaver
     public string Export(GridConfig config, AutoEvaluationConfig settings)
     {
         var gridSize = config.GridSize;
-        var obstacleDensity = Mathf.RoundToInt(config.ObstacleDensity * 100);
+        var obstacleSeed = config.ObstacleSeed;
         var result = SaveManager.Export(
             config,
             settings,
             saveData,
-            fileName: $"{gridSize}x_{gridSize}x_{gridSize}x_ob{obstacleDensity}",
+            fileName: $"{gridSize}x_{gridSize}x_{gridSize}",
             directory: "Exported Data"
         );
 
@@ -49,7 +49,7 @@ public class EvaluationDataSaver
         return new SaveData
         {
             GridSize = config.GridSize,
-            ObstacleDensity = config.ObstacleDensity * 100,
+            ObstacleSeed = config.ObstacleSeed,
             EvaluationResult = results,
             MaxHeight = config.MaxHeight,
             NoiseScale = config.NoiseScale,

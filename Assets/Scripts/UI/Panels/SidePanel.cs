@@ -83,9 +83,6 @@ public class SidePanel : MonoBehaviour
             Debug.LogError("ParamsPanel is not set!");
             return gridConfig;
         }
-
-        paramsPanel.UpdateConfig(ref gridConfig);
-
-        return gridConfig;
+        return paramsPanel.GetConfig();
     }
 }

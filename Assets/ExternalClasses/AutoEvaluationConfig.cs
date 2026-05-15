@@ -5,7 +5,6 @@ using UnityEngine;
 [Serializable]
 public enum EExportType
 {
-    EveryObstacleDensity,
     EveryGridSize,
     EveryAlgorithm,
     EveryIteration,
@@ -18,8 +17,7 @@ public class AutoEvaluationConfig
     public readonly int BatchSize;
     public readonly HashSet<AlgorithmType> Algorithms;
     public readonly HashSet<int> GridSizes;
-    public readonly HashSet<float> ObstacleDensities;
-    public readonly float ObstacleDensityDeviation;
+    public readonly List<DensityRange> DensityRanges;
     public readonly (float Min, float Max) NoiseRange;
     public readonly float NoiseMultiplier;
     public readonly (float Min, float Max) OffsetXRange;
@@ -37,8 +35,7 @@ public class AutoEvaluationConfig
     public AutoEvaluationConfig(
         int batchSize,
         HashSet<int> gridSizes,
-        HashSet<float> obstacleDensities,
-        float obstacleDensityDeviation,
+        List<DensityRange> densityRanges,
         (float Min, float Max) noiseRange,
         float noiseMultiplier,
         (float Min, float Max) offsetXRange,
@@ -54,8 +51,7 @@ public class AutoEvaluationConfig
     {
         BatchSize = batchSize;
         GridSizes = gridSizes;
-        ObstacleDensities = obstacleDensities;
-        ObstacleDensityDeviation = obstacleDensityDeviation;
+        DensityRanges = densityRanges;
         Algorithms = algorithms;
         NoiseRange = noiseRange;
         NoiseMultiplier = noiseMultiplier;

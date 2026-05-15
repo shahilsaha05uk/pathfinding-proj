@@ -9,7 +9,7 @@ public class SaveData
     public int GridSize;
     public int MaxHeight;
     public float NoiseScale;
-    public float ObstacleDensity;
+    public int ObstacleSeed;
 
     [Space(5)][Header("Evaluation Data")]
     public int BatchSize;

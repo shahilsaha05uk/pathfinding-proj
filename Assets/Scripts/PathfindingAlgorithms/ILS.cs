@@ -3,11 +3,16 @@ using UnityEngine;
 
 public class ILS : BasePathfinding
 {
+    // Track peak memory across all iterations
+    private long ilsPeakedMemory = 0;
 
     public PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, INavigate algorithm) {
         int currentWidth = 1, corridorIterations = 1;
         int maxWidth = maxCorridorWidth;
         var linePoints = BLA.GenerateLine(start, end);
+
+        // Initialize ILS peak memory tracking
+        ilsPeakedMemory = System.GC.GetTotalMemory(false);
 
         // Keep increasing the size of the corridor until a path is found or the maximum width is reached
         while (currentWidth <= maxWidth)
@@ -15,7 +20,12 @@ public class ILS : BasePathfinding
             var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
             var pathResult = algorithm.Navigate(start, end, corridor);
 
-            if (pathResult.Success)
+            // Track peak memory from inner algorithm
+            BasePathfinding baseAlgo = algorithm as BasePathfinding;
+            if (baseAlgo != null && baseAlgo.peakedMemoryDuringSearch > ilsPeakedMemory)
+                ilsPeakedMemory = baseAlgo.peakedMemoryDuringSearch;
+
+            if (pathResult.Success == 1)
             {
                 return new PathResult
                 {
@@ -26,12 +36,20 @@ public class ILS : BasePathfinding
                     CorridorIterations = corridorIterations,
                     Success = pathResult.Success,
                     Message = pathResult.Message,
+                    MaxOpenListSize = pathResult.MaxOpenListSize,
+                    MaxClosedListSize = pathResult.MaxClosedListSize,
+                    PeakedMemoryBytes = ilsPeakedMemory,
                 };
             }
             currentWidth++;
             corridorIterations++;
         }
-        return DefaultPath();
+
+        var failed = DefaultPath();
+        failed.CorridorIterations = corridorIterations - 1;
+        failed.MaxOpenListSize = 0;
+        failed.PeakedMemoryBytes = ilsPeakedMemory;
+        return failed;
     }
     
     // Step 2: Define the corridor

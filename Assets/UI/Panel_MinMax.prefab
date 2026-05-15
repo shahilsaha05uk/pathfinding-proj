@@ -191,9 +191,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7364afb4dab904c419bab4a756d1d060, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultLabel: Default Label
+  txtLabel: {fileID: 0}
   inputField: {fileID: 7739747031385533499}
   FieldType: 2
-  PlaceholderText: for integers
   defaultValue: 10
 --- !u!1 &830869996003535833
 GameObject:
@@ -298,6 +299,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -486,6 +488,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -710,10 +713,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7364afb4dab904c419bab4a756d1d060, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultLabel: Default Label
+  txtLabel: {fileID: 0}
   inputField: {fileID: 1481209752739406419}
   FieldType: 2
-  PlaceholderText: for integers
-  defaultValue: 10
+  defaultValue: -10
 --- !u!1 &2750278038979119939
 GameObject:
   m_ObjectHideFlags: 0
@@ -779,7 +783,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Label
+  m_text: Default Label
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7592094917b608441865e2a8e3be1e9d, type: 2}
   m_sharedMaterial: {fileID: 4802256234906076223, guid: 7592094917b608441865e2a8e3be1e9d, type: 2}
@@ -817,6 +821,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -862,7 +867,7 @@ GameObject:
   - component: {fileID: 1847305287483547975}
   - component: {fileID: 1999587799792844568}
   - component: {fileID: 4789532176405779146}
-  - component: {fileID: 4400892428820734193}
+  - component: {fileID: 4432693470057840446}
   m_Layer: 5
   m_Name: Panel_MinMax
   m_TagString: Untagged
@@ -955,7 +960,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &4400892428820734193
+--- !u!114 &4432693470057840446
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -966,14 +971,14 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e7a499b5fb76f0042b944b868bc0ad0f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  label: Noise
-  defaultMinValue: -0.5
-  defaultMaxValue: 0.5
-  FieldType: 3
+  m_EditorClassIdentifier: Assembly-CSharp::PanelMinMax
+  defaultLabel: Default Label
+  txtLabel: {fileID: 504895281110207340}
+  defaultMinValue: 0
+  defaultMaxValue: 1
+  FieldType: 0
   min: {fileID: 1481209752739406419}
   max: {fileID: 7739747031385533499}
-  txtLabel: {fileID: 504895281110207340}
 --- !u!1 &6578903984602412433
 GameObject:
   m_ObjectHideFlags: 0
@@ -1130,6 +1135,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -1287,6 +1293,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -1399,6 +1406,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0

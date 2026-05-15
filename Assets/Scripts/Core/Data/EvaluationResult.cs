@@ -29,6 +29,11 @@ public class EvaluationResult
             VisitedNodes = result.VisitedNodes,
             CorridorIterations = result.CorridorIterations,
 
+            Success = result.Success,
+            PeakMemoryBytes = result.PeakedMemoryBytes > 0 ? result.PeakedMemoryBytes : (long)(stats?.PeekedBytes ?? 0),
+            MaxOpenListSize = result.MaxOpenListSize,
+            MaxClosedListSize = result.MaxClosedListSize,
+
             TimeTaken = stats?.TimeTaken ?? 0,
             MeasuredTimeMs = stats?.MeasuredTimeMs ?? 0,
             MemoryUsedBytes = stats?.MemoryUsedBytes ?? 0,

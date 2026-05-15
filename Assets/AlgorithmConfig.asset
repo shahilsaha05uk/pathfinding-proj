@@ -33,7 +33,7 @@ MonoBehaviour:
       Value:
         Label: A*
         IsOn: 1
-        ColorKey: {r: 0, g: 1, b: 0.050955772, a: 1}
+        ColorKey: {r: 0, g: 0.21509439, b: 0.01096557, a: 1}
     - Key: 1
       Value:
         Label: JPS

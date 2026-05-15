@@ -24,6 +24,9 @@ public class Node
     public Node parent;
     public bool bIsBlocked;
 
+    private float defaultMovementCost;
+    private float movementCost;
+
     public void Init(TerrainData tData, Vector3Int gridPos)
     {
         gridX = gridPos.x;
@@ -33,9 +36,11 @@ public class Node
         defaultTerrainType = tData.Type;
         defaultColor = tData.Color;
         defaultIsBlocked = tData.IsBlocked;
+        defaultMovementCost = tData.MovementCost;
 
         terrainType = defaultTerrainType;
         bIsBlocked = defaultIsBlocked;
+        movementCost = defaultMovementCost;
         currentColor = defaultColor;
 
         SetColor(defaultColor);
@@ -48,6 +53,8 @@ public class Node
         defaultTerrainType = data.Type;
         defaultColor = data.Color;
         defaultIsBlocked = data.IsBlocked;
+        defaultMovementCost = data.MovementCost;
+        movementCost = data.MovementCost;
         currentColor = data.Color;
         SetColor(data.Color);
     }
@@ -86,6 +93,8 @@ public class Node
     public Vector3Int GetNodePositionOnGrid() => new Vector3Int(gridX, gridY, gridZ);
     public TerrainType GetTerrainType() => terrainType;
     public bool IsEndpoint() => bIsEndPoint;
+    public float GetMovementCost() => movementCost <= 0f ? 1f : movementCost;
+
     public void ToggleNeighbours(bool value, List<Node> neighbors)
     {
         Color color = value ? Color.yellow : defaultColor;
@@ -104,10 +113,12 @@ public class Node
         ResetColor();
         ResetBlockStatus();
         ResetTerrainType();
+        ResetMovementCost();
     }
     public void ResetColor() => SetColor(defaultColor);
     public void ResetBlockStatus() => bIsBlocked = defaultIsBlocked;
     public void ResetTerrainType() => terrainType = defaultTerrainType;
+    public void ResetMovementCost() => movementCost = defaultMovementCost;
 
     public void DestroyNode()
     {

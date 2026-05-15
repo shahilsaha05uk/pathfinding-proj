@@ -24,15 +24,15 @@ public class SO_EvaluatorConfig : ScriptableObject
     // Display only - shows the largest grid size
     [SerializeField] private int lastGridSize;
 
-    // Obstacle densities to evaluate, e.g. 0.1, 0.2, 0.3
-    public List<float> ObstacleDensities;
+    [Header("Obstacle Density Ranges")]
+    // List of density ranges to evaluate
+    // Each range will be randomized and inverted for obstacle generation
+    // Lesser value = lesser obstacles
+    public List<DensityRange> ObstacleDensityRanges = new();
 
-    // Deviation for obstacle density, e.g. if set to 2, then for a density of 10%,
-    // the actual density will be between 8% and 12%
-    [Range(0, 0.1f)] public float ObstacleDensityDeviation;
-
-    // total number of evaluations to run for each grid size
+    // total number of evaluations to run for each grid size and density range
     public int BatchSize = 10;
+    public int BaseSeed = 200;
 
     // Range for noise scale, e.g. 0.1 to 1.0
     [Range(0, 1)] public float NoiseScaleMin;
@@ -61,6 +61,17 @@ public class SO_EvaluatorConfig : ScriptableObject
 
         // Update the display field
         UpdateLastGridSize();
+
+        // Initialize density ranges if empty
+        if (ObstacleDensityRanges == null || ObstacleDensityRanges.Count == 0)
+        {
+            ObstacleDensityRanges = new List<DensityRange>
+            {
+                new DensityRange(0.1f, 0.3f),  // Low density range
+                new DensityRange(0.4f, 0.6f),  // Medium density range
+                new DensityRange(0.7f, 0.9f),  // High density range
+            };
+        }
     }
 
     private void GenerateGridSizes()

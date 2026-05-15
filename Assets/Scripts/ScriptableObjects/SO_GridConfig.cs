@@ -6,7 +6,7 @@ public class SO_GridConfig : ScriptableObject
     [SerializeField] private int GridSize;
     [SerializeField] private int MaxHeight;
     [SerializeField] private float NoiseScale;
-    [SerializeField] private float ObstacleDensity;
+    [SerializeField] private int ObstacleSeed;
 
     [Space(5)]
     [SerializeField] private float MinOffsetX;
@@ -29,7 +29,7 @@ public class SO_GridConfig : ScriptableObject
         GridSize = GridSize,
         MaxHeight = MaxHeight,
         NoiseScale = NoiseScale,
-        ObstacleDensity = ObstacleDensity,
+        ObstacleSeed = ObstacleSeed,
         OffsetX = (MinOffsetX, MaxOffsetX),
         OffsetY = (MinOffsetY, MaxOffsetY),
     };
@@ -39,7 +39,7 @@ public class SO_GridConfig : ScriptableObject
         GridSize = GridSize,
         MaxHeight = MaxHeight,
         NoiseScale = NoiseScale,
-        ObstacleDensity = ObstacleDensity,
+        ObstacleSeed = ObstacleSeed,
         OffsetX = (MinOffsetX, MaxOffsetX),
         OffsetY = (MinOffsetY, MaxOffsetY),
         bSetEndpoints = bSetEndpoints,

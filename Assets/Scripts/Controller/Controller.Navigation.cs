@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public partial class Controller
 {
@@ -51,22 +52,39 @@ public partial class Controller
             yield break;
         }
 
+        if (settings.DensityRanges == null || settings.DensityRanges.Count == 0)
+        {
+            Debug.LogError("No density ranges configured for evaluation.");
+            yield break;
+        }
+
         evaluator.ClearResults();
 
         // For every grid size
-        foreach(var size in settings.GridSizes)
+        var gridSizes = new List<int>(settings.GridSizes);
+        GridConfig config = null;
+
+        for(int gi = 0; gi < gridSizes.Count; gi++)
         {
-            GridConfig config = null;
-            // Batch to run for each grid size and obstacle density
-            // for each obstacle density
-            foreach (var density in settings.ObstacleDensities)
+            var size = gridSizes[gi];
+            
+            // For every density range
+            for (int di = 0; di < settings.DensityRanges.Count; di++)
             {
+                var densityRange = settings.DensityRanges[di];
+                
                 // For every batch 
                 for (int i = 0; i < settings.BatchSize; i++)
                 {
-                    Debug.Log($"Starting batch {i + 1} of {settings.BatchSize} for grid size {size}x{size}.");
+                    Debug.Log($"Starting batch {i + 1} of {settings.BatchSize} for grid size {size}x{size}, density range {di + 1}.");
 
-                    config = BuildRandomGridConfig(settings, size, density);
+                    config = BuildRandomGridConfig(
+                        settings, 
+                        size,
+                        gi, 
+                        di,
+                        i, 
+                        densityRange);
                     grid.Clear();
                     grid.Create(config);
 
@@ -91,7 +109,7 @@ public partial class Controller
                     UpdateConfigPanel(new EvaluationLog(
                         batchSize: settings.BatchSize,
                         gridSize: config.GridSize,
-                        obstacleDensity: config.ObstacleDensity,
+                        obstacleSeed: config.ObstacleSeed,
                         noiseScale: config.NoiseScale,
                         offsets: (X: offsetX, Y: offsetY),
                         height: config.MaxHeight));
@@ -132,12 +150,23 @@ public partial class Controller
                     grid.Clear();
                 }
 
-                // This will save and export after every obstacle density, regardless of the grid size batches
-                HandleSaveAndExport(settings.ExportOption == EExportType.EveryObstacleDensity, config, settings);
+                // This will save and export after every density range
+                HandleSaveAndExport(settings.ExportOption == EExportType.EveryGridSize, config, settings);
             }
+        }
 
-            // This will save and export after every grid size, regardless of the obstacle density batches
-            HandleSaveAndExport(settings.ExportOption == EExportType.EveryGridSize, config, settings);
+        // Final export: ensure all remaining data is saved and exported
+        Debug.Log("Auto evaluation complete. Performing final data export...");
+        if (evaluator.GetEvaluationResults().Count > 0)
+        {
+            SaveToMemory(config, settings);
+            Export(settings);
+            evaluator.ClearResults();
+            Debug.Log("Final export completed successfully.");
+        }
+        else
+        {
+            Debug.Log("No remaining data to export.");
         }
     }
 
@@ -223,38 +252,43 @@ public partial class Controller
     private GridConfig BuildRandomGridConfig(
         AutoEvaluationConfig settings, 
         int size, 
-        float density)
+        int gridIndex,
+        int densityRangeIndex,
+        int batchIndex,
+        DensityRange densityRange)
     {
+        // Get randomized density within the range
+        float randomDensity = densityRange.GetRandomDensity();
+        
+        // Invert the density: lesser value = fewer obstacles
+        float invertedDensity = DensityRange.InvertDensity(randomDensity);
+
+        // Calculate seed based on grid size index, density range index, and batch iteration
+        // For grid index 0, density range 0, batch 0: seed = 1000
+        // For grid index 0, density range 1, batch 0: seed = 1100
+        // For grid index 0, density range 0, batch 1: seed = 1001
+        // For grid index 1, density range 0, batch 0: seed = 2000
+        int obstacleSeed = (gridIndex + 1) * 1000 + (densityRangeIndex * 100) + batchIndex;
+
         return new GridConfig
         {
             GridSize = size,
-            MaxHeight = (int)(DeviatedValue(settings.HeightRange, settings.HeightDeviation)),
-            NoiseScale = DeviatedValue(settings.NoiseRange, settings.NoiseMultiplier),
-            ObstacleDensity = DeviatedValue(density, settings.ObstacleDensityDeviation),
-            OffsetX = (settings.OffsetXRange.Min, settings.OffsetXRange.Max),
-            OffsetY = (settings.OffsetYRange.Min, settings.OffsetYRange.Max),
+            MaxHeight = (int)(GridConfigHelper.DeviatedValue(
+                settings.HeightRange, 
+                settings.HeightDeviation)),
+            NoiseScale = GridConfigHelper.DeviatedValue(
+                settings.NoiseRange, 
+                settings.NoiseMultiplier),
+            ObstacleSeed = obstacleSeed,
+            DensityThreshold = invertedDensity,
+            OffsetX = (
+                settings.OffsetXRange.Min, 
+                settings.OffsetXRange.Max),
+            OffsetY = (
+                settings.OffsetYRange.Min, 
+                settings.OffsetYRange.Max),
         };
     }
-
-    private float DeviatedValue(float value, float deviation)
-    {
-        return Random.Range(value - deviation, value + deviation);
-    }
-
-    private float DeviatedValue(Vector2 value, float deviation)
-    {
-        return Random.Range(
-            minInclusive: DeviatedValue(value.x, deviation), 
-            maxInclusive: DeviatedValue(value.y, deviation));
-    }
-
-    private float DeviatedValue((float x, float y) value, float deviation)
-    {
-        return Random.Range(
-            minInclusive: DeviatedValue(value.x, deviation), 
-            maxInclusive: DeviatedValue(value.y, deviation));
-    }
-
     private Node FindStartNodeAtOrigin()
     {
         if (!grid.IsInsideGrid(0, 0, 0))

@@ -7,10 +7,8 @@ public static class AutoEvaluatorExtensions
     {
         return new AutoEvaluationConfig(
             batchSize: config.BatchSize,
-            algorithms: new HashSet<AlgorithmType>(config.Algorithms),
             gridSizes: new HashSet<int>(config.GridSizes),
-            obstacleDensities: new HashSet<float>(config.ObstacleDensities),
-            obstacleDensityDeviation: config.ObstacleDensityDeviation,
+            densityRanges: config.ObstacleDensityRanges ?? new List<DensityRange>(),
             noiseRange: (config.NoiseScaleMin, config.NoiseScaleMax),
             noiseMultiplier: config.NoiseScaleMultiplier,
             offsetXRange: (config.OffsetXMinRange, config.OffsetXMaxRange),
@@ -20,6 +18,7 @@ public static class AutoEvaluatorExtensions
             heightDeviation: config.MaxHeightDeviation,
             animate: config.AnimatePaths,
             animationDelay: config.PathAnimationDelay,
+            algorithms: new HashSet<AlgorithmType>(config.Algorithms),
             exportOption: config.ExportOption,
             numberOfIterations: config.NumberOfIterations);
     }

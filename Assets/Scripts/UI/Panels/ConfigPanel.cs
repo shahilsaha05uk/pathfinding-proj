@@ -51,7 +51,7 @@ public class ConfigPanel : MonoBehaviour
         lblBatchSize.SetValue(config.BatchSize.ToString());
         lblCurrentAlgorithm.SetValue("N/A");
         lblCurrentGridSize.SetValue(config.GridSize.ToString());
-        lblCurrentObstacleDensity.SetValue(config.ObstacleDensity.ToString());
+        lblCurrentObstacleDensity.SetValue(config.ObstacleSeed.ToString());
         lblNoiseRange.SetValue(config.NoiseScale.ToString());
         lblOffsets.SetValue($"({config.Offsets.X}, {config.Offsets.Y})");
         lblHeight.SetValue(config.Height.ToString());

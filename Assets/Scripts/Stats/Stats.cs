@@ -17,20 +17,39 @@ public static class Stats
         long memBefore = System.GC.GetTotalMemory(false);
         var sw = Stopwatch.StartNew();
 
-        // Calls the function
+        // Calls the function (algorithm will track its own peak memory)
         var result = func();
 
         sw.Stop();
+
+        // Sample memory after function completes
         long memAfter = System.GC.GetTotalMemory(false);
         long memUsed = memAfter - memBefore;
+
+        // Extract peaked memory from the result if it's a PathResult
+        // PeakedMemoryBytes is stored as absolute value by the algorithm
+        long peakedMemoryAbsolute = memBefore;
+        if (result is PathResult pathResult && pathResult.PeakedMemoryBytes > 0)
+        {
+            peakedMemoryAbsolute = pathResult.PeakedMemoryBytes;
+        }
+        else
+        {
+            // Fallback: use memAfter if no peaked value was recorded
+            peakedMemoryAbsolute = memAfter;
+        }
+
+        // Calculate the relative peaked memory (how much memory was used during execution)
+        long peakedMemoryRelative = peakedMemoryAbsolute - memBefore;
 
         // Records the memory usage after the function call
         float endTime = Time.realtimeSinceStartup;
         return (result, new StatData
         {
             TimeTaken = (float)(endTime - startTime) * 1000f,
-            MemoryUsedBytes = memUsed,
-            MeasuredTimeMs = (float)sw.Elapsed.TotalMilliseconds
+            MeasuredTimeMs = (float)sw.Elapsed.TotalMilliseconds,
+            MemoryUsedBytes = memUsed,                                  // Final memory still in use
+            PeekedBytes = (float)peakedMemoryRelative                   // Peak memory relative to baseline
         });
     }
 }

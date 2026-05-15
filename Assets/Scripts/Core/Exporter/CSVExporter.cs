@@ -77,6 +77,7 @@ public static class CSVExporter
             "ObstacleDensity," +
             "BatchSize," +
             "Algorithm," +
+            "Success," +
             "TimeTaken," +
             "PathLength," +
             "PathCost," +
@@ -84,6 +85,11 @@ public static class CSVExporter
             "MeasuredTimeMs," +
             "MemoryUsedBytes," +
             "MemoryUsedInKb," + 
+            "PeakMemoryBytes," +
+            "PeakMemoryInKb," +
+            "PeakMemoryInMb," +
+            "MaxOpenListSize," +
+            "MaxClosedListSize," +
             "Message");
 
         foreach (var data in saveData)
@@ -124,16 +130,22 @@ public static class CSVExporter
             config.GridSize.ToString(),
             saveData.MaxHeight.ToString(),
             saveData.NoiseScale.ToString("F3"),
-            saveData.ObstacleDensity.ToString("F3"),
+            saveData.ObstacleSeed.ToString("F3"),
             settings.BatchSize.ToString(),
             algorithmName,
+            data.Success.ToString(),
             data.TimeTaken.ToString("F3"),
             data.PathLength.ToString(),
             data.PathCost.ToString("F3"),
             data.VisitedNodes.ToString(),
             data.MeasuredTimeMs.ToString("F3"),
-            data.MemoryUsedBytes.ToString(),
+            data.MemoryUsedBytes.ToString("F3"),
             (data.MemoryUsedBytes / 1024f).ToString("F3"),
+            data.PeakMemoryBytes.ToString(),
+            (data.PeakMemoryBytes / 1024f).ToString("F3"),
+            (data.PeakMemoryBytes / (1024f * 1024f)).ToString("F3"),
+            data.MaxOpenListSize.ToString(),
+            data.MaxClosedListSize.ToString(),
             data.Message,
         }));
     }

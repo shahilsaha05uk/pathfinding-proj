@@ -7,7 +7,6 @@ public class ObstacleManager : MonoBehaviour
     private List<Node> potentialNodes = new();
     private List<Node> obstacleNodes = new();
 
-    private float currentPercent = 0f;
     [SerializeField] private SO_TerrainConfig terrainConfig;
 
     public void Init(List<Node> nodes)
@@ -18,6 +17,49 @@ public class ObstacleManager : MonoBehaviour
             obstacleNodes.Clear();
 
         potentialNodes = nodes;
+    }
+
+    /// <summary>
+    /// Generate obstacles using Perlin noise clustering based on a seed.
+    /// This creates terrain-like obstacle clusters instead of random scattered obstacles.
+    /// </summary>
+    public void UpdateObstacleDensityWithSeed(int gridSize, int seed, float densityThreshold = 0.5f, float scale = 0.1f)
+    {
+        if (potentialNodes == null || potentialNodes.Count == 0)
+            return;
+
+        // Clear existing obstacles
+        Clear();
+
+        // Use seed to generate Perlin noise pattern
+        Random.InitState(seed);
+
+        // Determine offset for this seed
+        float offsetX = Random.Range(0f, 1000f);
+        float offsetY = Random.Range(0f, 1000f);
+        float offsetZ = Random.Range(0f, 1000f);
+
+        // Create obstacles based on Perlin noise
+        foreach (var node in potentialNodes)
+        {
+            var pos = node.GetNodePositionOnGrid();
+
+            // Sample Perlin noise at this position
+            float noiseValue = Mathf.PerlinNoise(
+                (pos.x + offsetX) * scale,
+                (pos.z + offsetZ) * scale
+            );
+
+            // Threshold for obstacle placement (tune this to adjust density)
+            // densityThreshold = 0.3f → more obstacles (~70%)
+            // densityThreshold = 0.5f → medium obstacles (~50%)
+            // densityThreshold = 0.7f → fewer obstacles (~30%)
+            if (noiseValue > densityThreshold)
+            {
+                node.UpdateNode(terrainConfig.GetData(TerrainType.Obstacle));
+                obstacleNodes.Add(node);
+            }
+        }
     }
 
     public void UpdateObstacleDensity(float newDensity)
@@ -52,20 +94,18 @@ public class ObstacleManager : MonoBehaviour
                 obstacleNodes.Remove(node);
             }
         }
-
-        currentPercent = newDensity;
     }
 
     public void Remove(float percent)
     {
         percent = Mathf.Clamp01(percent);
 
+        float currentPercent = (float)obstacleNodes.Count / potentialNodes.Count;
         float newPercent = currentPercent - percent;
-        newPercent = Mathf.Clamp01(newPercent); // Don't go below 0
+        newPercent = Mathf.Clamp01(newPercent);
         if (newPercent == currentPercent) return;
 
-
-        int currentObstacleCount = Mathf.FloorToInt(potentialNodes.Count * currentPercent);
+        int currentObstacleCount = obstacleNodes.Count;
         int newObstacleCount = Mathf.FloorToInt(potentialNodes.Count * newPercent);
         int countToRemove = currentObstacleCount - newObstacleCount;
 
@@ -76,8 +116,6 @@ public class ObstacleManager : MonoBehaviour
             node.ResetNode();
             obstacleNodes.Remove(node);
         }
-
-        currentPercent = newPercent;
     }
 
     public void Clear()
@@ -92,6 +130,8 @@ public class ObstacleManager : MonoBehaviour
 
     public float GetCurrentPercent()
     {
-        return Mathf.Clamp01(currentPercent); // Cap at 100%
+        if (potentialNodes == null || potentialNodes.Count == 0)
+            return 0f;
+        return Mathf.Clamp01((float)obstacleNodes.Count / potentialNodes.Count);
     }
 }

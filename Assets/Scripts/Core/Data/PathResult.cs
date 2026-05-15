@@ -14,6 +14,7 @@ public class PathResult
     
     // Performance recording
     public int Success; // 1 = success, 0 = failure
-    public long PeakMemoryBytes; // Peak memory used during pathfinding
     public int MaxOpenListSize; // Maximum size of open list during search
+    public int MaxClosedListSize; // Maximum size of closed list during search
+    public long PeakedMemoryBytes; // Peak memory usage recorded by the algorithm during search
 }

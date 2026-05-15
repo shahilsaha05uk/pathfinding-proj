@@ -15,6 +15,7 @@ public class AStar : BasePathfinding
         var closedSet = new HashSet<Node>();
         int visitedNodes = 0;
         int maxOpenSize = 0;
+        int maxClosedSize = 0;
 
         // Initialize start node
         start.gCost = 0;
@@ -25,11 +26,19 @@ public class AStar : BasePathfinding
         openQueue.Enqueue(start, start.fCost);
         openSet.Add(start);
 
+        // Reset and sample initial memory
+        peakedMemoryDuringSearch = System.GC.GetTotalMemory(false);
+
         while (openQueue.Count > 0)
         {
             // Track max open list size
             if (openQueue.Count > maxOpenSize)
                 maxOpenSize = openQueue.Count;
+
+            // Sample memory during search
+            long currentMemory = System.GC.GetTotalMemory(false);
+            if (currentMemory > peakedMemoryDuringSearch)
+                peakedMemoryDuringSearch = currentMemory;
 
             // Get the next node in the queue
             var current = openQueue.Dequeue();
@@ -37,10 +46,12 @@ public class AStar : BasePathfinding
 
             // If we reached the goal, return the path
             if (current == goal)
-                return ReturnPath(start, goal, visitedNodes, maxOpenSize);
+                return ReturnPath(start, goal, visitedNodes, maxOpenSize, maxClosedSize);
 
             // Add current node to closed set
             closedSet.Add(current);
+            if (closedSet.Count > maxClosedSize)
+                maxClosedSize = closedSet.Count;
 
             // Check all neighbors of the current node
             foreach (var neighbor in GetAllNeighbors(current))
@@ -51,7 +62,7 @@ public class AStar : BasePathfinding
                     continue;
 
                 // Calculate the cost to move to this neighbor
-                float tentativeGCost = current.gCost + CalculateHeuristicDistance(current, neighbor);
+                float tentativeGCost = current.gCost + CalculateStepCost(current, neighbor);
 
                 // If the neighbor is not in the open set or the new path is cheaper
                 if (!openSet.Contains(neighbor) || tentativeGCost < neighbor.gCost)

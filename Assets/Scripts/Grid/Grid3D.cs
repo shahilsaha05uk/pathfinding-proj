@@ -10,12 +10,11 @@ public class Grid3D : BaseGrid
     private float offsetX;
     private float offsetY;
     private float noiseScale = 1f;
+    private float caveOffsetX;
+    private float caveOffsetY;
 
-    [SerializeField] private float waterLevel = 0.2f;  // Below this = lake
-    [SerializeField] private float caveLevel = 0.4f;    // Below this = cave
     [SerializeField] private int maxTraversableHeight = 3; // Hills above this = non-traversable
     [SerializeField] private SO_TerrainConfig terrainConfig;
-    [SerializeField] private float nodeSpacing = 0.5f;
 
     [Header("Chunk Streaming")]
     [SerializeField] private int chunkSize = 16;
@@ -61,12 +60,21 @@ public class Grid3D : BaseGrid
 
         base.Create(config);
 
-        // Random offsets prevent the same seed from producing identical-looking terrain every time.
-        offsetX = Random.Range(config.OffsetX.min, config.OffsetX.max);
-        offsetY = Random.Range(config.OffsetY.min, config.OffsetY.max);
+        float offsetXMin = Mathf.Min(config.OffsetX.min, config.OffsetX.max);
+        float offsetXMax = Mathf.Max(config.OffsetX.min, config.OffsetX.max);
+        float offsetYMin = Mathf.Min(config.OffsetY.min, config.OffsetY.max);
+        float offsetYMax = Mathf.Max(config.OffsetY.min, config.OffsetY.max);
 
-        noiseScale = config.NoiseScale;
-        maxHeight = config.MaxHeight;
+        // Random offsets prevent the same seed from producing identical-looking terrain every time.
+        offsetX = Random.Range(offsetXMin, offsetXMax);
+        offsetY = Random.Range(offsetYMin, offsetYMax);
+        caveOffsetX = Random.Range(offsetXMin, offsetXMax) + 1000f;
+        caveOffsetY = Random.Range(offsetYMin, offsetYMax) + 2000f;
+
+        noiseScale = Mathf.Max(0.0001f, config.NoiseScale);
+        maxHeight = Mathf.Max(1, config.MaxHeight);
+
+        int traversalHeight = Mathf.Max(1, Mathf.RoundToInt(terrainConfig.TraversalHeight));
 
         // Build the full logical 3D grid.
         Nodes = new Node[mGridSize, maxHeight, mGridSize];
@@ -77,53 +85,66 @@ public class Grid3D : BaseGrid
             {
                 // Perlin noise gives us a height value for this column.
                 float noise = AddNoiseXY(x, z, offsetX, offsetY);
-                int terrainHeight = Mathf.FloorToInt(noise * maxHeight);
+                int terrainHeight = Mathf.Clamp(Mathf.FloorToInt(noise * maxHeight), 1, maxHeight);
+
+                var groundData = terrainConfig.GetData(TerrainType.Ground);
+                var caveData = terrainConfig.GetData(TerrainType.Cave);
+                var lakeData = terrainConfig.GetData(TerrainType.Lake);
+                var hillTopData = terrainConfig.GetData(TerrainType.HillTop);
+
+                var columnTerrain = terrainConfig.GetData(noise);
+
+                // Caves are only kept in clustered regions.
+                if (columnTerrain.Type == TerrainType.Cave && !terrainConfig.IsCaveClusterPoint(x, z, caveOffsetX, caveOffsetY))
+                    columnTerrain = groundData;
+
+                // Obstacles are handled by obstacle manager after terrain generation.
+                if (columnTerrain.Type == TerrainType.Obstacle)
+                    columnTerrain = groundData;
 
                 // Each Y slice becomes one logical node in the column.
                 for (int y = 0; y < terrainHeight; y++)
                 {
                     var node = new Node();
                     node.SetNodeIndex(x, y, z);
-                    node.Init(terrainConfig.GetData(TerrainType.Ground), new Vector3Int(x, y, z));
+                    node.Init(groundData, new Vector3Int(x, y, z));
                     Nodes[x, y, z] = node;
 
-                    // Bottom layer decides whether this column starts as water, cave, or ground.
-                    if (y == 0)
+                    TerrainData terrainData;
+                    bool isTopLayer = y == terrainHeight - 1;
+
+                    if (columnTerrain.Type == TerrainType.Lake)
                     {
-                        if (noise < waterLevel)
-                            node.UpdateNode(terrainConfig.GetData(TerrainType.Lake));
-                        else if (noise < caveLevel)
-                            node.UpdateNode(terrainConfig.GetData(TerrainType.Cave));
-                        else
-                        {
-                            node.UpdateNode(terrainConfig.GetData(TerrainType.Ground));
-                            potentialObstacles.Add(node);
-                        }
+                        // Lake columns render as water volume.
+                        terrainData = lakeData;
                     }
-                    // The top layer decides whether the surface is walkable or a hilltop.
-                    else if (y == terrainHeight - 1)
+                    else if (isTopLayer)
                     {
-                        if (terrainHeight > maxTraversableHeight)
-                            node.UpdateNode(terrainConfig.GetData(TerrainType.HillTop));
-                        else
-                        {
-                            node.UpdateNode(terrainConfig.GetData(TerrainType.Ground));
-                            potentialObstacles.Add(node);
-                        }
+                        // Surface is ground unless too high, then hilltop.
+                        terrainData = terrainHeight > traversalHeight ? hillTopData : groundData;
                     }
-                    // Middle layers are regular ground and can become obstacles.
+                    else if (columnTerrain.Type == TerrainType.Cave)
+                    {
+                        // Caves occupy lower strata of cave-designated columns.
+                        float normalizedHeight = terrainHeight <= 1 ? 0f : y / (float)(terrainHeight - 1);
+                        terrainData = normalizedHeight <= 0.65f ? caveData : groundData;
+                    }
                     else
                     {
-                        node.UpdateNode(terrainConfig.GetData(TerrainType.Ground));
-                        potentialObstacles.Add(node);
+                        terrainData = groundData;
                     }
+
+                    if (terrainData.Type == TerrainType.Ground)
+                        potentialObstacles.Add(node);
+
+                    node.UpdateNode(terrainData);
                 }
             }
         }
 
         // Let the obstacle system decide which candidates become blocked.
         obstacleManager.Init(potentialObstacles);
-        UpdateObstacles(config.ObstacleDensity);
+        UpdateObstacles(config.ObstacleSeed, mGridSize, config.DensityThreshold);
 
         // Spawn only the visible chunk visuals.
         RefreshVisibleChunks(true);
@@ -280,6 +301,8 @@ public class Grid3D : BaseGrid
 
     public override void ClearObstacles() => obstacleManager.Clear();
 
+    public void UpdateObstacles(int seed, int gridSize, float densityThreshold = 0.5f) => obstacleManager.UpdateObstacleDensityWithSeed(gridSize, seed, densityThreshold);
+
     public void UpdateObstacles(float percent) => obstacleManager.UpdateObstacleDensity(percent);
 
     public Node[,,] GetAllNodes() => Nodes;
@@ -290,6 +313,7 @@ public class Grid3D : BaseGrid
 
     private Vector3Int GetCurrentChunkCenter()
     {
+        var nodeSpacing = terrainConfig.NodeSpacing;
         var focus = viewFocus != null ? viewFocus : Camera.main != null ? Camera.main.transform : transform;
         Vector3 local = focus.position - transform.position;
         int cellX = Mathf.FloorToInt(local.x / nodeSpacing);
@@ -355,6 +379,8 @@ public class Grid3D : BaseGrid
 
     private Vector3 GetWorldPosition(int x, int y, int z)
     {
+        var nodeSpacing = terrainConfig.NodeSpacing;
+
         float baseX = transform.position.x + x * nodeSpacing;
         float baseY = transform.position.y + y * nodeSpacing;
         float baseZ = transform.position.z + z * nodeSpacing;

@@ -6,4 +6,5 @@ public class StatData
     public float TimeTaken;
     public float MeasuredTimeMs;
     public float MemoryUsedBytes;
+    public float PeekedBytes;
 }
