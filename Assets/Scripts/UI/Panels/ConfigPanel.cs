@@ -8,6 +8,7 @@ public class ConfigPanel : MonoBehaviour
 {
     public Action<EvaluationLog> OnConfigChanged;
     public Action<AlgorithmType> OnAlgorithmComplete;
+    public Action<int> OnBatchComplete;
 
     public PanelLabel lblBatchSize;
     public PanelLabel lblCurrentAlgorithm;
@@ -16,6 +17,7 @@ public class ConfigPanel : MonoBehaviour
     public PanelLabel lblNoiseRange;
     public PanelLabel lblOffsets;
     public PanelLabel lblHeight;
+    public PanelLabel lblCurrentBatch;
     public PanelLabel lblAlgorithmsComplete;
 
     private HashSet<AlgorithmType> algorithmsComplete = new();
@@ -24,7 +26,11 @@ public class ConfigPanel : MonoBehaviour
     {
         OnConfigChanged += HandleConfigChanged;
         OnAlgorithmComplete += HandleAlgorithmComplete;
+        OnBatchComplete += HandleBatchComplete;
     }
+
+    private void HandleBatchComplete(int count)
+        => lblCurrentBatch.SetValue(count.ToString());
 
     private void HandleAlgorithmComplete(AlgorithmType type)
     {
@@ -50,10 +56,13 @@ public class ConfigPanel : MonoBehaviour
         algorithmsComplete.Clear();
         lblBatchSize.SetValue(config.BatchSize.ToString());
         lblCurrentAlgorithm.SetValue("N/A");
-        lblCurrentGridSize.SetValue(config.GridSize.ToString());
+        lblCurrentGridSize.SetValue(FormatGridSize(config.GridSize));
         lblCurrentObstacleDensity.SetValue(config.ObstacleSeed.ToString());
         lblNoiseRange.SetValue(config.NoiseScale.ToString());
         lblOffsets.SetValue($"({config.Offsets.X}, {config.Offsets.Y})");
         lblHeight.SetValue(config.Height.ToString());
     }
+
+    static string FormatGridSize(int size)
+        => $"{size}x{size}x{size}";
 }

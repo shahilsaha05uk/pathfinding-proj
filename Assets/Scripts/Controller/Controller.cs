@@ -56,8 +56,11 @@ public partial class Controller : MonoBehaviour
 
     public void UpdateConfigPanel(EvaluationLog data)
         => ui.configPanel.OnConfigChanged?.Invoke(data);
-    public void UpdateConfigPanelCompletedAlgorithmType(AlgorithmType type)
+    public void UpdateAlgorithmType(AlgorithmType type)
         => ui.configPanel.OnAlgorithmComplete?.Invoke(type);
+
+    public void UpdateBatchCount(int count)
+        => ui.configPanel.OnBatchComplete?.Invoke(count);
 
     public EvaluationDataSaver GetSaveManager() => saveManager;
 }

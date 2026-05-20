@@ -28,6 +28,8 @@ public class AutoEvaluationConfig
     public readonly bool Animate;
     public readonly float AnimationDelay;
 
+    public readonly float ObstacleSeedScale; // Scale factor for seed generation (default: 1000)
+
     // Evaluator configs
     public readonly EExportType ExportOption;
     public readonly int NumberOfIterations;
@@ -36,6 +38,7 @@ public class AutoEvaluationConfig
         int batchSize,
         HashSet<int> gridSizes,
         List<DensityRange> densityRanges,
+        float seedScale,
         (float Min, float Max) noiseRange,
         float noiseMultiplier,
         (float Min, float Max) offsetXRange,
@@ -63,6 +66,7 @@ public class AutoEvaluationConfig
         Animate = animate;
         AnimationDelay = animationDelay;
 
+        ObstacleSeedScale = seedScale; 
         ExportOption = exportOption;
         NumberOfIterations = numberOfIterations;
     }

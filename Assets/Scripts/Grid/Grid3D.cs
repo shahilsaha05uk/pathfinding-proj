@@ -134,7 +134,9 @@ public class Grid3D : BaseGrid
                         terrainData = groundData;
                     }
 
-                    if (terrainData.Type == TerrainType.Ground)
+                    // Add any traversable node to potential obstacles list
+                    // This allows obstacles to be placed on ground, cave, and other traversable terrains
+                    if(!terrainData.IsBlocked)
                         potentialObstacles.Add(node);
 
                     node.UpdateNode(terrainData);
@@ -144,7 +146,7 @@ public class Grid3D : BaseGrid
 
         // Let the obstacle system decide which candidates become blocked.
         obstacleManager.Init(potentialObstacles);
-        UpdateObstacles(config.ObstacleSeed, mGridSize, config.DensityThreshold);
+        UpdateObstacles(config.ObstacleSeed, config.DensityThreshold);
 
         // Spawn only the visible chunk visuals.
         RefreshVisibleChunks(true);
@@ -301,7 +303,8 @@ public class Grid3D : BaseGrid
 
     public override void ClearObstacles() => obstacleManager.Clear();
 
-    public void UpdateObstacles(int seed, int gridSize, float densityThreshold = 0.5f) => obstacleManager.UpdateObstacleDensityWithSeed(gridSize, seed, densityThreshold);
+    public void UpdateObstacles(int seed, float densityThreshold = 0.5f) 
+        => obstacleManager.UpdateObstacleDensityWithSeed(seed, densityThreshold);
 
     public void UpdateObstacles(float percent) => obstacleManager.UpdateObstacleDensity(percent);
 

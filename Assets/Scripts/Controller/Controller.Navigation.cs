@@ -66,7 +66,7 @@ public partial class Controller
 
         for(int gi = 0; gi < gridSizes.Count; gi++)
         {
-            var size = gridSizes[gi];
+            var gridSize = gridSizes[gi];
             
             // For every density range
             for (int di = 0; di < settings.DensityRanges.Count; di++)
@@ -76,14 +76,12 @@ public partial class Controller
                 // For every batch 
                 for (int i = 0; i < settings.BatchSize; i++)
                 {
-                    Debug.Log($"Starting batch {i + 1} of {settings.BatchSize} for grid size {size}x{size}, density range {di + 1}.");
+                    UpdateBatchCount(i + 1);
+                    Debug.Log($"Starting batch {i + 1} of {settings.BatchSize} for grid size {gridSize}x{gridSize}, density range {di + 1}.");
 
                     config = BuildRandomGridConfig(
+                        gridSize,
                         settings, 
-                        size,
-                        gi, 
-                        di,
-                        i, 
                         densityRange);
                     grid.Clear();
                     grid.Create(config);
@@ -118,7 +116,7 @@ public partial class Controller
                     var algoEvalResults = new EvaluationResult();
                     foreach (var algorithm in settings.Algorithms)
                     {
-                        UpdateConfigPanelCompletedAlgorithmType(algorithm);
+                        UpdateAlgorithmType(algorithm);
                         var (data, path) = EvaluateAlgorithm(algorithm, start, goal);
 
                         algoEvalResults.AddResult(algorithm, data);
@@ -221,11 +219,7 @@ public partial class Controller
 
             return result;
         });
-        
-        //if(type == AlgorithmType.GBFS && stats.MemoryUsedBytes <=0 && result.Success)
-        //{
-        //    Debug.DebugBreak();
-        //}
+
 
         return (EvaluationResult.FromPathResult(result, stats), result?.Path);
     }
@@ -250,36 +244,27 @@ public partial class Controller
         : Color.white;
 
     private GridConfig BuildRandomGridConfig(
+        int gridSize, 
         AutoEvaluationConfig settings, 
-        int size, 
-        int gridIndex,
-        int densityRangeIndex,
-        int batchIndex,
         DensityRange densityRange)
     {
         // Get randomized density within the range
-        float randomDensity = densityRange.GetRandomDensity();
-        
+        var randomDensity = densityRange.GetRandomDensity();
+
         // Invert the density: lesser value = fewer obstacles
         float invertedDensity = DensityRange.InvertDensity(randomDensity);
 
-        // Calculate seed based on grid size index, density range index, and batch iteration
-        // For grid index 0, density range 0, batch 0: seed = 1000
-        // For grid index 0, density range 1, batch 0: seed = 1100
-        // For grid index 0, density range 0, batch 1: seed = 1001
-        // For grid index 1, density range 0, batch 0: seed = 2000
-        int obstacleSeed = (gridIndex + 1) * 1000 + (densityRangeIndex * 100) + batchIndex;
-
+        var density = (int)(randomDensity * settings.ObstacleSeedScale);
         return new GridConfig
         {
-            GridSize = size,
+            GridSize = gridSize,
             MaxHeight = (int)(GridConfigHelper.DeviatedValue(
                 settings.HeightRange, 
                 settings.HeightDeviation)),
             NoiseScale = GridConfigHelper.DeviatedValue(
                 settings.NoiseRange, 
                 settings.NoiseMultiplier),
-            ObstacleSeed = obstacleSeed,
+            ObstacleSeed = density,
             DensityThreshold = invertedDensity,
             OffsetX = (
                 settings.OffsetXRange.Min, 

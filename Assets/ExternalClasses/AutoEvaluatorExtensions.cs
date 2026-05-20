@@ -9,6 +9,7 @@ public static class AutoEvaluatorExtensions
             batchSize: config.BatchSize,
             gridSizes: new HashSet<int>(config.GridSizes),
             densityRanges: config.ObstacleDensityRanges ?? new List<DensityRange>(),
+            seedScale: config.ObstacleSeedScale,
             noiseRange: (config.NoiseScaleMin, config.NoiseScaleMax),
             noiseMultiplier: config.NoiseScaleMultiplier,
             offsetXRange: (config.OffsetXMinRange, config.OffsetXMaxRange),

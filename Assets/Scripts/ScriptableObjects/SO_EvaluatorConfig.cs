@@ -29,6 +29,7 @@ public class SO_EvaluatorConfig : ScriptableObject
     // Each range will be randomized and inverted for obstacle generation
     // Lesser value = lesser obstacles
     public List<DensityRange> ObstacleDensityRanges = new();
+    [Range(10000, 100000)]public int ObstacleSeedScale;
 
     // total number of evaluations to run for each grid size and density range
     public int BatchSize = 10;

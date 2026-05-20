@@ -81,6 +81,7 @@ public class SO_EvaluatorConfigEditor : Editor
         {
             EditorGUILayout.HelpBox("ObstacleDensityRanges property not found!", MessageType.Error);
         }
+        DrawPropertySafe("ObstacleSeedScale");
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Evaluation Settings", EditorStyles.boldLabel);

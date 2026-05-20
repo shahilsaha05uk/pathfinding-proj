@@ -22,8 +22,13 @@ public class ObstacleManager : MonoBehaviour
     /// <summary>
     /// Generate obstacles using Perlin noise clustering based on a seed.
     /// This creates terrain-like obstacle clusters instead of random scattered obstacles.
+    /// The seed deterministically affects the Perlin noise pattern, ensuring different
+    /// seeds produce different obstacle distributions while remaining reproducible.
     /// </summary>
-    public void UpdateObstacleDensityWithSeed(int gridSize, int seed, float densityThreshold = 0.5f, float scale = 0.1f)
+    public void UpdateObstacleDensityWithSeed(
+        int seed, 
+        float densityThreshold = 0.5f, 
+        float scale = 0.1f)
     {
         if (potentialNodes == null || potentialNodes.Count == 0)
             return;
@@ -31,20 +36,18 @@ public class ObstacleManager : MonoBehaviour
         // Clear existing obstacles
         Clear();
 
-        // Use seed to generate Perlin noise pattern
-        Random.InitState(seed);
-
-        // Determine offset for this seed
-        float offsetX = Random.Range(0f, 1000f);
-        float offsetY = Random.Range(0f, 1000f);
-        float offsetZ = Random.Range(0f, 1000f);
+        // Derive deterministic offsets directly from seed
+        // This ensures different seeds produce different patterns
+        float offsetX = (seed % 1000) + (seed / 1000f);
+        float offsetY = ((seed * 7) % 1000) + ((seed * 7) / 1000f);
+        float offsetZ = ((seed * 13) % 1000) + ((seed * 13) / 1000f);
 
         // Create obstacles based on Perlin noise
         foreach (var node in potentialNodes)
         {
             var pos = node.GetNodePositionOnGrid();
 
-            // Sample Perlin noise at this position
+            // Sample Perlin noise at this position using seed-derived offsets
             float noiseValue = Mathf.PerlinNoise(
                 (pos.x + offsetX) * scale,
                 (pos.z + offsetZ) * scale
