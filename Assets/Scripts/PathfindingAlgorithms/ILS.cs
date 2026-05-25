@@ -6,7 +6,8 @@ public class ILS : BasePathfinding
     // Track peak memory across all iterations
     private long ilsPeakedMemory = 0;
 
-    public PathResult Navigate(Grid3D grid, Node start, Node end, INavigate algorithm) {
+    public PathResult Navigate(Grid3D grid, Node start, Node end, INavigate algorithm)
+    {
         int currentWidth = 1, corridorIterations = 1;
         var linePoints = BLA.GenerateLine(grid, start, end);
 
@@ -56,11 +57,11 @@ public class ILS : BasePathfinding
         failed.MaxCorridorWidth = maxWidth;
         return failed;
     }
-    
+
     // Step 2: Define the corridor
     private HashSet<Node> DefineCorridor(
-        List<Vector3Int> linePoints, 
-        Grid3D grid, 
+        List<Vector3Int> linePoints,
+        Grid3D grid,
         Node start, Node end,
         int width = 1)
     {
@@ -77,11 +78,11 @@ public class ILS : BasePathfinding
             }
             corridorNodes.UnionWith(neighbors);
         }
-        
+
         corridorNodes.Add(start);
         corridorNodes.Add(end);
-        
+
         return corridorNodes;
     }
-    
+
 }
