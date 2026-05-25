@@ -28,6 +28,8 @@ public class EvaluationResult
             PathCost = result.PathCost,
             VisitedNodes = result.VisitedNodes,
             CorridorIterations = result.CorridorIterations,
+            MaxCorridorWidth = result.MaxCorridorWidth,
+            CorridorSize = result.CorridorSize,
 
             Success = result.Success,
             PeakMemoryBytes = result.PeakedMemoryBytes > 0 ? result.PeakedMemoryBytes : (long)(stats?.PeekedBytes ?? 0),

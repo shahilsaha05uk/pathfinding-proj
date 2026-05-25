@@ -19,16 +19,21 @@ MonoBehaviour:
         Label: ILS_Dijkstra
         IsOn: 1
         ColorKey: {r: 0.49803925, g: 0, b: 0.49803925, a: 1}
-    - Key: 2
-      Value:
-        Label: GBFS
-        IsOn: 1
-        ColorKey: {r: 0, g: 0.3238877, b: 1, a: 1}
     - Key: 5
       Value:
         Label: ILS_A*
         IsOn: 1
         ColorKey: {r: 1, g: 1, b: 0, a: 1}
+    - Key: 6
+      Value:
+        Label: ILS_GBFS
+        IsOn: 1
+        ColorKey: {r: 0, g: 1, b: 1, a: 1}
+    - Key: 2
+      Value:
+        Label: GBFS
+        IsOn: 1
+        ColorKey: {r: 0, g: 0.3238877, b: 1, a: 1}
     - Key: 0
       Value:
         Label: A*
@@ -44,8 +49,3 @@ MonoBehaviour:
         Label: Dijkstra
         IsOn: 1
         ColorKey: {r: 0.9921569, g: 0, b: 0.9921569, a: 1}
-    - Key: 6
-      Value:
-        Label: ILS_GBFS
-        IsOn: 1
-        ColorKey: {r: 0, g: 1, b: 1, a: 1}

@@ -17,10 +17,12 @@ public class Grid3D : BaseGrid
     [SerializeField] private SO_TerrainConfig terrainConfig;
 
     [Header("Chunk Streaming")]
-    [SerializeField] private int chunkSize = 16;
+    [SerializeField] private int chunkSize = 32;
     [SerializeField] private int viewRadiusInChunks = 1;
     [SerializeField] private Transform viewFocus;
     [SerializeField] private bool autoRefreshVisibleChunks = true;
+
+    public int MaxDimension => Mathf.Max(mGridSize, maxHeight, mGridSize);
 
     public static Grid3D Instance { get; private set; }
 

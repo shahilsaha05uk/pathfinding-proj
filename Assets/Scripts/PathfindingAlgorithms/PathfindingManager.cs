@@ -46,12 +46,12 @@ public class PathfindingManager : MonoBehaviour
         return algo.Navigate(start, end);
     }
 
-    public PathResult RunILSWith<T>(Node start, Node end, int corridorWidth = 10) where T : INavigate
+    public PathResult RunILSWith<T>(Node start, Node end) where T : INavigate
     {
         if (!algorithms.TryGetValue(typeof(T), out var algo) || algo == null)
             throw new ArgumentException($"AlgorithmType '{typeof(T).Name}' is not supported.", nameof(T));
 
-        return ils.Navigate(grid, start, end, corridorWidth, algo);
+        return ils.Navigate(grid, start, end, algo);
     }
 
     public PathResult RunAlgorithm(AlgorithmType type, Node start, Node end)

@@ -19,7 +19,8 @@ public static class AutoEvaluatorExtensions
             heightDeviation: config.MaxHeightDeviation,
             animate: config.AnimatePaths,
             animationDelay: config.PathAnimationDelay,
-            algorithms: new HashSet<AlgorithmType>(config.Algorithms),
+            algorithms: new HashSet<AlgorithmType>(
+                config.Algorithms.Where(a => a.Value == true).Select(a => a.Key).ToList()),
             exportOption: config.ExportOption,
             numberOfIterations: config.NumberOfIterations);
     }

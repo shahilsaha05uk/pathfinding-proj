@@ -40,18 +40,6 @@ public static class CSVExporter
         string folderPath = GetExportDir(directory);
         if (!Directory.Exists(folderPath))
             Directory.CreateDirectory(folderPath);
-        else
-        {
-            // if there are any files in there, delete them first
-            //if (Directory.GetFiles(folderPath).Length > 0)
-            //{
-            //    foreach (var file in Directory.GetFiles(folderPath))
-            //    {
-            //        File.Delete(file);
-            //    }
-            //}
-        }
-
         return folderPath;
     }
 
@@ -90,6 +78,9 @@ public static class CSVExporter
             "PeakMemoryInMb," +
             "MaxOpenListSize," +
             "MaxClosedListSize," +
+            "CorridorCount," +
+            "MaxCorridorWidth," +
+            "CorridorSize," +
             "Message");
 
         foreach (var data in saveData)
@@ -146,6 +137,9 @@ public static class CSVExporter
             (data.PeakMemoryBytes / (1024f * 1024f)).ToString("F3"),
             data.MaxOpenListSize.ToString(),
             data.MaxClosedListSize.ToString(),
+            data.CorridorIterations.ToString(),
+            data.MaxCorridorWidth.ToString(),
+            data.CorridorSize.ToString(),
             data.Message,
         }));
     }

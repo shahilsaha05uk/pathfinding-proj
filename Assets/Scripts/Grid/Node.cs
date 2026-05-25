@@ -17,6 +17,7 @@ public class Node
     private NodeView boundView;
 
     public int gridX, gridY, gridZ;
+    public Vector3Int Position => new(gridX, gridY, gridZ);
 
     public Vector3Int travelDirection;
 

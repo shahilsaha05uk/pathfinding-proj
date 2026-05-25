@@ -1,3 +1,4 @@
+using AYellowpaper.SerializedCollections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +10,7 @@ public class SO_EvaluatorConfig : ScriptableObject
     public EExportType ExportOption;
     public int NumberOfIterations;
 
-    public List<AlgorithmType> Algorithms;
+    public SerializedDictionary<AlgorithmType, bool> Algorithms;
 
     public bool SetCustomGridSize;
 

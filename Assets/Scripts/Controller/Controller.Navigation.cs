@@ -134,11 +134,9 @@ public partial class Controller
                             yield return AnimatePath(path, settings.AnimationDelay, algorithmColor);
                             grid.ResetPath();
                         }
-                        else
-                        {
-                            yield return null;
-                        }
 
+                        // Yield once per algorithm to prevent main thread lockup
+                        // without doubling the artificial delay
                         yield return null;
                     }
 

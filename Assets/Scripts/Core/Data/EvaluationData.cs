@@ -7,6 +7,8 @@ public class EvaluationData
     public float PathCost;
     public int VisitedNodes;
     public int CorridorIterations;
+    public int MaxCorridorWidth;
+    public int CorridorSize;
 
     // Search result quality
     public int Success; // 1 = success, 0 = failure

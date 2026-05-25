@@ -9,6 +9,8 @@ public class PathResult
     public float PathCost;
     public int VisitedNodes;
     public int CorridorIterations;
+    public int MaxCorridorWidth;
+    public int CorridorSize;
     public List<Node> Path;
     public string Message;
     

@@ -13,7 +13,7 @@
     
 public static class BLA
 { 
-    public static List<Vector3Int> GenerateLine(Node start, Node end, float offset = 0.2f)
+    public static List<Vector3Int> GenerateLine(Grid3D grid, Node start, Node end, float offset = 0.2f)
     {
         var startPos = GridHelper.GetPositionAs3DInt(start);
         var endPos = GridHelper.GetPositionAs3DInt(end);
@@ -56,7 +56,9 @@ public static class BLA
                 }
                 p1 += 2 * deltaY;
                 p2 += 2 * deltaZ;
-                points.Add(new Vector3Int(x, y, z));
+
+                if (!TryAddPoint(grid, points, x, y, z))
+                    break;
             }
         }
         // Driving axis is Y-axis
@@ -79,7 +81,8 @@ public static class BLA
                 }
                 p1 += 2 * deltaX;
                 p2 += 2 * deltaZ;
-                points.Add(new Vector3Int(x, y, z));
+                if (!TryAddPoint(grid, points, x, y, z))
+                    break;
             }
         }
         // Driving axis is Z-axis
@@ -104,10 +107,20 @@ public static class BLA
 
                 p1 += 2 * deltaY;
                 p2 += 2 * deltaX;
-                points.Add(new Vector3Int(x, y, z));
+
+                if (!TryAddPoint(grid, points, x, y, z))
+                    break;
             }
         }
 
         return points;
+    }
+
+    private static bool TryAddPoint(Grid3D grid, List<Vector3Int> points, int x, int y, int z)
+    {
+        var point = new Vector3Int(x, y, z);
+        if (!grid.IsInsideGrid(point)) return false;
+        points.Add(point);
+        return true;
     }
 }
