@@ -16,5 +16,5 @@ MonoBehaviour:
     StartNodeColor: {r: 0.48101807, g: 0, b: 1, a: 1}
     EndNodeColor: {r: 0.48235294, g: 0, b: 1, a: 1}
     PathNodeColor: {r: 0, g: 1, b: 0.91830444, a: 1}
-    ObstacleNodeColor: {r: 1, g: 0.6245283, b: 0.6245283, a: 1}
+    ObstacleNodeColor: {r: 1, g: 0, b: 0, a: 1}
     VisitedNodeColor: {r: 0.061670184, g: 1, b: 0, a: 1}

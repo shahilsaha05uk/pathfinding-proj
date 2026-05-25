@@ -1,99 +1,53 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class PathfindingEvaluator : MonoBehaviour
 {
     [SerializeField] private Grid3D grid;
     [SerializeField] private PathfindingManager pathManager;
-    private List<EvaluationResult> evaluationResults = new List<EvaluationResult>();
+    private readonly List<EvaluationResult> evaluationResults = new();
 
     public List<EvaluationResult> GetEvaluationResults() => evaluationResults;
 
-    public EvaluationResult Evaluate(int evalSize, EvaluateAlgorithms evaluateAlgorithms)
+    public void AddEvaluationResult(EvaluationResult result)
     {
-        // Pre evaluation
-        if (evalSize <= 0)
-        {
-            Debug.LogError("Evaluation size must be greater than 0.");
-            return null;
-        }
-
-        // -- Clear data if exists.
-        ClearResults();
-
-        var nodes = grid.GetStartEndNodes();
-
-        // Evaluate the algorithms
-        StartEvaluation(evalSize, nodes.start, nodes.goal, evaluateAlgorithms);
-
-        // Post evaluation
-        if (evaluationResults.Count <= 0) return null;
-
-        return evaluationResults[evalSize - 1];
+        if (result != null)
+            evaluationResults.Add(result);
     }
 
     public void ClearResults()
     {
-        if (evaluationResults != null && evaluationResults.Count > 0)
+        if (evaluationResults.Count > 0)
             evaluationResults.Clear();
     }
 
-    private void StartEvaluation(int evalSize, Node start, Node goal, EvaluateAlgorithms evaluateAlgorithms)
+    // keep your existing Evaluate(...) if you still need it for the old flow
+
+    private EvaluationData GetEvaluationData(AlgorithmType type, Node start, Node end)
     {
-        int count = 0;
-
-        while (count < evalSize)
+        return type switch
         {
-            var results = GatherEvaluationData(start, goal, evaluateAlgorithms);
-            evaluationResults.Add(results);
-            count++;
-        }
-    }
-
-    private EvaluationResult GatherEvaluationData(Node start, Node goal, EvaluateAlgorithms evaluateAlgorithms)
-    {
-        // Basic algorithms
-        var aStar = (evaluateAlgorithms.AStar)? GetEvaluationData<AStar>(start, goal) : null;
-        var gbfs = (evaluateAlgorithms.GBFS)? GetEvaluationData<Dijkstra>(start, goal) : null;
-        var jps = (evaluateAlgorithms.JPS) ? GetEvaluationData<JPS>(start, goal) : null;
-        var dijkstra = (evaluateAlgorithms.Dijkstra) ? GetEvaluationData<Dijkstra>(start, goal) : null;
-
-        // ILS algorithms
-        var ilsWithAStar = (evaluateAlgorithms.ILSAStar) ? GetILSEvaluationData<AStar>(start, goal) : null;
-        var ilsWithGBFS = (evaluateAlgorithms.ILSGBFS) ? GetILSEvaluationData<GBFS>(start, goal) : null;
-        var ilsWithDijkstra = (evaluateAlgorithms.ILSDijkstra) ? GetILSEvaluationData<Dijkstra>(start, goal) : null;
-
-        return new EvaluationResult
-        {
-            AStar = aStar,
-            GBFS = gbfs,
-            JPS = jps,
-            Dijkstra = dijkstra,
-            ILSWithAStar = ilsWithAStar,
-            ILSWithDijkstra = ilsWithDijkstra,
-            ILSWithGBFS = ilsWithGBFS,
+            AlgorithmType.AStar => Evaluator(start, end, (s, e) => pathManager.RunAlgorithm<AStar>(s, e)),
+            AlgorithmType.GBFS => Evaluator(start, end, (s, e) => pathManager.RunAlgorithm<GBFS>(s, e)),
+            AlgorithmType.Dijkstra => Evaluator(start, end, (s, e) => pathManager.RunAlgorithm<Dijkstra>(s, e)),
+            AlgorithmType.JPS => Evaluator(start, end, (s, e) => pathManager.RunAlgorithm<JPS>(s, e)),
+            AlgorithmType.ILS_AStar => Evaluator(start, end, (s, e) => pathManager.RunILSWith<AStar>(s, e)),
+            AlgorithmType.ILS_GBFS => Evaluator(start, end, (s, e) => pathManager.RunILSWith<GBFS>(s, e)),
+            AlgorithmType.ILS_Dijkstra => Evaluator(start, end, (s, e) => pathManager.RunILSWith<Dijkstra>(s, e)),
+            _ => new EvaluationData { Message = $"Unsupported algorithm: {type}" },
         };
     }
 
-    private EvaluationData GetEvaluationData<T>(Node start, Node end) where T : INavigate
+    private EvaluationData Evaluator(
+        Node start,
+        Node end,
+        Func<Node, Node, PathResult> fn)
     {
-        var result = RunAlgorithm<T>(start, end);
-        return EvaluationResult.FromPathResult(result);
-    }
+        var (results, stats) = Stats.RecordStats(() => fn(start, end));
 
-    private EvaluationData GetILSEvaluationData<T>(Node start, Node end) where T : INavigate
-    {
-        var result = RunILSAlgorithm<T>(start, end);
-        return EvaluationResult.FromPathResult(result);
-    }
-
-    private PathResult RunAlgorithm<T>(Node start, Node end) where T: INavigate
-    {
-        return pathManager.RunAlgorithm<T>(start, end);
-    }
-    
-    private PathResult RunILSAlgorithm<T>(Node start, Node end) where T: INavigate
-    {
-        return pathManager.RunILSWith<T>(start, end);
+        return EvaluationResult.FromPathResult(results, stats);
     }
 }

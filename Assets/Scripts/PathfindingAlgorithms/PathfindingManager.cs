@@ -40,32 +40,24 @@ public class PathfindingManager : MonoBehaviour
     public PathResult RunAlgorithm<T>(Node start, Node end) where T: INavigate
     {
         if (!algorithms.TryGetValue(typeof(T), out var algo) || algo == null)
-        {
-            Debug.LogError($"Algorithm {typeof(T).Name} is not registered on {nameof(PathfindingManager)}.");
-            return null;
-        }
+            throw new InvalidOperationException(
+                $"Inner algorithm {typeof(T).Name} is not registered on {nameof(PathfindingManager)}.");
 
         return algo.Navigate(start, end);
     }
 
-    public PathResult RunILSWith<T>(Node start, Node end, int corridorWidth = 10) where T : INavigate
+    public PathResult RunILSWith<T>(Node start, Node end) where T : INavigate
     {
         if (!algorithms.TryGetValue(typeof(T), out var algo) || algo == null)
-        {
-            Debug.LogError($"Inner algorithm {typeof(T).Name} is not registered on {nameof(PathfindingManager)}.");
-            return null;
-        }
+            throw new ArgumentException($"AlgorithmType '{typeof(T).Name}' is not supported.", nameof(T));
 
-        return ils.Navigate(grid, start, end, corridorWidth, algo);
+        return ils.Navigate(grid, start, end, algo);
     }
 
     public PathResult RunAlgorithm(AlgorithmType type, Node start, Node end)
     {
         if (!runners.TryGetValue(type, out var run))
-        {
-            Debug.LogWarning($"AlgorithmType '{type}' not found. Falling back to A*.");
-            run = runners[AlgorithmType.AStar];
-        }
+            throw new ArgumentException($"AlgorithmType '{type}' is not supported.", nameof(type));
         return run(start, end);
     }
 }

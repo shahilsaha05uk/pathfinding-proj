@@ -16,6 +16,8 @@ public class JPS : BasePathfinding
         var closedSet = new HashSet<Node>();
         var directionMap = new Dictionary<Node, Vector3Int>();
         var visited = 0;
+        int maxOpenSize = 0;
+        int maxClosedSize = 0;
 
         start.gCost = 0;
         start.hCost = CalculateHeuristicDistance(start, goal);
@@ -24,26 +26,42 @@ public class JPS : BasePathfinding
         openList.Enqueue(start, start.fCost);
         directionMap[start] = Vector3Int.zero;
 
+        // Reset and sample initial memory
+        peakedMemoryDuringSearch = System.GC.GetTotalMemory(false);
+
         while (openList.Count > 0)
         {
+            // Track max open list size
+            if (openList.Count > maxOpenSize)
+                maxOpenSize = openList.Count;
+
+            // Sample memory during search
+            long currentMemory = System.GC.GetTotalMemory(false);
+            if (currentMemory > peakedMemoryDuringSearch)
+                peakedMemoryDuringSearch = currentMemory;
+
             var current = openList.Dequeue();
             closedSet.Add(current);
+            if (closedSet.Count > maxClosedSize)
+                maxClosedSize = closedSet.Count;
 
             if (current == goal)
             {
-                var path = ReturnPath(start, goal, visited);
+                var path = ReturnPath(start, goal, visited, maxOpenSize, maxClosedSize);
                 return path;
             }
 
             var currentDir = directionMap[current];
-            var successors = IdentifySuccessors(current, start, goal, currentDir);
+            var successors = IdentifySuccessors(current, start, goal, currentDir, allowedNodes);
 
             foreach (var jumpPoint in successors)
             {
-                if (jumpPoint == null || closedSet.Contains(jumpPoint))
+                if (jumpPoint == null ||
+                    closedSet.Contains(jumpPoint) ||
+                    !HeuristicHelper.IsNodeAllowed(jumpPoint, allowedNodes))
                     continue;
 
-                float tentativeG = current.gCost + CalculateHeuristicDistance(current, jumpPoint);
+                float tentativeG = current.gCost + CalculateStepCost(current, jumpPoint);
 
                 if (!openList.Contains(jumpPoint) || tentativeG < jumpPoint.gCost)
                 {
@@ -67,8 +85,7 @@ public class JPS : BasePathfinding
                 }
             }
         }
-
-        return null;
+        return DefaultPath();
     }
 
     /// <summary>
@@ -80,7 +97,7 @@ public class JPS : BasePathfinding
     ///         this means, it will only get the nodes that are reachable in the current direction (natural neighbors)
     ///         once you have these directions, you continue to jump in the same direction
     /// </summary>
-    private List<Node> IdentifySuccessors(Node node, Node start, Node goal, Vector3Int currentDir)
+    private List<Node> IdentifySuccessors(Node node, Node start, Node goal, Vector3Int currentDir, HashSet<Node> allowedNodes = null)
     {
         var successors = new List<Node>();
 
@@ -89,7 +106,7 @@ public class JPS : BasePathfinding
             // First node: explore all directions
             foreach (var dir in allDirections)
             {
-                var jumpPoint = Jump(node, goal, dir);
+                var jumpPoint = Jump(node, goal, dir, allowedNodes);
                 if (jumpPoint != null)
                     successors.Add(jumpPoint);
             }
@@ -99,7 +116,7 @@ public class JPS : BasePathfinding
             // Natural directions
             foreach (var dir in NeighborHelper.GetNaturalNeighbors(currentDir))
             {
-                var jumpPoint = Jump(node, goal, dir);
+                var jumpPoint = Jump(node, goal, dir, allowedNodes);
                 if (jumpPoint != null)
                     successors.Add(jumpPoint);
             }
@@ -109,7 +126,7 @@ public class JPS : BasePathfinding
             foreach (var forced in forcedNeighbors)
             {
                 var dir = GridHelper.GetDirection(node, forced);
-                var jumpPoint = Jump(node, goal, dir);
+                var jumpPoint = Jump(node, goal, dir, allowedNodes);
                 if (jumpPoint != null)
                     successors.Add(jumpPoint);
             }
@@ -119,52 +136,98 @@ public class JPS : BasePathfinding
     }
 
     /// <summary>
-    /// This method will recursively check in the given direction to see:
-    ///     if the goal can be reached
-    ///     if the next node is blocked (forced neighbor)
-    ///     if it can move further
+    /// Iterative Jump implementation to avoid deep recursion.
+    /// Returns the jump point node or null if none found.
     /// </summary>
-    private Node Jump(Node current, Node goal, Vector3Int direction)
+    private Node Jump(Node current, Node goal, Vector3Int direction, HashSet<Node> allowedNodes = null)
     {
         if (current == goal) return current;
 
-        Vector3Int nextPos = current.GetNodePositionOnGrid() + direction;
-        if (!Grid3D.Instance.IsInsideGrid(nextPos.x, nextPos.y, nextPos.z))
-            return null;
+        Node node = current;
+        var grid = Grid3D.Instance;
 
-        Node nextNode = Grid3D.Instance.GetNodeAt(nextPos);
-        if (nextNode == null || nextNode.bIsBlocked)
-            return null;
-
-        if (nextNode == goal)
-            return nextNode;
-
-        // -- updates
-        var forcedNeighbors = NeighborHelper.GetForcedNeighbors(nextNode, direction);
-        if (forcedNeighbors != null && forcedNeighbors.Count > 0)
+        while (true)
         {
-            // Found forced neighbors, nextNode is a jump point
-            return nextNode;
-        }
+            Vector3Int nextPos = node.GetNodePositionOnGrid() + direction;
+            if (!grid.IsInsideGrid(nextPos.x, nextPos.y, nextPos.z))
+                return null;
 
-        // Diagonal movement: check component directions
-        if (IsDiagonal(direction))
-        {
-            // Check for jump points in component directions
-            foreach (var component in GetComponentDirections(direction))
+            Node nextNode = grid.GetNodeAt(nextPos);
+            if (nextNode == null ||
+                !HeuristicHelper.IsNodeAllowed(nextNode, allowedNodes))
+                return null;
+
+            if (nextNode == goal)
+                return nextNode;
+
+            var forcedNeighbors = NeighborHelper.GetForcedNeighbors(nextNode, direction);
+            if (forcedNeighbors != null && forcedNeighbors.Count > 0)
             {
-                var jumpPoint = Jump(nextNode, goal, component);
+                // Found forced neighbors, nextNode is a jump point
+                return nextNode;
+            }
 
-                if (jumpPoint != null)
+            // Diagonal movement: check component directions by iterative jump
+            if (IsDiagonal(direction))
+            {
+                foreach (var component in GetComponentDirections(direction))
                 {
-                    jumpPoint.SetColor(Color.orange);
-                    return nextNode;
+                    var jp = JumpIterative(nextNode, goal, component, allowedNodes);
+                    if (jp != null)
+                    {
+                        // mark and return nextNode (since presence in component makes nextNode a jump point)
+                        nextNode.SetColor(new Color(1f, 0.65f, 0f)); // orange
+                        return nextNode;
+                    }
                 }
             }
-        }
 
-        // Recurse
-        return Jump(nextNode, goal, direction);
+            node = nextNode;
+        }
+    }
+
+    /// <summary>
+    /// Iterative helper used for component-direction checks (avoids recursion).
+    /// Returns a non-null node when a jump point or goal is detected along the component.
+    /// </summary>
+    private Node JumpIterative(Node startNode, Node goal, Vector3Int direction, HashSet<Node> allowedNodes = null)
+    {
+        Node node = startNode;
+        var grid = Grid3D.Instance;
+
+        while (true)
+        {
+            Vector3Int nextPos = node.GetNodePositionOnGrid() + direction;
+            if (!grid.IsInsideGrid(nextPos.x, nextPos.y, nextPos.z))
+                return null;
+
+            Node nextNode = grid.GetNodeAt(nextPos);
+            if (nextNode == null ||
+                !HeuristicHelper.IsNodeAllowed(nextNode, allowedNodes))
+                return null;
+
+            if (nextNode == goal)
+                return nextNode;
+
+            var forcedNeighbors = NeighborHelper.GetForcedNeighbors(nextNode, direction);
+            if (forcedNeighbors != null && forcedNeighbors.Count > 0)
+            {
+                return nextNode;
+            }
+
+            // For safety: if direction is diagonal (shouldn't happen for components) check recursively/iteratively
+            if (IsDiagonal(direction))
+            {
+                foreach (var comp in GetComponentDirections(direction))
+                {
+                    var result = JumpIterative(nextNode, goal, comp, allowedNodes);
+                    if (result != null)
+                        return nextNode;
+                }
+            }
+
+            node = nextNode;
+        }
     }
 
     private bool IsDiagonal(Vector3Int dir)
@@ -188,5 +251,42 @@ public class JPS : BasePathfinding
             components.Add(new Vector3Int(0, 0, dir.z));
 
         return components;
+    }
+
+    protected override float CalculateStepCost(Node from, Node to)
+    {
+        if (from == null || to == null)
+            return 0f;
+
+        Vector3Int fromPos = from.GetNodePositionOnGrid();
+        Vector3Int toPos = to.GetNodePositionOnGrid();
+        Vector3Int direction = new Vector3Int(
+            Mathf.Clamp(toPos.x - fromPos.x, -1, 1),
+            Mathf.Clamp(toPos.y - fromPos.y, -1, 1),
+            Mathf.Clamp(toPos.z - fromPos.z, -1, 1));
+
+        if (direction == Vector3Int.zero)
+            return 0f;
+
+        float stepDistance = Mathf.Sqrt(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
+        float total = 0f;
+
+        var grid = Grid3D.Instance;
+        var cursor = fromPos;
+
+        while (cursor != toPos)
+        {
+            cursor += direction;
+            if (!grid.IsInsideGrid(cursor))
+                break;
+
+            var stepNode = grid.GetNodeAt(cursor);
+            if (stepNode == null)
+                break;
+
+            total += stepDistance * stepNode.GetMovementCost();
+        }
+
+        return total;
     }
 }

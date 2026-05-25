@@ -1,31 +1,46 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-[SerializeField]
 public class EvaluationResult
 {
-    public EvaluationData AStar;
-    public EvaluationData GBFS;
-    public EvaluationData JPS;
-    public EvaluationData Dijkstra;
-    public EvaluationData ILSWithAStar;
-    public EvaluationData ILSWithGBFS;
-    public EvaluationData ILSWithDijkstra;
-    
-    public static EvaluationData FromPathResult(PathResult result)
+    public Dictionary<AlgorithmType, EvaluationData> Results = new();
+    public int ResultCount => Results.Count;
+
+    public void AddResult(AlgorithmType type, EvaluationData data)
     {
-        if(result == null)
+        Results[type] = data;
+    }
+
+    public static EvaluationData FromPathResult(PathResult result, StatData stats = null)
+    {
+        if (result == null)
         {
             Debug.LogError("Path result was null!!");
-            return new EvaluationData();
+            return new EvaluationData
+            {
+                Message = "Path result was null!!"
+            };
         }
 
         return new EvaluationData
         {
-            TimeTaken = result.TimeTaken,
             PathLength = result.PathLength,
             PathCost = result.PathCost,
             VisitedNodes = result.VisitedNodes,
-            CorridorIterations = result.CorridorIterations
+            CorridorIterations = result.CorridorIterations,
+            MaxCorridorWidth = result.MaxCorridorWidth,
+            CorridorSize = result.CorridorSize,
+
+            Success = result.Success,
+            PeakMemoryBytes = result.PeakedMemoryBytes > 0 ? result.PeakedMemoryBytes : (long)(stats?.PeekedBytes ?? 0),
+            MaxOpenListSize = result.MaxOpenListSize,
+            MaxClosedListSize = result.MaxClosedListSize,
+
+            TimeTaken = stats?.TimeTaken ?? 0,
+            MeasuredTimeMs = stats?.MeasuredTimeMs ?? 0,
+            MemoryUsedBytes = stats?.MemoryUsedBytes ?? 0,
+
+            Message = result.Message,
         };
     }
 }

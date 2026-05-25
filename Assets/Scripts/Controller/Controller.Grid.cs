@@ -15,9 +15,9 @@ public partial class Controller
         
         if (Physics.Raycast(ray, out hit))
         {
-            if (hit.collider.TryGetComponent(out Node node))
+            if (hit.collider.TryGetComponent(out NodeView nodeView))
             {
-                return node;
+                return nodeView.Node;
             }
         }
         return null;

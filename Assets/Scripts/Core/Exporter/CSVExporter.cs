@@ -1,46 +1,87 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public static class CSVExporter
 {
     private static string extension = ".csv";
 
-    public static string ExportToCSV(List<SaveData> saveData, string filename, string directory)
+    public static string ExportToCSV(
+        GridConfig config,
+        AutoEvaluationConfig settings,
+        List<SaveData> saveData, 
+        string filename, 
+        string directory)
     {
-        if(saveData == null || string.IsNullOrEmpty(filename))
+        if (saveData == null || string.IsNullOrEmpty(filename))
         {
             Debug.LogWarning("No data to export.");
             return default;
         }
-
-        // Create the directory if it doesn't exist
-        string projectRoot = Directory.GetParent(Application.dataPath).FullName;
-        string folderPath = Path.Combine(projectRoot, directory);
-        if(!Directory.Exists(folderPath))
-            Directory.CreateDirectory(folderPath);
-
-        // Find next available file name
-        int fileIndex = GetNextFileIndex(folderPath, filename);
-        string fileName = (filename == "data")? $"{filename}_{fileIndex}.csv" : $"{filename}.csv";
+        string folderPath = PrepareDir(directory);
+        string fileName = CreateFileName(filename, folderPath);
         string fullPath = Path.Combine(folderPath, fileName);
 
-        bool success = CreateCSV(saveData, fullPath);
+        bool success = CreateCSV(config, settings, saveData, fullPath);
         return success ? fullPath : null;
     }
 
-    private static bool CreateCSV(List<SaveData> saveData, string fullpath)
+    private static string CreateFileName(string filename, string folderPath)
     {
-        var sb = new System.Text.StringBuilder();
+        int fileIndex = GetNextFileIndex(folderPath, filename);
+        string fileName = (fileIndex == 0) ? $"{filename}.csv" : $"{filename}_{fileIndex}.csv";
+        return fileName;
+    }
 
-        // Header
-        sb.AppendLine("GridSize," +
+    private static string PrepareDir(string directory)
+    {
+        string folderPath = GetExportDir(directory);
+        if (!Directory.Exists(folderPath))
+            Directory.CreateDirectory(folderPath);
+        return folderPath;
+    }
+
+    private static string GetExportDir(string directory)
+    {
+        string projectRoot = Directory.GetParent(Application.dataPath).FullName;
+        string folderPath = Path.Combine(projectRoot, directory);
+        return folderPath;
+    }
+
+    private static bool CreateCSV(
+        GridConfig config,
+        AutoEvaluationConfig settings, 
+        List<SaveData> saveData, 
+        string fullpath)
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine(
+            "GridSize," +
+            "MaxHeight," +
+            "NoiseScale," +
             "ObstacleDensity," +
+            "BatchSize," +
             "Algorithm," +
+            "Success," +
             "TimeTaken," +
             "PathLength," +
             "PathCost," +
-            "VisitedNodes,");
+            "VisitedNodes," +
+            "MeasuredTimeMs," +
+            "MemoryUsedBytes," +
+            "MemoryUsedInKb," + 
+            "PeakMemoryBytes," +
+            "PeakMemoryInKb," +
+            "PeakMemoryInMb," +
+            "MaxOpenListSize," +
+            "MaxClosedListSize," +
+            "CorridorCount," +
+            "MaxCorridorWidth," +
+            "CorridorSize," +
+            "Message");
 
         foreach (var data in saveData)
         {
@@ -48,13 +89,15 @@ public static class CSVExporter
 
             foreach (var result in data.EvaluationResult)
             {
-                AppendRow(sb, data, "AStar", result.AStar);
-                AppendRow(sb, data, "GBFS", result.GBFS);
-                AppendRow(sb, data, "JPS", result.JPS);
-                AppendRow(sb, data, "Dijkstra", result.Dijkstra);
-                AppendRow(sb, data, "ILSWithAStar", result.ILSWithAStar);
-                AppendRow(sb, data, "ILSWithGBFS", result.ILSWithGBFS);
-                AppendRow(sb, data, "ILSWithDijkstra", result.ILSWithDijkstra);
+                var r = result.Results;
+                foreach (var item in r)
+                    AppendRow(
+                        sb, 
+                        data, 
+                        config, 
+                        settings, 
+                        item.Key.ToString(), 
+                        item.Value);
             }
         }
 
@@ -63,38 +106,50 @@ public static class CSVExporter
         return true;
     }
 
-    private static void AppendRow(System.Text.StringBuilder sb, SaveData saveData, string algorithmName, EvaluationData data)
+    private static void AppendRow(
+        StringBuilder sb,
+        SaveData saveData,
+        GridConfig config,
+        AutoEvaluationConfig settings,
+        string algorithmName,
+        EvaluationData data)
     {
         if (data == null) return;
 
         sb.AppendLine(string.Join(",", new string[]
         {
-            saveData.GridSize.ToString(),
-            saveData.ObstacleDensity.ToString("F3"),
+            config.GridSize.ToString(),
+            saveData.MaxHeight.ToString(),
+            saveData.NoiseScale.ToString("F3"),
+            saveData.ObstacleSeed.ToString("F3"),
+            settings.BatchSize.ToString(),
             algorithmName,
+            data.Success.ToString(),
             data.TimeTaken.ToString("F3"),
             data.PathLength.ToString(),
             data.PathCost.ToString("F3"),
             data.VisitedNodes.ToString(),
+            data.MeasuredTimeMs.ToString("F3"),
+            data.MemoryUsedBytes.ToString("F3"),
+            (data.MemoryUsedBytes / 1024f).ToString("F3"),
+            data.PeakMemoryBytes.ToString(),
+            (data.PeakMemoryBytes / 1024f).ToString("F3"),
+            (data.PeakMemoryBytes / (1024f * 1024f)).ToString("F3"),
+            data.MaxOpenListSize.ToString(),
+            data.MaxClosedListSize.ToString(),
+            data.CorridorIterations.ToString(),
+            data.MaxCorridorWidth.ToString(),
+            data.CorridorSize.ToString(),
+            data.Message,
         }));
     }
 
     private static int GetNextFileIndex(string folderPath, string baseFileName)
     {
+        if(Directory.GetFiles(folderPath).Length == 0)
+            return 0;
+
         var files = Directory.GetFiles(folderPath, $"{baseFileName}_*{extension}");
-        int maxIndex = 0;
-
-        foreach (var file in files)
-        {
-            string name = Path.GetFileNameWithoutExtension(file); // e.g., Export_3
-            string[] parts = name.Split('_');
-            if (parts.Length >= 2 && int.TryParse(parts[1], out int index))
-            {
-                if (index > maxIndex)
-                    maxIndex = index;
-            }
-        }
-
-        return maxIndex + 1;
+        return files.Length + 1;
     }
 }

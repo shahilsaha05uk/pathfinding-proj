@@ -3,54 +3,65 @@ using UnityEngine;
 
 public class ILS : BasePathfinding
 {
-    public bool debugCorridor;
-    public Color debugColor;
+    // Track peak memory across all iterations
+    private long ilsPeakedMemory = 0;
 
-    public PathResult Navigate(Grid3D grid, Node start, Node end, int maxCorridorWidth, INavigate algorithm) {
-        // Record stats for the pathfinding operation
-        var (result, stats) = Stats.RecordStats(() => {
-            int currentWidth = 1, corridorIterations = 1;
-            int maxWidth = maxCorridorWidth;
-            var linePoints = GenerateLine(start, end);
-
-            // Keep increasing the size of the corridor until a path is found or the maximum width is reached
-            while (currentWidth <= maxWidth) {
-                var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
-                ColorCorridor(corridor);
-                var pathResult = algorithm.Navigate(start, end, corridor, false);
-
-                if (pathResult != null) {
-                    return new PathResult
-                    {
-                        Path = pathResult.Path,
-                        PathLength = pathResult.PathLength,
-                        PathCost = pathResult.PathCost,
-                        VisitedNodes = pathResult.VisitedNodes,
-                        CorridorIterations = corridorIterations,
-                    };
-                }
-                currentWidth++;
-                corridorIterations++;
-            }
-            return new PathResult { Path = null };
-        });
-
-        result.TimeTaken = stats.TimeTaken;
-        return result;
-    }
-
-
-    
-    // Step 1: Get the Line from BLA
-    private List<Vector3Int> GenerateLine(Node start, Node end)
+    public PathResult Navigate(Grid3D grid, Node start, Node end, INavigate algorithm)
     {
-        return BLA.GenerateLine(start, end);
+        int currentWidth = 1, corridorIterations = 1;
+        var linePoints = BLA.GenerateLine(grid, start, end);
+
+        // Initialize ILS peak memory tracking
+        ilsPeakedMemory = System.GC.GetTotalMemory(false);
+
+        int maxWidth = grid.MaxDimension;
+
+        // Keep increasing the size of the corridor until a path is found or the maximum width is reached
+        while (currentWidth <= maxWidth)
+        {
+            var corridor = DefineCorridor(linePoints, grid, start, end, currentWidth);
+            var pathResult = algorithm.Navigate(start, end, corridor);
+
+            // Track peak memory from inner algorithm
+            BasePathfinding baseAlgo = algorithm as BasePathfinding;
+            if (baseAlgo != null && baseAlgo.peakedMemoryDuringSearch > ilsPeakedMemory)
+                ilsPeakedMemory = baseAlgo.peakedMemoryDuringSearch;
+
+            if (pathResult.Success == 1)
+            {
+                return new PathResult
+                {
+                    Path = pathResult.Path,
+                    PathLength = pathResult.PathLength,
+                    PathCost = pathResult.PathCost,
+                    VisitedNodes = pathResult.VisitedNodes,
+                    CorridorIterations = corridorIterations,
+                    CorridorSize = corridor.Count,
+                    MaxCorridorWidth = maxWidth,
+                    Success = pathResult.Success,
+                    Message = pathResult.Message,
+                    MaxOpenListSize = pathResult.MaxOpenListSize,
+                    MaxClosedListSize = pathResult.MaxClosedListSize,
+                    PeakedMemoryBytes = ilsPeakedMemory,
+                };
+            }
+            currentWidth++;
+            corridorIterations++;
+        }
+
+        var failed = DefaultPath();
+        failed.MaxOpenListSize = 0;
+        failed.PeakedMemoryBytes = ilsPeakedMemory;
+        failed.CorridorSize = 0;
+        failed.CorridorIterations = corridorIterations;
+        failed.MaxCorridorWidth = maxWidth;
+        return failed;
     }
-    
+
     // Step 2: Define the corridor
     private HashSet<Node> DefineCorridor(
-        List<Vector3Int> linePoints, 
-        Grid3D grid, 
+        List<Vector3Int> linePoints,
+        Grid3D grid,
         Node start, Node end,
         int width = 1)
     {
@@ -59,23 +70,19 @@ public class ILS : BasePathfinding
         foreach (var point in linePoints)
         {
             var neighbors = NeighborHelper.GetNeighborsInRange(point, width);
+            foreach (var neighbor in neighbors)
+            {
+                // Only include nodes within grid bounds
+                if (grid.IsInsideGrid(neighbor.Position))
+                    corridorNodes.Add(neighbor);
+            }
             corridorNodes.UnionWith(neighbors);
         }
-        
+
         corridorNodes.Add(start);
         corridorNodes.Add(end);
-        
+
         return corridorNodes;
     }
 
-    private void ColorCorridor(HashSet<Node> nodes)
-    {
-        if (!debugCorridor) return;
-
-        foreach (var n in nodes)
-        {
-            n.SetColor(debugColor);
-        }
-    }
-    
 }

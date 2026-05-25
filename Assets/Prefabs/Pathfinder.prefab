@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3593370797652740691}
   - component: {fileID: 5827749209801056136}
+  - component: {fileID: 8244457677806181929}
   m_Layer: 0
   m_Name: JPS
   m_TagString: Untagged
@@ -44,52 +45,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b681209c69da09d479b91d5f5dc0be77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1138478031545685705
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2378291580918283437}
-  - component: {fileID: 9130011144360012354}
-  m_Layer: 0
-  m_Name: Evaluator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2378291580918283437
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1138478031545685705}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3753176820776727679}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9130011144360012354
+--- !u!114 &8244457677806181929
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1138478031545685705}
+  m_GameObject: {fileID: 814597407457141228}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13dc6bc091ed4cda8fb346bc7d67a0b6, type: 3}
+  m_Script: {fileID: 11500000, guid: b681209c69da09d479b91d5f5dc0be77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mGrid: {fileID: 0}
-  mPathManager: {fileID: 3162446283526828595}
 --- !u!1 &3273344779897300493
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,6 +243,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3753176820776727679}
   - component: {fileID: 3162446283526828595}
+  - component: {fileID: 7149180892079589844}
   m_Layer: 0
   m_Name: Pathfinder
   m_TagString: Untagged
@@ -300,7 +268,6 @@ Transform:
   - {fileID: 2207881264200808727}
   - {fileID: 134147797372271141}
   - {fileID: 2881430716955297956}
-  - {fileID: 2378291580918283437}
   - {fileID: 3593370797652740691}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -316,9 +283,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1994e29848e148138afd1a7e734180a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mGrid: {fileID: 0}
+  grid: {fileID: 0}
   aStar: {fileID: 1093933300889748}
   gbfs: {fileID: 2146567032715355885}
   dijkstra: {fileID: 8490356757849609649}
   ils: {fileID: 2399236662088388762}
-  jps: {fileID: 5827749209801056136}
+  jps: {fileID: 8244457677806181929}
+--- !u!114 &7149180892079589844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8919282580985736063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13dc6bc091ed4cda8fb346bc7d67a0b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grid: {fileID: 0}
+  pathManager: {fileID: 0}

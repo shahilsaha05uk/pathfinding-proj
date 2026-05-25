@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,21 +6,27 @@ using UnityEngine;
     Diagonal neighbors: Up-Left, Up-Right, Down-Left, Down-Right : Total = 8 corners +  
  */
 
-public class Node : MonoBehaviour
+public class Node
 {
     private TerrainType defaultTerrainType;
     private Color defaultColor;
+    private Color currentColor;
     private bool defaultIsBlocked;
     private bool bIsEndPoint;
     private TerrainType terrainType;
+    private NodeView boundView;
 
     public int gridX, gridY, gridZ;
+    public Vector3Int Position => new(gridX, gridY, gridZ);
 
     public Vector3Int travelDirection;
 
     public float gCost, hCost, fCost;
     public Node parent;
     public bool bIsBlocked;
+
+    private float defaultMovementCost;
+    private float movementCost;
 
     public void Init(TerrainData tData, Vector3Int gridPos)
     {
@@ -32,9 +37,12 @@ public class Node : MonoBehaviour
         defaultTerrainType = tData.Type;
         defaultColor = tData.Color;
         defaultIsBlocked = tData.IsBlocked;
+        defaultMovementCost = tData.MovementCost;
 
         terrainType = defaultTerrainType;
         bIsBlocked = defaultIsBlocked;
+        movementCost = defaultMovementCost;
+        currentColor = defaultColor;
 
         SetColor(defaultColor);
     }
@@ -43,6 +51,12 @@ public class Node : MonoBehaviour
     {
         terrainType = data.Type;
         bIsBlocked = data.IsBlocked;
+        defaultTerrainType = data.Type;
+        defaultColor = data.Color;
+        defaultIsBlocked = data.IsBlocked;
+        defaultMovementCost = data.MovementCost;
+        movementCost = data.MovementCost;
+        currentColor = data.Color;
         SetColor(data.Color);
     }
 
@@ -51,8 +65,25 @@ public class Node : MonoBehaviour
     public void SetType(TerrainType type) => terrainType = type;
     public void SetColor(Color color)
     {
-        GetComponent<MeshRenderer>().material.color = color;
+        currentColor = color;
+        boundView?.SetColor(color);
     }
+
+    public void AttachView(NodeView view)
+    {
+        boundView = view;
+        boundView?.SetColor(currentColor);
+    }
+
+    public void DetachView(NodeView view)
+    {
+        if (boundView == view)
+            boundView = null;
+    }
+
+    public Color GetCurrentColor() => currentColor;
+    public bool HasView() => boundView != null;
+
     public void SetNodeIndex(int x, int y, int z)
     {
         gridX = x;
@@ -63,6 +94,8 @@ public class Node : MonoBehaviour
     public Vector3Int GetNodePositionOnGrid() => new Vector3Int(gridX, gridY, gridZ);
     public TerrainType GetTerrainType() => terrainType;
     public bool IsEndpoint() => bIsEndPoint;
+    public float GetMovementCost() => movementCost <= 0f ? 1f : movementCost;
+
     public void ToggleNeighbours(bool value, List<Node> neighbors)
     {
         Color color = value ? Color.yellow : defaultColor;
@@ -81,13 +114,17 @@ public class Node : MonoBehaviour
         ResetColor();
         ResetBlockStatus();
         ResetTerrainType();
+        ResetMovementCost();
     }
     public void ResetColor() => SetColor(defaultColor);
     public void ResetBlockStatus() => bIsBlocked = defaultIsBlocked;
     public void ResetTerrainType() => terrainType = defaultTerrainType;
+    public void ResetMovementCost() => movementCost = defaultMovementCost;
 
     public void DestroyNode()
     {
-        Destroy(gameObject);
+        if (boundView != null)
+            Object.Destroy(boundView.gameObject);
+        boundView = null;
     }
 }

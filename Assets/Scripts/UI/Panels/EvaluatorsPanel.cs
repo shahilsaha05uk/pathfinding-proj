@@ -1,3 +1,7 @@
+using AYellowpaper.SerializedCollections;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,18 +11,28 @@ public class EvaluatorsPanel : MonoBehaviour
     [SerializeField] private Button btnEvaluate;
     [SerializeField] private PanelInputField inputEvaluationSize;
 
-    [SerializeField] private Toggle toggleAStar;
-    [SerializeField] private Toggle toggleDijkstra;
-    [SerializeField] private Toggle toggleGBFS;
-    [SerializeField] private Toggle toggleJPS;
-    [SerializeField] private Toggle toggleILSAStar;
-    [SerializeField] private Toggle toggleILSGBFS;
-    [SerializeField] private Toggle toggleILSDijkstra;
+    [SerializeField] private NavigatorsPanel navigatorsPanel;
+    //[SerializeField] private GameObject togglesContainer;
+    [SerializeField] private PanelToggle togglePrefab;
+    [SerializeField] private SO_AlgorithmConfig algorithmConfig;
+    [SerializeField] private SO_EvaluatorConfig evaluatorConfig;
+
+
+
+    private SerializedDictionary<AlgorithmType, TogglerData> algorithmToggles;
 
     void Start()
     {
         btnEvaluate.onClick.AddListener(OnEvaluateButtonClick);
 
+        //algorithmToggles = algorithmConfig.GetData();
+        //foreach (var type in algorithmToggles.Keys)
+        //{
+        //    var value = algorithmToggles[type];
+        //    var toggler = GameObject.Instantiate(togglePrefab);
+        //    toggler.Init(value.Label, value.IsOn);
+        //    toggler.transform.SetParent(togglesContainer.transform, false);
+        //}
     }
 
     public void Init(Controller controller)
@@ -28,16 +42,6 @@ public class EvaluatorsPanel : MonoBehaviour
 
     private void OnEvaluateButtonClick()
     {
-        UIHelper.ValidateInputAsInt(inputEvaluationSize.GetValue(), out int size);
-        Controller.OnEvaluate(size, new EvaluateAlgorithms()
-        {
-            AStar = toggleAStar.isOn,
-            Dijkstra = toggleDijkstra.isOn,
-            GBFS = toggleGBFS.isOn,
-            JPS = toggleJPS.isOn,
-            ILSAStar = toggleILSAStar.isOn,
-            ILSGBFS = toggleILSGBFS.isOn,
-            ILSDijkstra = toggleILSDijkstra.isOn
-        });
+        Controller.OnEvaluate();
     }
 }

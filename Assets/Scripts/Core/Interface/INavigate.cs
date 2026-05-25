@@ -2,6 +2,6 @@
 
 public interface INavigate
 {
-    public PathResult Navigate(Node start, Node end, HashSet<Node> allowedNodes = null, bool trackStats = true);
+    public PathResult Navigate(Node start, Node end, HashSet<Node> allowedNodes = null);
 }
 
